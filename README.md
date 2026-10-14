@@ -20,7 +20,11 @@ the correct audible answer. An attended Hey Jarvis test at approximately one
 metre also produced the expected audible answer. After stream-address and
 native-command fixes and HA recovery, the operator confirmed that a spoken
 music request started playback on the second Dot without a device-selection
-question. Sustained playback quality remains unverified. A five-metre trial
+question. After the operator reported audible hiccups and buffering,
+normalization was disabled only for the pilot's Music Assistant queue. A
+bounded trace showed improved delivery, but another source stall followed;
+the operator's listening confirmation remains pending. An explicit
+player card was added to the existing Lovelace media view. A five-metre trial
 woke correctly but STT misheard the question. See the dated
 [deployment record](docs/deployment-record.md) for verified results and limits.
 

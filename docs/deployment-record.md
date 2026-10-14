@@ -86,9 +86,10 @@ its queue entity to HA.
 
 Only the second Dot's voice origin and music target were changed. Existing
 live automation actions, Plex selection and other room bindings were retained;
-private canonical bindings were reconciled with the live configuration. The
-existing dynamic Lovelace player list includes the new available players, so
-no duplicate dashboard card was added.
+private canonical bindings were reconciled with the live configuration. At
+this checkpoint the existing dynamic Lovelace list was expected to expose
+the new player, and no explicit card was added. The operator later reported
+that the card was missing; the explicit dashboard correction is recorded below.
 
 The first attended music request received a voice acknowledgment but no
 music playback. Investigation found that Music Assistant's shared
@@ -154,8 +155,8 @@ or a fresh voice-to-music request.
 
 The decoder reported six read stalls, with a maximum of 3.154 seconds,
 including startup. Playback buffering may absorb such stalls, so these
-counters alone do not establish audible interruptions. Sound quality still
-needs the operator's confirmation.
+counters alone do not establish audible interruptions. Sound quality had not
+yet been confirmed at this checkpoint; a later listening report is recorded below.
 
 During playback, a wake event scored 0.484 against the lower 0.25 interruption
 threshold and ended with `no_speech` after 5.207 seconds. Whether the operator
@@ -192,7 +193,58 @@ After these corrections, the operator repeated the action-button request
 a device-selection question. This confirms one successful attended spoken
 request through to audible playback on the intended device.
 
-The confirmation does not establish sustained playback quality, freedom from
-dropouts, or reliable wake detection during music. The earlier direct stop
-test remains a transport/control check; an attended spoken stop and the
-unclassified playback-time wake still need evaluation.
+The earlier direct stop test remains a transport/control check; an attended
+spoken stop and reliable wake detection during music still need evaluation.
+
+## October 13, 2026 — audible buffering and dashboard correction
+
+After the successful spoken music request, the operator explicitly reported
+audible hiccups and buffering. Sustained playback quality is therefore a known
+open issue, not simply an unperformed acceptance check.
+
+A later trace showed 9.141 seconds of upstream decoder starvation, exceeding
+the approximately 5.46 seconds of audio held by the Dot's fixed playback
+buffer. Wi-Fi checks were healthy during the inspection. Investigation is
+focused on delivery through Music Assistant and Plex. This evidence did not
+by itself identify the responsible component or establish a fix. It also does
+not retroactively classify every earlier decoder stall as an audible interruption.
+
+The operator also reported that the new player was missing from the existing
+Lovelace media view. An explicit `custom:mini-media-player` card named
+**EchoMuse Dot 002** was inserted first in the first grid of the existing
+`/lovelace/media` view, using the new Music Assistant queue entity. A private
+before/after comparison and live readback verified that this was the only
+dashboard change. No playback services were called while adding the card.
+The earlier assumption that the dynamic list was sufficient is superseded
+by this explicit card; existing dynamic cards and their filters were retained.
+
+## Pilot queue normalization mitigation
+
+Investigation found dynamic loudness normalization in the source-processing
+chain and high CPU pressure on the Music Assistant host. Processing starvation
+was suspected; the evidence did not isolate one component as the sole cause.
+
+Only the pilot queue's `volume_normalization` was changed from `global` to
+`disabled`, through the supported Music Assistant `config/player_queues/save`
+API. The save resumed the same current track. The 25-item queue's order and
+hash were preserved, and comparison confirmed that other queue settings,
+global configuration, and player configuration were unchanged. Setting this
+queue back to `global` restores its inherited normalization policy; it does
+not require changing the global setting. The saved queue setting persists;
+with normalization disabled, tracks may differ in playback loudness.
+
+The preceding stream had logged 155 source-stall warnings, with a maximum of
+9.141 seconds. In one 30-second pre-change window, audio advanced only about
+17 seconds. The replacement stream had an initial 3.042-second startup wait
+and one 745 ms wait, followed by approximately 53 seconds with no further
+starvation warnings. No duck events occurred in that observation window.
+An independent 20.44-second WebSocket observation acknowledged approximately
+99,243 bytes/second, consistent with 96,000 PCM bytes/second plus overhead.
+A later passive snapshot recorded another 3.488-second source stall after
+the clean interval, without a disconnect, reconnect, or stop. The change
+therefore did not eliminate all source stalls.
+
+These results show an improvement in bounded source delivery, not proof of
+zero speaker underruns or sustained audible quality. Music remained playing
+at the checkpoint, and the operator's listening confirmation after the
+mitigation was still pending.

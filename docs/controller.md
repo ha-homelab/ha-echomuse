@@ -163,10 +163,29 @@ automatically. EchoMuse's own Sendspin integration is an optional, separately
 paired route marked Early Access in this pinned release; it is disabled in
 this pilot. No additional MA provider or HA custom component was needed.
 
-An existing Lovelace auto-entities card that lists available media players can
-show the new native and MA players automatically. Inspect its filters before
-adding duplicate cards. Test **«играй музыку»**, audible playback, and pause
-on the intended physical Dot before calling music acceptance complete.
+An existing Lovelace auto-entities card can list available native and MA
+players, but its presence does not establish that the operator can find the
+new player. Inspect the actual media view and its filters. For this pilot,
+the operator reported the player missing and an explicit card was added first
+in the existing view's first grid. Existing dynamic cards were retained.
+
+Use the new **Music Assistant queue entity**, not the superseded EchoLocal
+player or an assumed entity suffix. With `mini-media-player` already installed,
+an explicit card can use this placeholder configuration:
+
+```yaml
+type: custom:mini-media-player
+entity: media_player.replace_with_music_assistant_queue
+name: EchoMuse Dot 002
+icon: mdi:speaker
+artwork: cover
+```
+
+Replace the placeholder after inspecting the live HA entity. Save a private
+dashboard backup, insert the card in the intended existing view, and read the
+configuration back to verify that other cards and filters are unchanged.
+Dashboard editing should not start playback. Test **«играй музыку»**, sustained
+audible playback, and pause on the intended physical Dot separately.
 
 ### Check the advertised stream address
 
@@ -215,6 +234,47 @@ Decoder-read stalls measure when the controller receives decoded data. They
 can include startup and may be absorbed by playback buffers; they do not
 alone prove audible glitches. Correlate them with actual playback underruns
 and an attended listening result before changing buffers or audio settings.
+
+In this pilot, the operator subsequently confirmed audible hiccups and
+buffering. A later 9.141-second decoder starvation exceeded the Dot's
+approximately 5.46-second fixed playback buffer, while inspected Wi-Fi health
+was good. Trace the same stream through Music Assistant/Plex and the
+controller, separating source delivery gaps from device-link loss. Record
+the period tested and compare it with the listening report. Healthy Wi-Fi
+at one checkpoint does not prove every network path is fault-free.
+
+### Test queue-specific normalization when source delivery stalls
+
+The pilot's source-processing chain used dynamic loudness normalization while
+the Music Assistant host had high CPU pressure. Disabling normalization only
+for this queue improved a bounded delivery trace. This is a targeted
+mitigation, with post-change listening confirmation still pending; do not
+assume it resolves every playback interruption. The saved queue policy
+persists, and disabling normalization allows track-to-track loudness
+differences.
+
+1. Save private snapshots of the target queue, its ordered items, and its
+   configuration. Record the current `volume_normalization` value and compare
+   the other queues and global/player configuration after the change.
+2. Through Music Assistant's supported `config/player_queues/save` API, set
+   only the target queue's `volume_normalization` to `disabled`. The pilot's
+   previous value was `global`, meaning it inherited the global policy.
+   Saving this setting resumed the current track in the pilot; perform the
+   test while attended and verify the selected track and queue order.
+3. Observe a bounded interval and compare source-stall warnings, delivered
+   audio, and the listener's experience. Separate initial startup waits from
+   gaps during ongoing playback. Bytes acknowledged over WebSocket do not
+   establish zero speaker underruns.
+4. To roll back this pilot change, set the same queue field back to `global`.
+   Restore a different original value if that was what the snapshot held;
+   leave the global policy and other players unchanged.
+
+The measured pilot stream had an initial 3.042-second wait and one 745 ms
+wait, then approximately 53 seconds with no further starvation warnings.
+A subsequent passive snapshot recorded a 3.488-second source stall without
+a disconnect, reconnect, or stop. This supports continued investigation
+and listening evaluation; it does not establish that hiccups are resolved
+or that long-term playback quality is acceptable.
 
 ## Initial wake and recording posture
 
