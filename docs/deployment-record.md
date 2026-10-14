@@ -264,3 +264,7 @@ the raw control higher is not a clean amplification path. Stock processing
 and the supported but untested Music EQ alternative are explained in the
 [controller guide](controller.md#maximum-volume-and-stock-alexa-comparisons).
 No controlled stock-versus-EchoMuse loudness measurement was performed.
+
+The operator subsequently accepted the current pilot setup and authorized
+publication of the findings. Flat EQ and volume limits remain unchanged;
+the playback and far-field test limitations recorded above still apply.
