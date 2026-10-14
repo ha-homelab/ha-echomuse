@@ -90,8 +90,22 @@ private canonical bindings were reconciled with the live configuration. The
 existing dynamic Lovelace player list includes the new available players, so
 no duplicate dashboard card was added.
 
-Audible music acceptance is pending at this checkpoint; the close-range wake
-trial above succeeded.
+The first attended music request received a voice acknowledgment but no
+music playback. Investigation found that Music Assistant's shared
+`streams.publish_ip` still advertised an old host address unreachable from
+the EchoMuse controller. The actual host-networked Music Assistant node was
+reachable.
+
+After private configuration and queue backups and an idle-player check, only
+the supported `streams.publish_ip` setting was corrected to the current host
+address. The exact previous queue flow then returned HTTP 200 with
+`audio/wav` from the controller environment. FFmpeg decoded one second into
+96,000 PCM bytes, including 44,346 nonzero samples, and exited successfully
+with no diagnostic output. This check did not start speaker playback.
+
+An attended repeat of **«играй музыку»**, 15–20 seconds of audible playback,
+and a stop command are still pending. Transport recovery and the successful
+close-range wake trial do not substitute for that physical playback check.
 
 ## Maintenance cleanup
 

@@ -140,6 +140,33 @@ show the new native and MA players automatically. Inspect its filters before
 adding duplicate cards. Test **«играй музыку»**, audible playback, and pause
 on the intended physical Dot before calling music acceptance complete.
 
+### Check the advertised stream address
+
+A successful voice acknowledgment does not prove that music can reach the
+controller. Inspect the actual Music Assistant queue stream URL privately,
+then test it from the EchoMuse controller's network environment. A URL that
+works on the Music Assistant host may still advertise an old or unreachable
+address to other clients.
+
+For a Music Assistant deployment using host networking, verify that the
+supported `streams.publish_ip` setting advertises the current, reachable
+host address. The bind address and the advertised address serve different
+purposes: do not advertise a wildcard bind address or blindly reuse a former
+host's address. Preserve the stream port and other provider settings.
+
+Before correcting this shared setting, save private configuration and queue
+snapshots and make sure all affected players are idle. Change only the
+advertised address through Music Assistant's supported configuration API or
+settings interface. Verify the saved value and generated URL afterward;
+do not edit database files to bypass configuration validation.
+
+Retest the same queue flow from the controller. Check the HTTP response and
+audio content type, then decode a bounded interval to confirm that actual
+non-silent audio is available. Keep stream URLs, queue identifiers, and any
+captured data private. This verifies transport and decoding only. Complete a
+separate attended playback and stop test on the physical Dot before claiming
+that music works.
+
 ## Initial wake and recording posture
 
 Start from upstream's `hey_jarvis` model and 0.5 threshold. Its numerical scores
