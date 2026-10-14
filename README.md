@@ -66,6 +66,16 @@ trained personal models stay outside the public repository.
 See [shared CI and PR automation](docs/ci.md) for required checks, independent
 bot approvals, opt-in merging, and Terraform-managed access.
 
+See the [Russian voice and energy-report improvement plan](docs/russian-voice-roadmap.md)
+for the proposed IGW integration, multilingual speech evaluation and multi-device
+reliability work. These are research findings and planned changes, not deployed
+features.
+
+The [Russian Assist energy adapter](docs/energy-assist.md) implements the first
+part of that plan: six read-only intents that return validated IGW reports to
+the originating conversation. Installation and live acceptance are separate
+from generating the package.
+
 ## Upstream and related work
 
 - [EchoMuse](https://github.com/wilbowes/EchoMuse): device software, controller,
