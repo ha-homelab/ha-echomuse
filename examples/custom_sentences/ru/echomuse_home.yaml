@@ -1,0 +1,18 @@
+# Use HA's state-query handler, accepting both е and ё spellings.
+language: ru
+lists:
+  echomuse_on_off_states:
+    values:
+      - in: "(включен|включён|включена|включено|включены)"
+        out: "on"
+      - in: "(выключен|выключён|выключена|выключено|выключены)"
+        out: "off"
+intents:
+  HassGetState:
+    data:
+      - sentences:
+          - "{echomuse_on_off_states:state} ли [сейчас] {name}"
+          - "{name} [сейчас] {echomuse_on_off_states:state}"
+        requires_context:
+          domain: [light, switch, fan]
+        response: one_yesno

@@ -56,7 +56,7 @@ jobs:
           python-version: '3.11'
       - name: Validate Python, upstream lock, and public files
         run: |
-          python -m compileall -q scripts tests
+          python -m compileall -q scripts tests custom_components
           python -m json.tool upstream-lock.json > /dev/null
           python scripts/check_public.py
       - name: Validate intents in an isolated Home Assistant runtime
@@ -65,7 +65,7 @@ jobs:
           --entrypoint python3
           -v "$PWD:/work:ro" -w /work
           ghcr.io/home-assistant/home-assistant:2026.10.0@sha256:1b64d38f38d922bf9d59336451fd6453e1d614f934456af4ee3d2a51061be3a4
-          tests/runtime_energy_assist.py
+          -m unittest discover -s tests -p 'runtime_*.py'
 
   gate:
     name: CI gate

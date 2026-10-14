@@ -1,0 +1,99 @@
+# Review storage, CPU and node placement for your own cluster before applying.
+# This is a separate local inference workload, not the EchoMuse controller.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: home-voice
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-models
+  namespace: home-voice
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 16Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-voice-ollama
+  namespace: home-voice
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: home-voice-ollama
+  template:
+    metadata:
+      labels:
+        app: home-voice-ollama
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: ollama
+          image: ollama/ollama:0.40.4
+          ports:
+            - containerPort: 11434
+          env:
+            - {name: OLLAMA_HOST, value: "0.0.0.0:11434"}
+            - {name: OLLAMA_NO_CLOUD, value: "1"}
+            - {name: OLLAMA_MODELS, value: /models}
+            - {name: OLLAMA_NUM_PARALLEL, value: "1"}
+            - {name: OLLAMA_MAX_LOADED_MODELS, value: "1"}
+            - {name: OLLAMA_MAX_QUEUE, value: "2"}
+            - {name: OLLAMA_KEEP_ALIVE, value: "-1"}
+            - {name: HOME, value: /tmp}
+          resources:
+            requests: {cpu: "2", memory: 4Gi}
+            limits: {cpu: "8", memory: 12Gi}
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - {name: models, mountPath: /models}
+          readinessProbe:
+            httpGet: {path: /api/version, port: 11434}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: ollama-models
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-voice-ollama
+  namespace: home-voice
+spec:
+  selector:
+    app: home-voice-ollama
+  ports:
+    - {port: 11434, targetPort: 11434}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ha-only
+  namespace: home-voice
+spec:
+  podSelector:
+    matchLabels:
+      app: home-voice-ollama
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: homeassistant
+      ports:
+        - {protocol: TCP, port: 11434}

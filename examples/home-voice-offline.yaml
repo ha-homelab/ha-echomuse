@@ -1,0 +1,13 @@
+# Apply AFTER provisioning the local model. Denies all inference-workload egress.
+# Your CNI must enforce Kubernetes NetworkPolicy.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: local-inference-only
+  namespace: home-voice
+spec:
+  podSelector:
+    matchLabels:
+      app: home-voice-ollama
+  policyTypes: [Egress]
+  egress: []

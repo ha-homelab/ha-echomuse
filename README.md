@@ -82,6 +82,12 @@ the originating conversation. The Russian IGW endpoint and HA package are now
 deployed; [service acceptance](docs/russian-voice-validation.md#local-energy-reports)
 is recorded separately from microphone and listening tests.
 
+The optional [local home tools](docs/home-control.md) connect an Ollama
+conversation agent to current HA entity states, a reviewed device-control list
+and Recorder statistics. The integration discovers relevant entities on demand
+instead of sending the entire household catalog in every prompt. Its setup,
+access boundaries, Russian command examples and rollback are documented separately.
+
 ## Upstream and related work
 
 - [EchoMuse](https://github.com/wilbowes/EchoMuse): device software, controller,
