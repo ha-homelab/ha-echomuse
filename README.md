@@ -17,9 +17,11 @@ WSS using device-specific credentials; TLS is now required. Home Assistant
 ESPHome enrollment is complete and both Assistant selectors use the existing
 FCC Russian Backup pipeline. An attended button-triggered question received
 the correct audible answer. An attended Hey Jarvis test at approximately one
-metre also produced the expected audible answer. Music routing is configured
-through the existing Music Assistant provider, with audible music acceptance
-still pending. A five-metre trial woke correctly but STT misheard the question. See the dated
+metre also produced the expected audible answer. After stream-address and
+native-command fixes and HA recovery, the operator confirmed that a spoken
+music request started playback on the second Dot without a device-selection
+question. Sustained playback quality remains unverified. A five-metre trial
+woke correctly but STT misheard the question. See the dated
 [deployment record](docs/deployment-record.md) for verified results and limits.
 
 EchoMuse's supported path for this operating-system base is **emOS**. The

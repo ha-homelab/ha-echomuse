@@ -182,6 +182,17 @@ phrase to the second Dot's native origin handler and preserved explicit-target
 recognition without executing media services.
 
 The [canonical generator fix and regression cases](https://github.com/ha-homelab/ha-echo-show-5/pull/51)
-track the source correction separately. A fresh spoken request and operator
-confirmation of playback quality remain pending; parser success alone does
-not complete voice-to-music acceptance.
+track the source correction separately. The isolated HA runtime suite passed
+all 16 tests without skips, including the new origin and explicit-target cases.
+
+## Attended voice-to-music confirmation
+
+After these corrections, the operator repeated the action-button request
+**«Играй музыку»** and confirmed that music played on the second Dot without
+a device-selection question. This confirms one successful attended spoken
+request through to audible playback on the intended device.
+
+The confirmation does not establish sustained playback quality, freedom from
+dropouts, or reliable wake detection during music. The earlier direct stop
+test remains a transport/control check; an attended spoken stop and the
+unclassified playback-time wake still need evaluation.
