@@ -103,9 +103,10 @@ address. The exact previous queue flow then returned HTTP 200 with
 96,000 PCM bytes, including 44,346 nonzero samples, and exited successfully
 with no diagnostic output. This check did not start speaker playback.
 
-An attended repeat of **«играй музыку»**, 15–20 seconds of audible playback,
-and a stop command are still pending. Transport recovery and the successful
-close-range wake trial do not substitute for that physical playback check.
+At this stage only stream retrieval and decoding had been verified. A later
+direct playback and stop check is recorded below. An attended repeat of
+**«играй музыку»** and confirmation of what the physical speaker sounds like
+are separate acceptance checks; neither follows from stream decoding alone.
 
 ## Maintenance cleanup
 
@@ -114,3 +115,52 @@ and removed after migration. Recovery images and private receipts remain on
 both hosts. The Dot stayed connected to the controller and Home Assistant
 over WSS, with local wake detection and microphone streaming disabled. The
 maintenance host now provides power only; normal operation uses Wi-Fi.
+
+## Later Home Assistant availability incident
+
+Three subsequent music turns correctly recognized **«играй музыку»** but
+ended with `tts_error`. HA's HTTP listener was unavailable even from inside
+its own runtime, Music Assistant services were no longer registered, and
+multiple integrations reported `Session is closed`. This identified a wider
+HA availability failure; the trigger for that process state was not yet
+established.
+
+After diagnostic snapshots were preserved, only the HA StatefulSet pod was
+restarted. An HTTP 200 response returned in approximately 24 seconds. This
+proved that the HTTP listener had recovered, but did not by itself establish
+that all integration connections and voice services were ready.
+
+The operator also observed an action-button sequence of green, orange, then
+off. The matching controller log reported
+`Dot button but no HA connection — standing down`. The pinned implementation
+uses the `no_ha` outcome, a 0.6-second listening hold, and an orange cue for
+this condition. The observation is consistent with a missing HA native API
+connection while the controller can still receive the Dot's button event.
+
+Subsequent checks confirmed HA HTTP and authenticated access, loaded ESPHome
+and Music Assistant entries, both Assistant selectors still using **FCC
+Russian Backup**, and a working MA queue lookup for the new player. The Dot
+reported WSS and HA connected, with local wake detection and continuous
+microphone streaming disabled.
+
+## Bounded post-recovery music check
+
+A direct MA test targeted only the second Dot for 18 seconds. The native and
+MA player states changed to `playing` and then `idle`; 514 PCM periods were
+sent, and the first device audio frame followed the request by 3.157 seconds.
+The stop was acknowledged and queue item order was unchanged. These results
+verify transport and control behavior, not the operator's audible experience
+or a fresh voice-to-music request.
+
+The decoder reported six read stalls, with a maximum of 3.154 seconds,
+including startup. Playback buffering may absorb such stalls, so these
+counters alone do not establish audible interruptions. Sound quality still
+needs the operator's confirmation.
+
+During playback, a wake event scored 0.484 against the lower 0.25 interruption
+threshold and ended with `no_speech` after 5.207 seconds. Whether the operator
+intentionally spoke at that moment is unknown; the event remains unclassified.
+It is not evidence by itself of a false wake activation.
+
+An attended voice-to-music repeat and confirmation of audible playback,
+quality, and stopping remain pending at this checkpoint.

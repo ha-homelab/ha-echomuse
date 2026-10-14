@@ -114,6 +114,34 @@ native ESPHome voice path. A hosted private-CA HA URL needs the relevant CA
 mounted in the controller and `EM_EXTRA_CA_CERT` set; test fetching the actual
 response URL rather than assuming that a working dashboard proves audio access.
 
+### Diagnose a button that briefly lights and stops
+
+The Dot-to-controller WSS link and the controller-to-HA ESPHome connection
+are separate. A Dot can reach its controller while HA is unable to accept a
+voice turn. In the pinned release, a button press in this state logs
+`Dot button but no HA connection — standing down`. With the default ring
+scene, the listening indication is held for 0.6 seconds, followed by the
+orange `no_ha` cue, which clears itself. Check the log and connection state
+alongside the color; a customized ring scene can look different.
+
+Check the pilot's HA ESPHome connection, then test HA's HTTP listener from
+inside its own runtime as well as from the controller. An unavailable local
+listener, missing integration services, and `Session is closed` errors
+across integrations indicate a wider HA availability problem. Preserve
+logs and configuration before recovery, and identify which process is
+unavailable before changing satellite settings.
+
+For the Kubernetes deployment, a controlled restart of the affected HA pod
+can recover a stalled HA process after diagnostics are saved. HTTP recovery
+is only the first check: verify that the native ESPHome connection returns,
+the selected Assist pipeline is available, and the required Music Assistant
+services register again. Then repeat an attended short voice turn and the
+physical music playback/stop test.
+
+The behavior is defined by the pinned
+[button handler](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/controller/em_controller.py#L4255)
+and [end-of-turn ring handling](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/controller/em_controller.py#L1682).
+
 ## Music Assistant and the existing player dashboard
 
 The pilot uses Music Assistant's existing **Home Assistant** and **Home
@@ -166,6 +194,17 @@ non-silent audio is available. Keep stream URLs, queue identifiers, and any
 captured data private. This verifies transport and decoding only. Complete a
 separate attended playback and stop test on the physical Dot before claiming
 that music works.
+
+For a bounded playback check, preserve queue contents and record the native
+and MA player states, time to the first device audio frame, sent audio
+periods, and the stop acknowledgment. A direct MA queue test verifies a
+different path from a spoken command; validate voice dispatch separately.
+Neither a `playing` state nor sent PCM proves what a listener heard.
+
+Decoder-read stalls measure when the controller receives decoded data. They
+can include startup and may be absorbed by playback buffers; they do not
+alone prove audible glitches. Correlate them with actual playback underruns
+and an attended listening result before changing buffers or audio settings.
 
 ## Initial wake and recording posture
 
