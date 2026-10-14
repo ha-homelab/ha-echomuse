@@ -16,7 +16,9 @@ Controller **2.26.0** is deployed separately, and the pilot has reached it over
 WSS using device-specific credentials; TLS is now required. Home Assistant
 ESPHome enrollment is complete and both Assistant selectors use the existing
 FCC Russian Backup pipeline. An attended button-triggered question received
-the correct audible answer. Wake-word and music checks are in progress. See the dated
+the correct audible answer. Music routing is configured through the existing
+Music Assistant provider. Further wake-word and audible music checks are in
+progress; a five-metre trial woke correctly but STT misheard the question. See the dated
 [deployment record](docs/deployment-record.md) for verified results and limits.
 
 EchoMuse's supported path for this operating-system base is **emOS**. The

@@ -114,6 +114,32 @@ native ESPHome voice path. A hosted private-CA HA URL needs the relevant CA
 mounted in the controller and `EM_EXTRA_CA_CERT` set; test fetching the actual
 response URL rather than assuming that a working dashboard proves audio access.
 
+## Music Assistant and the existing player dashboard
+
+The pilot uses Music Assistant's existing **Home Assistant** and **Home
+Assistant MediaPlayers** providers. After the native EchoMuse ESPHome player
+appears in HA, append that entity to the MediaPlayers provider's selected
+players. Preserve the other selections and provider settings. Verify that MA
+imports an available player, then identify its exported HA queue entity; do
+not infer its entity ID or require the same wrapper type as the old player.
+
+Change only the pilot's voice-dispatch origin (new HA device and Assist
+satellite) and music target (the MA queue entity). Preserve the Plex source,
+queue defaults, and other rooms. Compare the current live scripts and
+automation actions against any local generator before reloading: a full
+regeneration can introduce unrelated changes. Keep private canonical bindings
+consistent with the updated live routing and save a rollback copy.
+
+The former EchoLocal Sendspin player does not follow the converted hardware
+automatically. EchoMuse's own Sendspin integration is an optional, separately
+paired route marked Early Access in this pinned release; it is disabled in
+this pilot. No additional MA provider or HA custom component was needed.
+
+An existing Lovelace auto-entities card that lists available media players can
+show the new native and MA players automatically. Inspect its filters before
+adding duplicate cards. Test **«играй музыку»**, audible playback, and pause
+on the intended physical Dot before calling music acceptance complete.
+
 ## Initial wake and recording posture
 
 Start from upstream's `hey_jarvis` model and 0.5 threshold. Its numerical scores

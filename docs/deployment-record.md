@@ -65,4 +65,32 @@ turn's observations, not average latency or a long-term reliability result.
 No utterance audio was saved. The device returned to local wake listening,
 with WSS and Home Assistant still connected.
 
-Wake-word and music acceptance are still in progress at this checkpoint.
+A subsequent wake trial at approximately five metres triggered Hey Jarvis
+locally (score 0.6282 against a 0.5 threshold). Speech detection opened and
+2.16 seconds of audio reached STT, which returned `no` instead of the intended
+Russian question. The conversation stage returned empty speech, so no TTS
+was requested. This was not a connection failure. A closer controlled trial
+is needed before changing microphone or wake thresholds.
+
+## Music routing
+
+The new native ESPHome player was appended to the existing Music Assistant
+Home Assistant MediaPlayers provider. The previous player selection and other
+provider configurations were preserved. MA imported the player and exported
+its queue entity to HA.
+
+Only the second Dot's voice origin and music target were changed. Existing
+live automation actions, Plex selection and other room bindings were retained;
+private canonical bindings were reconciled with the live configuration. The
+existing dynamic Lovelace player list includes the new available players, so
+no duplicate dashboard card was added.
+
+Audible music and close-range wake acceptance are pending at this checkpoint.
+
+## Maintenance cleanup
+
+The temporary USB ADB container and its selected-device proxy were stopped
+and removed after migration. Recovery images and private receipts remain on
+both hosts. The Dot stayed connected to the controller and Home Assistant
+over WSS, with local wake detection and microphone streaming disabled. The
+maintenance host now provides power only; normal operation uses Wi-Fi.
