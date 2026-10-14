@@ -1,16 +1,49 @@
-# Russian voice and energy reports: improvement plan
+# Russian voice and energy reports
 
-Research date: **2026-10-14**. The baseline below was captured before
-implementation. It is not a claim about the current deployment.
+Research and implementation date: **2026-10-14**.
+For installation order and Home Assistant settings, see the
+[operations runbook](russian-voice-operations.md).
 
-The first implementation is the [Russian energy Assist adapter](energy-assist.md):
-six deterministic intents, response validation, and speech returned to the
-originating conversation. Its tests cover the actual HA intent/script engine,
-simultaneous requests and failure handling. Runtime activation, speech-model
-benchmarks and acoustic acceptance are tracked separately; passing these tests
-does not demonstrate microphone or TTS quality.
+## Implementation decisions
 
-## Recommended direction
+The [Russian energy Assist adapter](energy-assist.md) implements six deterministic
+intents, validates gateway responses and returns speech to the originating
+conversation. Tests exercise the actual HA intent/script engine, simultaneous
+requests and failure handling. IGW formats the Russian reports; neither the
+conversation model nor the speech model calculates their values.
+
+The chosen Russian speech backend is **Piper Denis medium**, served through
+Wyoming. The larger **KittenTTS 2** remains experimental: in a synthetic CPU
+benchmark it needed 14.24 seconds to generate 2.08 seconds of short speech,
+34.57 seconds for an energy report and 7.21 GiB peak process memory. Piper's
+two-thread Apple Silicon benchmark generated a short warm reply in 0.055
+seconds and an energy report in 0.32–0.33 seconds. These are generation
+measurements on the test host, not end-to-end Dot response times or a listening
+comparison. Full methods, model hashes, licenses and serving configuration are
+maintained in the [speech service change](https://github.com/4alvit/google-home-voice-stats/pull/36).
+
+The selected general-conversation candidate is the explicit free
+`claude-3-freecc-no-thinking/open_router/nvidia/nemotron-3-ultra-550b-a55b:free`
+route. Synthetic Russian arithmetic and science explanations passed; this does
+not establish reliability for every question. The endpoint excludes personal
+and confidential data and describes request logging. It is intended here for
+general questions only. **IGW context stays disabled in the model bridge**;
+energy questions use local intents. The missing-measurement guard is not a
+general personal-data detector. Do not dictate private information to this
+external route. See the [model evaluation](https://github.com/ha-homelab/ha-echo-show-5/pull/54)
+and [provider conditions](https://openrouter.ai/nvidia/nemotron-3-ultra-550b-a55b:free).
+
+The speech adapter separates bounded ASR and TTS concurrency, and the text bridge
+records timing and outcome without logging transcript content. The text model
+still has a single active request slot and returns an explicit busy result for
+contention; this work does not promise two simultaneous LLM answers. The local
+energy helper supports four concurrent requests.
+
+Deployment and acoustic acceptance are separate gates. The sections below
+preserve the **pre-implementation audit and proposed sequence**; they do not
+describe the current live configuration.
+
+## Original audit: recommended direction
 
 Reuse Inverter Gateway (IGW) as the source of energy facts. Add a deterministic
 Russian report formatter, then a dedicated Russian text-to-speech service shared
