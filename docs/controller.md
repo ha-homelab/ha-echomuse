@@ -201,6 +201,16 @@ periods, and the stop acknowledgment. A direct MA queue test verifies a
 different path from a spoken command; validate voice dispatch separately.
 Neither a `playing` state nor sent PCM proves what a listener heard.
 
+If the conversation agent asks which player to use despite a known satellite
+origin, inspect the exact STT result and native sentence match. Prefer-local
+handling does not guarantee a match: an unlisted wording can reach the
+conversation agent with `processed_locally: false`. In this pilot,
+**«Играем музыку»** needed an additional alternative in the existing native
+play grammar. The [canonical vocabulary fix](https://github.com/ha-homelab/ha-echo-show-5/pull/51)
+includes origin and explicit-target recognition regressions. Validate such
+changes with the installed Hassil runtime and preserve routing guards and
+service actions; then repeat the actual spoken request.
+
 Decoder-read stalls measure when the controller receives decoded data. They
 can include startup and may be absorbed by playback buffers; they do not
 alone prove audible glitches. Correlate them with actual playback underruns

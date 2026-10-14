@@ -164,3 +164,24 @@ It is not evidence by itself of a false wake activation.
 
 An attended voice-to-music repeat and confirmation of audible playback,
 quality, and stopping remain pending at this checkpoint.
+
+## Native music vocabulary correction
+
+A subsequent inspected HA turn transcribed the request as **«Играем музыку»**.
+It carried the correct pilot device and satellite identities, with local
+handling preferred, but was marked `processed_locally: false`. The FCC
+conversation agent then asked which device to use. The native sentence
+grammar accepted **«играй музыку»** but omitted the observed **«играем»**
+variant, so the native handler had not received the request.
+
+Only the six existing play-sentence patterns were amended to accept this
+variant. The live automation was reloaded and remained enabled. Its actions,
+guards, scripts, providers, pipelines, and device-to-player mappings were
+unchanged. Tests using the installed Hassil parser routed the observed
+phrase to the second Dot's native origin handler and preserved explicit-target
+recognition without executing media services.
+
+The [canonical generator fix and regression cases](https://github.com/ha-homelab/ha-echo-show-5/pull/51)
+track the source correction separately. A fresh spoken request and operator
+confirmation of playback quality remain pending; parser success alone does
+not complete voice-to-music acceptance.
