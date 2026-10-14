@@ -23,7 +23,8 @@ music request started playback on the second Dot without a device-selection
 question. After the operator reported audible hiccups and buffering,
 normalization was disabled only for the pilot's Music Assistant queue. A
 bounded trace showed improved delivery, but another source stall followed;
-the operator's listening confirmation remains pending. An explicit
+the operator subsequently confirmed smooth music playback after the change.
+Long-term reliability remains unmeasured. An explicit
 player card was added to the existing Lovelace media view. A five-metre trial
 woke correctly but STT misheard the question. See the dated
 [deployment record](docs/deployment-record.md) for verified results and limits.

@@ -247,8 +247,8 @@ at one checkpoint does not prove every network path is fault-free.
 
 The pilot's source-processing chain used dynamic loudness normalization while
 the Music Assistant host had high CPU pressure. Disabling normalization only
-for this queue improved a bounded delivery trace. This is a targeted
-mitigation, with post-change listening confirmation still pending; do not
+for this queue improved a bounded delivery trace, and the operator subsequently
+confirmed smooth music playback. This is a targeted mitigation; do not
 assume it resolves every playback interruption. The saved queue policy
 persists, and disabling normalization allows track-to-track loudness
 differences.
@@ -273,8 +273,8 @@ The measured pilot stream had an initial 3.042-second wait and one 745 ms
 wait, then approximately 53 seconds with no further starvation warnings.
 A subsequent passive snapshot recorded a 3.488-second source stall without
 a disconnect, reconnect, or stop. This supports continued investigation
-and listening evaluation; it does not establish that hiccups are resolved
-or that long-term playback quality is acceptable.
+alongside the positive listening result; the bounded trial does not establish
+that source stalls are eliminated or that long-term playback quality is acceptable.
 
 ## Initial wake and recording posture
 

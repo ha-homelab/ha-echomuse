@@ -246,5 +246,7 @@ therefore did not eliminate all source stalls.
 
 These results show an improvement in bounded source delivery, not proof of
 zero speaker underruns or sustained audible quality. Music remained playing
-at the checkpoint, and the operator's listening confirmation after the
-mitigation was still pending.
+at the checkpoint. The operator subsequently confirmed smooth music playback
+after the mitigation. This is a successful attended listening result for the
+trial; it does not erase the later recorded source stall or establish
+long-term playback reliability.
