@@ -69,8 +69,13 @@ A subsequent wake trial at approximately five metres triggered Hey Jarvis
 locally (score 0.6282 against a 0.5 threshold). Speech detection opened and
 2.16 seconds of audio reached STT, which returned `no` instead of the intended
 Russian question. The conversation stage returned empty speech, so no TTS
-was requested. This was not a connection failure. A closer controlled trial
-is needed before changing microphone or wake thresholds.
+was requested. This was not a connection failure.
+
+A subsequent controlled Hey Jarvis trial at approximately one metre completed
+with the audible answer «шесть», confirmed by the operator. This demonstrates
+one successful close-range wake and response, not reliable far-field speech
+recognition. The five-metre STT limitation still needs evaluation before
+changing microphone or wake thresholds.
 
 ## Music routing
 
@@ -85,7 +90,8 @@ private canonical bindings were reconciled with the live configuration. The
 existing dynamic Lovelace player list includes the new available players, so
 no duplicate dashboard card was added.
 
-Audible music and close-range wake acceptance are pending at this checkpoint.
+Audible music acceptance is pending at this checkpoint; the close-range wake
+trial above succeeded.
 
 ## Maintenance cleanup
 
