@@ -10,12 +10,16 @@ project, not a fork or official distribution of
 The pilot is the second previously converted Echo Dot 2. It now boots **emOS
 v0.10** and runs **EchoMuse v2.18.0**, built around its own ARM32 kernel from
 Fire OS 6 / Android 7.1.2. Its verified USB recovery backups remain private.
-The first EchoLocal unit was not changed.
+The first EchoLocal unit retains its device firmware. Its matching migration is
+prepared but has not started: the operator cannot currently connect it to USB.
+See [adding a second converted unit](docs/migration.md#9-migrate-another-existing-echolocal-unit).
 
 Controller **2.26.0** is deployed separately, and the pilot has reached it over
 WSS using device-specific credentials; TLS is now required. Home Assistant
-ESPHome enrollment is complete and both Assistant selectors use the existing
-FCC Russian Backup pipeline. An attended button-triggered question received
+ESPHome enrollment is complete. The initial migration used the existing
+FCC Russian Backup pipeline; the current voice rollout is recorded in the
+[Russian voice validation](docs/russian-voice-validation.md). An attended
+button-triggered question during migration received
 the correct audible answer. An attended Hey Jarvis test at approximately one
 metre also produced the expected audible answer. After stream-address and
 native-command fixes and HA recovery, the operator confirmed that a spoken

@@ -290,6 +290,65 @@ speech recognition, conversation, or playback.
 Do not migrate another Dot or deploy the custom Russian wake phrase until the
 pilot meets the agreed acceptance checks.
 
+## 9. Migrate another existing EchoLocal unit
+
+Treat each Dot as a separate migration even when the model, Fire OS release and
+intended EchoMuse version match. The second hardware unit completed the earlier
+button, wake and music checks. The operator has now requested the same system on
+the first unit, while postponing the newer Russian-voice listening test. That
+test remains pending independently of firmware preparation.
+
+The first unit's historical inventory identifies an unlocked Dot 2 with amonet2,
+Fire OS 6 / Android 7.1.2 and TWRP 3.7. This supports preparing the same ARM32 emOS
+route, but it is not a substitute for current USB inventory. At the preparation
+checkpoint, network ADB was unreachable and the intended unit was not present on
+the NAS USB bus. The operator could not connect it, so no recovery reboot,
+device staging, boot write, credential issuance or HA cutover was attempted.
+
+Resume in this order:
+
+1. Connect the intended first Dot to the NAS with a tested USB data cable,
+   initially without holding buttons. Match its USB serial to the private
+   inventory. A unit in an unexpected state must be investigated before any
+   reboot. Keep the already working EchoMuse unit running normally.
+2. Create a separate per-device workspace and isolated USB maintenance session.
+   Read current firmware, root access, partition map and identity. Never import
+   the completed pilot's target state or run its dated private scripts unchanged.
+3. Take fresh full boot, recovery and boot-control backups, plus EchoLocal
+   runtime and Wi-Fi state. Verify independent partition reads and copy the
+   verified escrow to another host. An old pre-wipe or pre-conversion backup is
+   recovery insurance, not the current EchoLocal configuration to restore.
+4. Enter and verify recovery, inspect both donor slots read-only, then build the
+   image from this unit's own verified boot backup. Derive the system partition
+   from that inspection. Do not reuse another Dot's prepared image, even when
+   both devices report the same release.
+5. Issue separate device credentials and prepare the pinned firmware and wake
+   assets. Stage only the new EchoMuse paths, preserving Wi-Fi and EchoLocal
+   state. Review a dry-run result before explicitly enabling the target boot
+   write. Independently verify readback and unchanged retained partitions
+   before requesting a boot.
+6. Verify emOS through USB and the authenticated controller connection. Approve
+   only this unit under its distinct label. Read its actual allocated ESPHome
+   port; the working unit already owns its own port. Controller-wide TLS and
+   recording settings do not need changing.
+7. Enroll a new HA ESPHome entry and assign **FCC Russian Local Voice** to both
+   Assistant selectors. Preserve the original first-unit entries for rollback.
+   Resolve new entity IDs from the registry rather than guessing suffixes.
+8. Add its native player to the existing Music Assistant provider. Update only
+   its originating-device music routes and add its card to the existing audio
+   view. Preserve the other unit's routes and card. Apply the proven per-queue
+   normalization choice to the new queue explicitly, without changing global
+   normalization settings.
+9. Verify transport and actual generated audio, then perform the deferred
+   attended button, wake and music checks when the operator is available. Mark
+   firmware, HA integration and acoustic acceptance separately.
+
+The matching wake baseline is **Hey Jarvis**. The old personal microWakeWord
+TFLite files cannot be copied into EchoMuse's ONNX detector. Firmware conversion
+does not establish Russian wake-word accuracy or solve speech-model errors by
+itself. See the [Russian voice operations](russian-voice-operations.md) for the
+independent server-side pipeline and rollback.
+
 ## Roll back to EchoLocal
 
 Boot the pilot into TWRP using the verified USB recovery route. A responsive
