@@ -1,0 +1,27 @@
+{
+  "reviewed_on": "2026-10-13",
+  "source": {
+    "repository": "https://github.com/wilbowes/EchoMuse",
+    "commit": "e119433c0845dfe80f4b1ec44c9e8e8028adbb07"
+  },
+  "controller": {
+    "version": "2.26.0",
+    "image": "ghcr.io/wilbowes/echomuse-controller:2.26.0@sha256:3e28ccba1102b0ef1c10d3821c937730afc1fb78e5f6f3811f3860079fc0008b"
+  },
+  "artifacts": {
+    "firmware": {
+      "version": "v2.18.0",
+      "url": "https://github.com/wilbowes/EchoMuse/releases/download/v2.18.0/server",
+      "filename": "server-v2.18.0",
+      "bytes": 12591961,
+      "sha256": "6c9262dfd4938cd8abb8532d006b396e90fdf81b921873f9bc015e48b852cb9b"
+    },
+    "emos": {
+      "version": "emos-v0.10",
+      "url": "https://github.com/wilbowes/EchoMuse/releases/download/emos-v0.10/emos-payload.zip",
+      "filename": "emos-v0.10-payload.zip",
+      "bytes": 3813071,
+      "sha256": "5c2c4e02f17bfa3c5e9a83e189b64a41025f16b8bfe43f4e6accd430621b06b8"
+    }
+  }
+}

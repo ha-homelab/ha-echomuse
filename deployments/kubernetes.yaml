@@ -1,0 +1,87 @@
+# TEMPLATE: replace the node and LAN address before applying.
+# Apply only this separate bundle; it does not mutate Home Assistant.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: echomuse
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: controller-data
+  namespace: echomuse
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echomuse-controller
+  namespace: echomuse
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: echomuse-controller
+  template:
+    metadata:
+      labels:
+        app: echomuse-controller
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: REPLACE_WITH_CONTROLLER_NODE
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      automountServiceAccountToken: false
+      containers:
+        - name: controller
+          image: ghcr.io/wilbowes/echomuse-controller:2.26.0@sha256:3e28ccba1102b0ef1c10d3821c937730afc1fb78e5f6f3811f3860079fc0008b
+          imagePullPolicy: IfNotPresent
+          env:
+            - {name: SERVER_IP, value: "192.0.2.10"}
+            - {name: SERVER_HOST, value: "0.0.0.0"}
+            - {name: SERVER_PORT, value: "8767"}
+            - {name: SERVER_TLS_PORT, value: "8770"}
+            - {name: API_PORT, value: "8768"}
+            - {name: MDNS_NAME, value: echomuse-pilot}
+            - {name: EM_ESPHOME_PORT_BASE, value: "16001"}
+            - {name: ESPHOME_PROJECT_VERSION, value: "2.26.0"}
+            - {name: DB_PATH, value: /app/data/echomuse.db}
+            - {name: DEVICE_APPROVAL, value: strict}
+            - {name: REQUIRE_DEVICE_TLS, value: "0"}
+            - {name: OWW_MODEL, value: hey_jarvis}
+            - {name: OWW_THRESHOLD, value: "0.5"}
+            - {name: EM_TTS_WAIT_TIMEOUT, value: "30"}
+            - {name: DEBUG, value: "0"}
+          volumeMounts:
+            - {name: data, mountPath: /app/data}
+          startupProbe:
+            httpGet: {path: /api/system/setup-state, port: 8768}
+            periodSeconds: 5
+            failureThreshold: 36
+          readinessProbe:
+            httpGet: {path: /api/system/setup-state, port: 8768}
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet: {path: /api/system/setup-state, port: 8768}
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          resources:
+            requests: {cpu: 250m, memory: 512Mi}
+            limits: {memory: 2Gi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+            seccompProfile: {type: RuntimeDefault}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: controller-data
