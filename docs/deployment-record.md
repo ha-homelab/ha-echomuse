@@ -268,3 +268,60 @@ No controlled stock-versus-EchoMuse loudness measurement was performed.
 The operator subsequently accepted the current pilot setup and authorized
 publication of the findings. Flat EQ and volume limits remain unchanged;
 the playback and far-field test limitations recorded above still apply.
+
+## October 14, 2026 — first Dot migration
+
+The operator connected the first, still-EchoLocal Dot to the maintenance host
+and authorized its conversion. A new isolated USB session matched its serial
+and Wi-Fi identity before any device write. Live inspection confirmed the
+expected Fire OS 6 / Android 7.1.2 / SDK 25, EchoLocal 0.0.8, active slot A,
+amonet2 and TWRP 3.7 environment.
+
+Fresh full copies of both boot partitions, recovery, boot-control metadata and
+the EchoLocal/Wi-Fi runtime archive passed independent second reads. All five
+files were then copied to the Mac and checked against the same hashes. The
+new emOS image used this first Dot's own boot backup and dynamically verified
+donor system partition. It did not reuse the completed pilot's prepared image
+or credentials.
+
+Thirteen firmware, startup, wake and connection files were staged with verified
+hashes and permissions; the Wi-Fi configuration remained unchanged. Only
+`boot_a` was written. Its full uncached readback matched the new image plus
+the preserved partition remainder; the alternate boot partition, recovery and
+boot-control bytes remained unchanged. A separate reboot guard rechecked the
+boot contents and retained partitions before starting emOS.
+
+USB console inspection confirmed **emOS v0.10**, **EchoMuse v2.18.0**, a running
+server and Wi-Fi connectivity. The v0.10 payload reports USB product **emOS**;
+the source also contains **emOS console**, so the product string alone must not
+override the exact serial, physical USB mapping and verified image. The device
+reached the intended controller over WSS and waited for approval. Its separate
+credentials and recovery files remain private.
+
+After authenticated first contact, only the new first unit was approved. Its
+initial live connection arrived before complete version telemetry; the check
+waited for TLS and both expected versions without issuing another approval or
+rotating credentials. A distinct ESPHome entry was enrolled in HA. Both
+Assistant selectors use **FCC Russian Local Voice**; the primary wake word is
+**Hey Jarvis** and the secondary wake word is disabled.
+
+The new native player was appended to Music Assistant's existing selected-player
+list. That provider reload exposed a disconnected HA client and temporarily
+removed the MA exports. A scoped reload of the HA connection provider and then
+`hass_players` restored both Dots without restarting MA or changing credentials,
+stream addresses or configured player selections. Only the new first queue's
+normalization was disabled to match the second queue.
+
+The first unit's originating-device music routes now target its new MA player.
+The private canonical bindings reproduce the live scripts. An **EchoMuse Dot
+001** card was added beside the existing **EchoMuse Dot 002** card in Lovelace's
+media view. Existing HA entries, pipelines, second-unit routes and its card were
+preserved; the original first EchoLocal entry remains available for rollback.
+
+Final read-only checks confirmed both units connected through TLS and HA,
+matching firmware/emOS versions, local wake listening without continuous
+microphone streaming, matching Assistant/wake selectors, and **57 matching
+effective settings**. Persisted device volume is intentionally independent.
+No music playback, microphone recording or attended acoustic test was performed
+during this first-unit migration. Its button, wake and audible playback checks
+remain separate acceptance work.

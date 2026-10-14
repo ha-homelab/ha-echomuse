@@ -241,7 +241,8 @@ which sets raw mode, flushes pending input, and performs the newline handshake
 before issuing commands. After USB re-enumeration, match the device's serial
 and the node's major/minor numbers against sysfs; a retained node or buffered
 text alone is not evidence of a failed boot. emOS identifies itself as USB
-**1949:2007**, manufacturer **EchoMuse**, product **emOS console**. Confirm a
+**1949:2007**, manufacturer **EchoMuse**, product **emOS** in the tested v0.10
+payload (the pinned source also uses **emOS console**). Confirm a
 shell response and `/etc/os-release` before considering another reset.
 
 If Wi-Fi needs configuration, use `em-wifi` from the USB console or the
@@ -255,6 +256,18 @@ WPA2 network; do not assume WPA3-only service will work.
 Approve only the verified pilot in the EchoMuse dashboard. Credential issuance
 alone does not approve the device. Verify its version, link security,
 microphone state, loaded wake model, and allocated ESPHome port.
+
+In controller 2.26.0, an authenticated but unapproved device updates its pending
+record and then disconnects before joining the live device map. Consequently,
+`connected` and `linkTls` can remain false until approval. Before approving,
+require a recent authenticated contact for the exact device, the expected
+firmware, its separately issued credentials, and successful USB boot checks.
+After approving, require a live TLS connection and verify the emOS and firmware
+versions. Initial version telemetry can arrive after the connection becomes
+live; wait for all three conditions within a bounded deadline before enrolling
+HA, without issuing a second approval or rotating credentials. A record
+created during credential issuance alone is not proof that
+the device has booted or contacted the controller.
 
 In Home Assistant, use **Settings → Devices & services → ESPHome**. Accept
 the discovered EchoMuse satellite, or add the controller's address and the
@@ -298,14 +311,15 @@ button, wake and music checks. The operator has now requested the same system on
 the first unit, while postponing the newer Russian-voice listening test. That
 test remains pending independently of firmware preparation.
 
-The first unit's historical inventory identifies an unlocked Dot 2 with amonet2,
-Fire OS 6 / Android 7.1.2 and TWRP 3.7. This supports preparing the same ARM32 emOS
-route, but it is not a substitute for current USB inventory. At the preparation
-checkpoint, network ADB was unreachable and the intended unit was not present on
-the NAS USB bus. The operator could not connect it, so no recovery reboot,
-device staging, boot write, credential issuance or HA cutover was attempted.
+The first unit's historical inventory identified an unlocked Dot 2 with amonet2,
+Fire OS 6 / Android 7.1.2 and TWRP 3.7. That supported preparing the same ARM32
+emOS route, but did not replace current USB inventory. Work stopped at local
+preparation until physical USB became available. On October 14 the operator
+connected the first unit, its live identity and layout were verified, and it
+was migrated using its own fresh recovery copies. The [deployment record](deployment-record.md#october-14-2026--first-dot-migration)
+separates completed firmware and integration checks from acoustic acceptance.
 
-Resume in this order:
+Repeat the migration in this order:
 
 1. Connect the intended first Dot to the NAS with a tested USB data cable,
    initially without holding buttons. Match its USB serial to the private
@@ -348,6 +362,17 @@ TFLite files cannot be copied into EchoMuse's ONNX detector. Firmware conversion
 does not establish Russian wake-word accuracy or solve speech-model errors by
 itself. See the [Russian voice operations](russian-voice-operations.md) for the
 independent server-side pipeline and rollback.
+
+If adding the new native player causes Music Assistant exports to disappear
+while the native HA players remain available, inspect the HA provider connection
+before changing speaker settings. During this migration, the `hass_players`
+reload encountered a disconnected HA client. Reloading only the HA connection
+provider and then `hass_players`, through `config/providers/reload`, restored
+both Dots. Preserve the complete selected-player list and other provider
+configuration, and verify the existing Dot as well as the new one. An unrelated
+selected player that was already unavailable should not trigger repeated
+reloads. This recovery does not establish that the underlying client error is
+permanently fixed.
 
 ## Roll back to EchoLocal
 

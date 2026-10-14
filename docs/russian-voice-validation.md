@@ -60,15 +60,43 @@ speech recognition and synthesis. The route and empty fallback list were
 verified; the FCC response echoes the configured model alias and does not
 independently identify the provider's backend weights.
 
+## Local energy reports
+
+IGW 0.4.2 was deployed with image digest
+`sha256:0e80459ede1a35940a77913e574a075e21b86e093ab432eed8c65584219f5f42`.
+The change replaced only the existing deployment's image. An isolated canary
+passed before promotion; the same checks then passed against the new primary:
+authentication, invalid and duplicate locale rejection, trusted HTTPS with
+hostname verification, English/Russian response headers, equal typed telemetry,
+six fresh metrics and connected MQTT. The old image and private rollback
+snapshot remain available. The new primary was ready with zero restarts at
+acceptance; this is not a long-term uptime measurement.
+
+The two generated HA files and separate secret references were installed after
+a private configuration backup. HA configuration validation and all four
+integration reloads passed without restarting HA. All six energy questions
+returned local `action_done` responses in both originating device contexts:
+**12 successful intent requests**. Two simultaneous intent-to-TTS requests also
+returned downloadable audio in **4.116 seconds each**. They explicitly selected
+the new local-voice pipeline; they did not change a device's Assistant selector
+or play audio on either Dot. These timings exclude wake detection, microphone
+capture, speech recognition and physical playback.
+
+After the first unit's migration, the checks were repeated using both actual
+EchoMuse device contexts. All **12 local intent responses** passed again and
+both generated audio responses were fetched successfully in **5.609 seconds
+each**. This confirms the updated HA origins and service path, not audible
+playback from the physical speakers.
+
 ## Acceptance still to complete
 
-At this point in the rollout, the second Dot's two Assistant selectors use the
-new voice pipeline. The operator explicitly postponed the new listening test
-and requested migration of the first Dot to the same EchoMuse system. That
-migration is prepared but has not started because physical USB access is not
-currently available; the first unit retains EchoLocal and its previous pipeline.
+Both Dots now use **FCC Russian Local Voice** on both Assistant selectors. The
+operator initially postponed the new listening test, then connected the first
+unit for migration. Its emOS/EchoMuse conversion and distinct HA enrollment
+completed with its own verified recovery backups; the old EchoLocal entries
+remain available for rollback.
 
-Physical listening, the first Dot's migration and pipeline assignment, and live
-Russian IGW activation remain outstanding. Service readiness alone does not
-establish physical success. The first-unit procedure and exact stopping point
-are recorded in the [migration runbook](migration.md#9-migrate-another-existing-echolocal-unit).
+The new Russian voice and the newly migrated first Dot still need attended
+button, wake and music checks. Service readiness alone does not establish
+physical success. See the [deployment record](deployment-record.md#october-14-2026--first-dot-migration)
+and [repeat migration procedure](migration.md#9-migrate-another-existing-echolocal-unit).

@@ -7,16 +7,15 @@ project, not a fork or official distribution of
 
 ## Current status
 
-The pilot is the second previously converted Echo Dot 2. It now boots **emOS
-v0.10** and runs **EchoMuse v2.18.0**, built around its own ARM32 kernel from
-Fire OS 6 / Android 7.1.2. Its verified USB recovery backups remain private.
-The first EchoLocal unit retains its device firmware. Its matching migration is
-prepared but has not started: the operator cannot currently connect it to USB.
-See [adding a second converted unit](docs/migration.md#9-migrate-another-existing-echolocal-unit).
+Both existing Echo Dot 2 units now boot **emOS v0.10** and run **EchoMuse
+v2.18.0**. Each image was built around that unit's own ARM32 kernel from
+Fire OS 6 / Android 7.1.2, with separate credentials and verified private USB
+recovery backups. The second unit was the original pilot; the first unit was
+migrated on October 14. See the [repeat migration procedure](docs/migration.md#9-migrate-another-existing-echolocal-unit).
 
-Controller **2.26.0** is deployed separately, and the pilot has reached it over
-WSS using device-specific credentials; TLS is now required. Home Assistant
-ESPHome enrollment is complete. The initial migration used the existing
+Controller **2.26.0** is deployed separately, and both units have reached it over
+WSS using device-specific credentials; TLS is required. Home Assistant
+ESPHome enrollment is complete for both. The initial pilot migration used the existing
 FCC Russian Backup pipeline; the current voice rollout is recorded in the
 [Russian voice validation](docs/russian-voice-validation.md). An attended
 button-triggered question during migration received
@@ -79,8 +78,9 @@ for service order, HA integration, per-Dot assignment, acceptance and rollback.
 
 The [Russian Assist energy adapter](docs/energy-assist.md) implements the first
 part of that plan: six read-only intents that return validated IGW reports to
-the originating conversation. Installation and live acceptance are separate
-from generating the package.
+the originating conversation. The Russian IGW endpoint and HA package are now
+deployed; [service acceptance](docs/russian-voice-validation.md#local-energy-reports)
+is recorded separately from microphone and listening tests.
 
 ## Upstream and related work
 
