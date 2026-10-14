@@ -87,6 +87,8 @@ conversation agent to current HA entity states, a reviewed device-control list
 and Recorder statistics. The integration discovers relevant entities on demand
 instead of sending the entire household catalog in every prompt. Its setup,
 access boundaries, Russian command examples and rollback are documented separately.
+Both EchoMuse units now select **Local Russian Home**; see the
+[deployment checks and measured limits](docs/home-control.md#deployed-local-home-assistant--october-14-2026).
 
 ## Upstream and related work
 

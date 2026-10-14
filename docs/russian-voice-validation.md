@@ -4,10 +4,14 @@ This record distinguishes service verification from physical listening tests.
 Use the [operations runbook](russian-voice-operations.md) for installation and
 rollback and the [energy guide](energy-assist.md) for supported questions.
 
+The later [local household-assistant rollout](home-control.md#deployed-local-home-assistant--october-14-2026)
+now supplies the conversation agent on both Dots. The FCC results below document
+the earlier general-question route, which remains available separately.
+
 ## Russian speech
 
 The selected voice is **Piper Denis medium**, served through the new Wyoming
-integration. HA exposes `tts.local_russian_speech`; the pilot pipeline is named
+integration. HA exposes `tts.local_russian_speech`; the initial pilot pipeline was named
 **FCC Russian Local Voice**. “Local Voice” refers to speech synthesis: general
 conversation and the existing speech recognition still use their configured
 external providers.
@@ -90,7 +94,8 @@ playback from the physical speakers.
 
 ## Acceptance still to complete
 
-Both Dots now use **FCC Russian Local Voice** on both Assistant selectors. The
+After migration, both Dots used **FCC Russian Local Voice** on both Assistant
+selectors; the later local-home rollout replaced that assignment. The
 operator initially postponed the new listening test, then connected the first
 unit for migration. Its emOS/EchoMuse conversion and distinct HA enrollment
 completed with its own verified recovery backups; the old EchoLocal entries

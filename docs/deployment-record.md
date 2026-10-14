@@ -325,3 +325,16 @@ effective settings**. Persisted device volume is intentionally independent.
 No music playback, microphone recording or attended acoustic test was performed
 during this first-unit migration. Its button, wake and audible playback checks
 remain separate acceptance work.
+
+
+## October 14, 2026 — local household assistant
+
+Both EchoMuse units now use **Local Russian Home** on both Assistant selectors.
+The local Ollama service provides household reasoning, guarded device commands
+and Recorder statistics; local Piper provides Russian speech. The existing
+cloud recognition provider is retained. The earlier FCC assignments above are
+migration checkpoints, not the final active configuration.
+
+See the [local-home deployment record](home-control.md#deployed-local-home-assistant--october-14-2026)
+for the verified control/read separation, real lamp restoration, generated
+audio for both device contexts, CPU latency limits and remaining attended tests.

@@ -193,3 +193,55 @@ retiring the local service.
 Reference: [HA LLM APIs](https://developers.home-assistant.io/docs/core/llm/),
 [Ollama integration](https://www.home-assistant.io/integrations/ollama/), and
 [Qwen3 Instruct](https://ollama.com/library/qwen3:4b-instruct).
+
+## Deployed local home assistant — October 14, 2026
+
+The local route uses Home Assistant 2026.10.0, Ollama 0.40.4 and Qwen3 4B
+Instruct (Q4_K_M). The reviewed control list contains 119 household entities;
+Russian entity and room aliases support device discovery. Home state and
+statistics go to the local model. The inference workload denies outbound
+connections after provisioning; the previous external general-question route
+has no automatic fallback from this pipeline. Russian synthesis remains local
+Piper Denis. Speech recognition still uses the existing cloud FCC service.
+
+The dedicated model runs on an existing two-core/four-thread, 8 GB server, with
+one active inference request, a bounded queue, a 5 GiB memory limit and a
+256 MiB prompt cache limit. The running model occupied approximately 4 GiB.
+This is a functional CPU deployment, not an instant-response benchmark.
+
+Validation includes 55 policy/source tests and 17 tests in an isolated HA
+runtime. Live text checks distinguished on/off and unavailable states without
+sending control commands. A monthly energy question invoked FindEntities and
+GetStatistics on the cumulative sensor, with the correct calendar interval,
+unit and counter change from Recorder. A separate synthetic case used different
+lifetime and monthly values to detect accidental substitution. Sensor discovery
+therefore exposes metadata rather than numeric snapshots.
+
+During tuning, cached state questions took about 23–27 seconds. The live monthly
+Recorder query took 197.6 seconds after a changed prompt and a broad sensor
+lookup; it included rebuilding the prompt cache. Avoid changing prompt text on
+every request: the GetDateTime tool suppresses HA's automatically appended
+seconds-level clock. A broad sensor search can still require substantial CPU
+time. These samples are text-service timings, excluding microphone capture,
+recognition and playback; they do not establish sustained-load performance.
+
+The final action check used **ControlDevice** to resolve and turn on one lamp.
+HA emitted the expected `light.turn_on` event and reported `on`; the test then
+sent `light.turn_off` and verified restoration to `off`. This cold-prompt test
+took 111.0 seconds. No heater actions were issued by the acceptance tests.
+The action interface deliberately combines resolution and execution because
+an earlier lookup-first model path could claim success without a service call.
+
+Before assignment, both actual Dot device contexts completed the local-model
+math question through intent and Russian TTS, and the resulting audio files
+were fetched (6.841 and 2.034 seconds). Two simultaneous native energy-summary
+requests also returned audio (3.365 and 3.362 seconds). These service checks did
+not play audio on the physical speakers.
+
+At final readback, **both Assistant selectors on each of the two EchoMuse Dots**
+used **Local Russian Home**, with `conversation.local_russian_home`, Russian
+recognition and local Piper TTS. Both satellites and their native/Music
+Assistant players were available and idle. The primary wake word remained
+**Hey Jarvis**, with the secondary wake word disabled. The prior FCC pipeline
+remains available for rollback. Fresh attended microphone, wake and listening
+acceptance is separate from these verified server-side results.
