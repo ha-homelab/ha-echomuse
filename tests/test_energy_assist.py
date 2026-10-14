@@ -23,7 +23,9 @@ def snapshot():
 
 class TestEnergyAssist(unittest.TestCase):
     def setUp(self):
-        self.env = Environment(undefined=StrictUndefined)
+        # Unit cases use safe prose. The pinned HA runtime tests separately
+        # verify exact plain-text behavior, including literal template syntax.
+        self.env = Environment(undefined=StrictUndefined, autoescape=True)
         self.env.globals.update(now=lambda: 1005, as_timestamp=lambda value: value)
         self.template = self.env.from_string(SPEECH_TEMPLATE)
 

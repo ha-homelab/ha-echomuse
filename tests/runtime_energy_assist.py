@@ -1,6 +1,5 @@
 """Run in the pinned HA image, isolated from the real HA instance and network."""
 import asyncio
-import json
 from pathlib import Path
 import sys
 import tempfile
