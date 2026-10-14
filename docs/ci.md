@@ -60,6 +60,11 @@ approval support, the bot's repository **write** permission, and this
 repository's membership in the existing organization `BOT_PAT` allowlist.
 It does not replace the secret value or other repositories' grants.
 
+A first collaborator grant can create a pending repository invitation. The
+verified bot account must accept that invitation before its write permission
+is active. If onboarding uses a temporary Actions job, keep it metadata-only,
+restrict it to the exact repository and invitation, and remove it before merge.
+
 Troubleshoot missing approvals by checking the metadata workflow logs, secret
 allowlist membership, bot write access, and current-head review state. Do not
 remove branch protection or lower the required review count to unblock a PR.
