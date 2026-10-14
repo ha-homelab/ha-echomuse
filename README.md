@@ -63,6 +63,9 @@ All documentation and scripts are in English, except phrases a user must speak.
 Wi-Fi credentials, tokens, device identities, boot backups, captured audio and
 trained personal models stay outside the public repository.
 
+See [shared CI and PR automation](docs/ci.md) for required checks, independent
+bot approvals, opt-in merging, and Terraform-managed access.
+
 ## Upstream and related work
 
 - [EchoMuse](https://github.com/wilbowes/EchoMuse): device software, controller,

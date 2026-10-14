@@ -1,21 +1,47 @@
-name: CI
+name: Quality gate
 
 on:
   push:
     branches: [main]
   pull_request:
+  merge_group:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  check:
-    name: CI gate
+  python:
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@3ee3558ff523dc31d89d8f5e3fd39b98efe36f0a
+    with:
+      python-version: '3.11'
+      install-dependencies: false
+      run-lint: false
+      run-type-check: false
+      test-args: tests -q
+      # Preserve the existing test requirement; collect coverage without adding
+      # an arbitrary new threshold during the workflow migration.
+      coverage-threshold: 0
+      coverage-artifact-name: echomuse-python-coverage
+
+  security:
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@3ee3558ff523dc31d89d8f5e3fd39b98efe36f0a
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    with:
+      languages: python,actions
+      run-codeql: true
+      run-trivy: true
+      run-dependency-review: true
+
+  source:
+    name: Public source validation
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -28,11 +54,34 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
-      - name: Compile Python source and validate lock syntax
+      - name: Validate Python, upstream lock, and public files
         run: |
           python -m compileall -q scripts tests
           python -m json.tool upstream-lock.json > /dev/null
-      - name: Run offline regression tests
-        run: python -m unittest discover -s tests -v
-      - name: Audit public source
-        run: python scripts/check_public.py
+          python scripts/check_public.py
+
+  gate:
+    name: CI gate
+    needs: [python, security, source]
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        with:
+          egress-policy: audit
+      - name: Require all validation jobs
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        shell: python3 {0}
+        run: |
+          import json, os
+          results = json.loads(os.environ['RESULTS'])
+          expected = {'python', 'security', 'source'}
+          if set(results) != expected:
+              raise SystemExit('Validation job inventory differs')
+          failed = {name: value['result'] for name, value in results.items()
+                    if value['result'] != 'success'}
+          if failed:
+              raise SystemExit(f'Validation did not pass: {failed}')
+          print('All validation jobs passed.')
