@@ -19,7 +19,7 @@ import probatio
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from custom_components.echomuse_home import HomeAPI
+from custom_components.echomuse_home import HomeAPI, ControlEntity
 
 
 class HomeToolsRuntimeTest(unittest.IsolatedAsyncioTestCase):
@@ -51,7 +51,9 @@ class HomeToolsRuntimeTest(unittest.IsolatedAsyncioTestCase):
         self.hass.states.async_set(call.data["entity_id"], "on", {"friendly_name": "Kitchen Lamp"})
 
     async def tool(self, name, **args):
-        tool = next(t for t in self.instance.tools if t.name == name)
+        # The internal dispatcher retains an additional discovery guard.
+        tool = (ControlEntity(self.instance.tools[0].session) if name == "ControlEntity"
+                else next(t for t in self.instance.tools if t.name == name))
         return await tool.async_call(self.hass, llm.ToolInput(tool_name=name, tool_args=args), self.context)
 
     async def test_schemas_serialize_for_real_ollama_adapter(self):
@@ -107,6 +109,18 @@ class HomeToolsRuntimeTest(unittest.IsolatedAsyncioTestCase):
         current = await self.tool("GetEntityState", entity_id=row["entity_id"])
         self.assertEqual(current.data["state"], "12")
 
+    async def test_named_control_resolves_authorizes_and_executes_once(self):
+        result = await self.tool("ControlDevice", query="лампа на кухне", domain="light", operation="turn_on")
+        self.assertFalse(result.error)
+        self.assertEqual(result.data["observed"]["state"], "on")
+        self.assertEqual(len(self.calls), 1)
+        self.assertTrue((await self.tool("ControlDevice", query="server", operation="turn_off")).error)
+        self.hass.states.async_set("light.second_room", "off", {"friendly_name": "Kitchen Lamp Two"})
+        self.api.controls.add("light.second_room")
+        self.assertTrue((await self.tool("ControlDevice", query="kitchen lamp", operation="turn_on")).error)
+        self.assertTrue((await self.tool("ControlDevice", query="в", operation="turn_on")).error)
+        self.assertEqual(len(self.calls), 1)
+
     async def test_current_time_uses_home_assistant_timezone(self):
         result = await self.tool("GetDateTime")
         self.assertFalse(result.error)
@@ -127,6 +141,9 @@ class HomeToolsRuntimeTest(unittest.IsolatedAsyncioTestCase):
         auth = SimpleNamespace(async_get_user=AsyncMock(return_value=user))
         with patch.object(self.hass, "auth", new=auth, create=True):
             result = await self.tool("FindEntities", query="")
+            denied = await self.tool("ControlDevice", query="kitchen lamp", operation="turn_on")
+        self.assertTrue(denied.error)
+        self.assertEqual(self.calls, [])
         self.assertEqual(result.data["total"], 0)
 
     async def test_limited_pagination_and_fresh_state(self):

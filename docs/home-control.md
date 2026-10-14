@@ -88,9 +88,11 @@ establish isolation unless the cluster's network plugin enforces the policies.
 - **GetEntityState** refreshes one previously discovered entity. It returns a
   bounded state and selected operational attributes; credentials, URLs, camera
   tokens and arbitrary attributes are not included.
-- **ControlEntity** accepts one exact discovered ID and a fixed operation. The
-  ID must also be in `control_entities`. There is no arbitrary service, template,
-  shell, SQL or URL tool. An unavailable device is rejected before dispatch.
+- **ControlDevice** accepts a device/room query, an optional domain and a fixed
+  operation. It searches only `control_entities`, checks user permissions and
+  requires exactly one match before dispatch. It resolves and executes in one
+  call; the model does not need a separate lookup before issuing a command. There is no arbitrary service, template,
+  shell, SQL or URL tool. Ambiguous names and unavailable devices are rejected before dispatch.
   Service completion and the observed state are reported separately: a service
   accepting a request is not proof that the physical device moved or switched.
 - **GetStatistics** queries HA Recorder for a discovered sensor. Supported
@@ -170,7 +172,7 @@ infallible or replace the physical controls and protection of a heater.
 Run the dependency-free policy tests and the runtime tests inside the pinned HA
 image used in CI. Runtime tests create a separate temporary HA instance with
 synthetic entities; they never call the live home or its database. Test permission
-boundaries, native Ollama argument normalization, schema conversion, actual service dispatch in that isolated instance,
+boundaries, native Ollama argument normalization, schema conversion, named-device resolution and actual service dispatch in that isolated instance,
 missing statistics, invalid numbers and DST boundaries.
 
 When testing a model outside the native integration, preserve the native tool
