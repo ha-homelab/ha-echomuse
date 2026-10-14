@@ -276,6 +276,30 @@ a disconnect, reconnect, or stop. This supports continued investigation
 alongside the positive listening result; the bounded trial does not establish
 that source stalls are eliminated or that long-term playback quality is acceptable.
 
+### Maximum volume and stock Alexa comparisons
+
+Check the native HA player, MA-exported player, MA volume limits, controller
+volume, and mute state before assuming a hidden cap. All were at the
+supported maximum and unmuted in the pilot, with no additional MA limit.
+In the pinned release, HA's 100% maps to device level 127, or 0 dB unity gain.
+Forcing the raw DAC above that level adds digital gain that can clip; it is
+not an unused clean amplifier boost. See the pinned
+[volume mapping](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/controller/em_volume.py#L8)
+and [device limit](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/device/internal/server/volume.go#L15).
+
+Stock Alexa uses driver-correction FIR processing and multiband
+compression/limiting that this EchoMuse release does not fully reproduce.
+That can change perceived body and loudness. The supported dashboard
+**Music** EQ preset offers a tonal correction to compare with **Flat**;
+it is not a proven increase in maximum sound pressure. Retain the bass guard
+and peak limiter, and do not bypass digital or analog limits. See upstream's
+[stock processing analysis](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/SETUP.md#L674)
+and [EQ presets](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/controller/static/dashboard.jsx#L9771).
+
+The pilot remained on Flat; Music was neither enabled nor tested. Its
+reported difference from stock Alexa has not been measured in a controlled
+same-track, same-position comparison.
+
 ## Initial wake and recording posture
 
 Start from upstream's `hey_jarvis` model and 0.5 threshold. Its numerical scores

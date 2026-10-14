@@ -250,3 +250,17 @@ at the checkpoint. The operator subsequently confirmed smooth music playback
 after the mitigation. This is a successful attended listening result for the
 trial; it does not erase the later recorded source stall or establish
 long-term playback reliability.
+
+## Maximum-volume inspection
+
+The operator subsequently reported that maximum volume seemed lower than
+stock Alexa. Read-only checks found the native HA player, MA-exported player,
+MA player, and controller all at 100%, unmuted, with no additional MA volume
+cap. The EQ remained Flat and the bass guard and peak limiter remained enabled.
+No volume, EQ, or hardware gain setting was changed during this inspection.
+
+The pinned implementation maps 100% to device level 127 at unity gain; forcing
+the raw control higher is not a clean amplification path. Stock processing
+and the supported but untested Music EQ alternative are explained in the
+[controller guide](controller.md#maximum-volume-and-stock-alexa-comparisons).
+No controlled stock-versus-EchoMuse loudness measurement was performed.
