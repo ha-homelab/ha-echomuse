@@ -114,6 +114,34 @@ native ESPHome voice path. A hosted private-CA HA URL needs the relevant CA
 mounted in the controller and `EM_EXTRA_CA_CERT` set; test fetching the actual
 response URL rather than assuming that a working dashboard proves audio access.
 
+### Diagnose a button that briefly lights and stops
+
+The Dot-to-controller WSS link and the controller-to-HA ESPHome connection
+are separate. A Dot can reach its controller while HA is unable to accept a
+voice turn. In the pinned release, a button press in this state logs
+`Dot button but no HA connection — standing down`. With the default ring
+scene, the listening indication is held for 0.6 seconds, followed by the
+orange `no_ha` cue, which clears itself. Check the log and connection state
+alongside the color; a customized ring scene can look different.
+
+Check the pilot's HA ESPHome connection, then test HA's HTTP listener from
+inside its own runtime as well as from the controller. An unavailable local
+listener, missing integration services, and `Session is closed` errors
+across integrations indicate a wider HA availability problem. Preserve
+logs and configuration before recovery, and identify which process is
+unavailable before changing satellite settings.
+
+For the Kubernetes deployment, a controlled restart of the affected HA pod
+can recover a stalled HA process after diagnostics are saved. HTTP recovery
+is only the first check: verify that the native ESPHome connection returns,
+the selected Assist pipeline is available, and the required Music Assistant
+services register again. Then repeat an attended short voice turn and the
+physical music playback/stop test.
+
+The behavior is defined by the pinned
+[button handler](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/controller/em_controller.py#L4255)
+and [end-of-turn ring handling](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/controller/em_controller.py#L1682).
+
 ## Music Assistant and the existing player dashboard
 
 The pilot uses Music Assistant's existing **Home Assistant** and **Home
@@ -135,10 +163,29 @@ automatically. EchoMuse's own Sendspin integration is an optional, separately
 paired route marked Early Access in this pinned release; it is disabled in
 this pilot. No additional MA provider or HA custom component was needed.
 
-An existing Lovelace auto-entities card that lists available media players can
-show the new native and MA players automatically. Inspect its filters before
-adding duplicate cards. Test **«играй музыку»**, audible playback, and pause
-on the intended physical Dot before calling music acceptance complete.
+An existing Lovelace auto-entities card can list available native and MA
+players, but its presence does not establish that the operator can find the
+new player. Inspect the actual media view and its filters. For this pilot,
+the operator reported the player missing and an explicit card was added first
+in the existing view's first grid. Existing dynamic cards were retained.
+
+Use the new **Music Assistant queue entity**, not the superseded EchoLocal
+player or an assumed entity suffix. With `mini-media-player` already installed,
+an explicit card can use this placeholder configuration:
+
+```yaml
+type: custom:mini-media-player
+entity: media_player.replace_with_music_assistant_queue
+name: EchoMuse Dot 002
+icon: mdi:speaker
+artwork: cover
+```
+
+Replace the placeholder after inspecting the live HA entity. Save a private
+dashboard backup, insert the card in the intended existing view, and read the
+configuration back to verify that other cards and filters are unchanged.
+Dashboard editing should not start playback. Test **«играй музыку»**, sustained
+audible playback, and pause on the intended physical Dot separately.
 
 ### Check the advertised stream address
 
@@ -166,6 +213,92 @@ non-silent audio is available. Keep stream URLs, queue identifiers, and any
 captured data private. This verifies transport and decoding only. Complete a
 separate attended playback and stop test on the physical Dot before claiming
 that music works.
+
+For a bounded playback check, preserve queue contents and record the native
+and MA player states, time to the first device audio frame, sent audio
+periods, and the stop acknowledgment. A direct MA queue test verifies a
+different path from a spoken command; validate voice dispatch separately.
+Neither a `playing` state nor sent PCM proves what a listener heard.
+
+If the conversation agent asks which player to use despite a known satellite
+origin, inspect the exact STT result and native sentence match. Prefer-local
+handling does not guarantee a match: an unlisted wording can reach the
+conversation agent with `processed_locally: false`. In this pilot,
+**«Играем музыку»** needed an additional alternative in the existing native
+play grammar. The [canonical vocabulary fix](https://github.com/ha-homelab/ha-echo-show-5/pull/51)
+includes origin and explicit-target recognition regressions. Validate such
+changes with the installed Hassil runtime and preserve routing guards and
+service actions; then repeat the actual spoken request.
+
+Decoder-read stalls measure when the controller receives decoded data. They
+can include startup and may be absorbed by playback buffers; they do not
+alone prove audible glitches. Correlate them with actual playback underruns
+and an attended listening result before changing buffers or audio settings.
+
+In this pilot, the operator subsequently confirmed audible hiccups and
+buffering. A later 9.141-second decoder starvation exceeded the Dot's
+approximately 5.46-second fixed playback buffer, while inspected Wi-Fi health
+was good. Trace the same stream through Music Assistant/Plex and the
+controller, separating source delivery gaps from device-link loss. Record
+the period tested and compare it with the listening report. Healthy Wi-Fi
+at one checkpoint does not prove every network path is fault-free.
+
+### Test queue-specific normalization when source delivery stalls
+
+The pilot's source-processing chain used dynamic loudness normalization while
+the Music Assistant host had high CPU pressure. Disabling normalization only
+for this queue improved a bounded delivery trace, and the operator subsequently
+confirmed smooth music playback. This is a targeted mitigation; do not
+assume it resolves every playback interruption. The saved queue policy
+persists, and disabling normalization allows track-to-track loudness
+differences.
+
+1. Save private snapshots of the target queue, its ordered items, and its
+   configuration. Record the current `volume_normalization` value and compare
+   the other queues and global/player configuration after the change.
+2. Through Music Assistant's supported `config/player_queues/save` API, set
+   only the target queue's `volume_normalization` to `disabled`. The pilot's
+   previous value was `global`, meaning it inherited the global policy.
+   Saving this setting resumed the current track in the pilot; perform the
+   test while attended and verify the selected track and queue order.
+3. Observe a bounded interval and compare source-stall warnings, delivered
+   audio, and the listener's experience. Separate initial startup waits from
+   gaps during ongoing playback. Bytes acknowledged over WebSocket do not
+   establish zero speaker underruns.
+4. To roll back this pilot change, set the same queue field back to `global`.
+   Restore a different original value if that was what the snapshot held;
+   leave the global policy and other players unchanged.
+
+The measured pilot stream had an initial 3.042-second wait and one 745 ms
+wait, then approximately 53 seconds with no further starvation warnings.
+A subsequent passive snapshot recorded a 3.488-second source stall without
+a disconnect, reconnect, or stop. This supports continued investigation
+alongside the positive listening result; the bounded trial does not establish
+that source stalls are eliminated or that long-term playback quality is acceptable.
+
+### Maximum volume and stock Alexa comparisons
+
+Check the native HA player, MA-exported player, MA volume limits, controller
+volume, and mute state before assuming a hidden cap. All were at the
+supported maximum and unmuted in the pilot, with no additional MA limit.
+In the pinned release, HA's 100% maps to device level 127, or 0 dB unity gain.
+Forcing the raw DAC above that level adds digital gain that can clip; it is
+not an unused clean amplifier boost. See the pinned
+[volume mapping](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/controller/em_volume.py#L8)
+and [device limit](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/device/internal/server/volume.go#L15).
+
+Stock Alexa uses driver-correction FIR processing and multiband
+compression/limiting that this EchoMuse release does not fully reproduce.
+That can change perceived body and loudness. The supported dashboard
+**Music** EQ preset offers a tonal correction to compare with **Flat**;
+it is not a proven increase in maximum sound pressure. Retain the bass guard
+and peak limiter, and do not bypass digital or analog limits. See upstream's
+[stock processing analysis](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/SETUP.md#L674)
+and [EQ presets](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/controller/static/dashboard.jsx#L9771).
+
+The pilot remained on Flat; Music was neither enabled nor tested. Its
+reported difference from stock Alexa has not been measured in a controlled
+same-track, same-position comparison.
 
 ## Initial wake and recording posture
 

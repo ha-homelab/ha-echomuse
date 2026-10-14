@@ -89,3 +89,10 @@ escrow/
 support-bundles/
 *.img.*
 *.onnx.data
+
+# Local test reports.
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/

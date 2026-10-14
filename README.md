@@ -17,9 +17,16 @@ WSS using device-specific credentials; TLS is now required. Home Assistant
 ESPHome enrollment is complete and both Assistant selectors use the existing
 FCC Russian Backup pipeline. An attended button-triggered question received
 the correct audible answer. An attended Hey Jarvis test at approximately one
-metre also produced the expected audible answer. Music routing is configured
-through the existing Music Assistant provider, with audible music acceptance
-still pending. A five-metre trial woke correctly but STT misheard the question. See the dated
+metre also produced the expected audible answer. After stream-address and
+native-command fixes and HA recovery, the operator confirmed that a spoken
+music request started playback on the second Dot without a device-selection
+question. After the operator reported audible hiccups and buffering,
+normalization was disabled only for the pilot's Music Assistant queue. A
+bounded trace showed improved delivery, but another source stall followed;
+the operator subsequently confirmed smooth music playback after the change.
+Long-term reliability remains unmeasured. An explicit
+player card was added to the existing Lovelace media view. A five-metre trial
+woke correctly but STT misheard the question. See the dated
 [deployment record](docs/deployment-record.md) for verified results and limits.
 
 EchoMuse's supported path for this operating-system base is **emOS**. The
@@ -55,6 +62,9 @@ forced on this pilot.
 All documentation and scripts are in English, except phrases a user must speak.
 Wi-Fi credentials, tokens, device identities, boot backups, captured audio and
 trained personal models stay outside the public repository.
+
+See [shared CI and PR automation](docs/ci.md) for required checks, independent
+bot approvals, opt-in merging, and Terraform-managed access.
 
 ## Upstream and related work
 
