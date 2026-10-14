@@ -13,6 +13,7 @@ from homeassistant.config_entries import ConfigEntries
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import llm
+from homeassistant.components.ollama.entity import _parse_tool_args
 from hassil import Intents, recognize
 import probatio
 import yaml
@@ -58,6 +59,13 @@ class HomeToolsRuntimeTest(unittest.IsolatedAsyncioTestCase):
             schema = probatio.to_openapi(tool.parameters, custom_serializer=self.instance.custom_serializer)
             self.assertEqual(schema["type"], "object")
 
+    async def test_empty_lookup_survives_native_ollama_argument_filter(self):
+        # The native adapter removes empty strings from model arguments.
+        result = await self.tool("FindEntities", **_parse_tool_args({"query": "", "domain": "light"}))
+        self.assertFalse(result.error)
+        self.assertEqual(result.data["total"], 1)
+        self.assertNotIn("aliases", result.data["entities"][0])
+
     async def test_russian_state_sentences_do_not_match_control_commands(self):
         path = Path(__file__).resolve().parents[1] / "examples/custom_sentences/ru/echomuse_home.yaml"
         data = yaml.safe_load(path.read_text())
@@ -88,6 +96,22 @@ class HomeToolsRuntimeTest(unittest.IsolatedAsyncioTestCase):
         self.assertTrue((await self.tool("ControlEntity", entity_id="light.test_room", operation="turn_on", extra="bad")).error)
         self.hass.states.async_set("light.test_room", "unavailable")
         self.assertTrue((await self.tool("ControlEntity", entity_id="light.test_room", operation="turn_on")).error)
+        self.assertEqual(self.calls, [])
+
+    async def test_sensor_discovery_cannot_be_mistaken_for_period_consumption(self):
+        result = await self.tool("FindEntities", query="test energy")
+        row = result.data["entities"][0]
+        self.assertNotIn("state", row)
+        self.assertTrue(row["available"])
+        self.assertEqual(row["read_with"]["history"], "GetStatistics")
+        current = await self.tool("GetEntityState", entity_id=row["entity_id"])
+        self.assertEqual(current.data["state"], "12")
+
+    async def test_current_time_uses_home_assistant_timezone(self):
+        result = await self.tool("GetDateTime")
+        self.assertFalse(result.error)
+        self.assertEqual(result.data["timezone"], self.hass.config.time_zone)
+        self.assertIn("T", result.data["datetime"])
         self.assertEqual(self.calls, [])
 
     async def test_private_attributes_and_other_providers(self):

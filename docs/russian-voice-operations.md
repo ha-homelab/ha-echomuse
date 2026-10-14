@@ -4,6 +4,12 @@ This runbook connects the energy reports, general conversation and Russian
 speech services. It applies to both EchoLocal and EchoMuse Assist satellites.
 No USB connection or new Dot firmware is required for these server-side changes.
 
+For a local model that can control household devices and read Recorder history,
+follow the [local home-control setup](home-control.md). The FCC configuration
+below remains the separate general-question baseline and rollback path. Keep
+household conversations on the local pipeline; the external FCC model must not
+receive home state or history through a fallback.
+
 ## Components and order
 
 1. Deploy the IGW version with the Russian energy formatter. Keep the existing

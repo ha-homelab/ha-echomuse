@@ -25,12 +25,20 @@ requires a question; do not choose the first match. Act only when explicitly ask
 Control only the exact devices the user requested; do not expand a singular request
 to every heater/light. Readings do not authorize switching. Unavailable is not off
 or zero. A submitted action is not proof of physical success. Report the observed
-state and any failures. Use GetStatistics for historical data; consumption is
-change of accumulated energy, never a sum of power readings. Preserve units and
+state and any failures. For historical data, first find a SENSOR with FindEntities, domain sensor.
+GetStatistics requires a sensor entity, never a switch or climate entity. For energy
+consumption search for the device plus energy total, then GetStatistics; consumption
+is change of accumulated energy, never a sum of power readings. Preserve units and
 periods and mention incomplete/unavailable data. No tariffs or battery runtime
 without measurements. Keep spoken answers below 700 characters. Do not reveal
 internal entity IDs unless asked. Do not start music unless asked.
 For general questions you may answer from your knowledge, indicating uncertainty.
+Command execution is a required sequence: FindEntities, then ControlEntity, then
+report the observed result. FindEntities and GetEntityState NEVER change anything.
+When a requested target is uniquely resolved, available and controllable, you MUST
+call ControlEntity with the requested operation before answering. Never say
+"включаю", "выключаю", "done" or that an action succeeded after only a lookup.
+For state or history questions, never call ControlEntity.
 """
 
 
@@ -54,7 +62,7 @@ class HomeAPI(llm.API):
             raise HomeAssistantError("Home data tools are restricted to the local Ollama agent")
         session = HomeSession(self, llm_context)
         return llm.APIInstance(api=self, api_prompt=PROMPT, llm_context=llm_context,
-            tools=[FindEntities(session), GetEntityState(session), ControlEntity(session), GetStatistics(session)],
+            tools=[FindEntities(session), GetEntityState(session), ControlEntity(session), GetStatistics(session), GetDateTime(session)],
             custom_serializer=llm.selector_serializer)
 
 
@@ -105,6 +113,19 @@ class HomeSession:
         await self.authorize(entity_id, control)
 
 
+def public_state(row, *, discovery=False):
+    """Keep search metadata local; send only decision-relevant state to the model."""
+    result = {key: row[key] for key in ("entity_id", "name", "state", "available", "controllable", "attributes")}
+    if discovery and row["entity_id"].startswith("sensor."):
+        # A counter snapshot is not consumption for a requested interval.
+        # Keep discovery descriptive so period questions must fetch history.
+        result.pop("state")
+        result["read_with"] = {"current": "GetEntityState", "history": "GetStatistics"}
+    if row["area"]:
+        result["area"] = row["area"]
+    return result
+
+
 class BaseTool(llm.Tool):
     integration = DOMAIN
     annotations = llm.ToolAnnotations(read_only=True, destructive=False, idempotent=True, open_world=False)
@@ -123,9 +144,9 @@ class BaseTool(llm.Tool):
 
 class FindEntities(BaseTool):
     name = "FindEntities"
-    description = "Find home entities by short Russian or English name, room or domain. Returns live states and counts. Use domain and state filters for questions like which lights are on. Use offset for more results. Empty query lists entities."
+    description = "READ-ONLY lookup of home entities by short Russian or English name, room or domain. For a command, continue with ControlEntity after resolving the target. Returns device states; sensors return metadata ONLY, so use GetEntityState for current values or GetStatistics for history. Use domain and state filters for questions like which lights are on. Use offset for more results. Empty query lists entities."
     parameters = vol.Schema({
-        vol.Required("query"): vol.All(str, vol.Length(max=120)),
+        vol.Optional("query", default=""): vol.All(str, vol.Length(max=120)),
         vol.Optional("domain", default=""): str,
         vol.Optional("state", default=""): str,
         vol.Optional("offset", default=0): vol.All(int, vol.Range(min=0, max=10000)),
@@ -151,17 +172,17 @@ class FindEntities(BaseTool):
         offset = args["offset"]
         rows = [row for _, row in matches[offset:offset + 12]]
         self.session.discovered.update(row["entity_id"] for row in rows)
-        return {"total": len(matches), "offset": offset, "next_offset": offset + 12 if offset + 12 < len(matches) else None, "entities": rows}
+        return {"total": len(matches), "offset": offset, "next_offset": offset + 12 if offset + 12 < len(matches) else None, "entities": [public_state(row, discovery=True) for row in rows]}
 
 
 class GetEntityState(BaseTool):
     name = "GetEntityState"
-    description = "Refresh the current state of one exact entity found by FindEntities. Does not control anything."
+    description = "Read the CURRENT snapshot of one discovered entity. NEVER use this to answer consumption for a time period; a total counter is lifetime accumulation, not period consumption. Use GetStatistics for historical questions. Does not control anything."
     parameters = vol.Schema({vol.Required("entity_id"): cv.entity_id})
 
     async def run(self, args):
         await self.session.require_found(args["entity_id"])
-        return await self.session.state(args["entity_id"])
+        return public_state(await self.session.state(args["entity_id"]))
 
 
 class ControlEntity(BaseTool):
@@ -189,8 +210,8 @@ class ControlEntity(BaseTool):
         await self.session.hass.services.async_call(domain, service, data,
             blocking=True, context=self.session.context.context or Context())
         return {"action_submitted": True, "operation": args["operation"],
-            "observed": await self.session.state(entity_id),
-            "note": "Service completed. Observed state may lag; physical execution is not independently verified."}
+            "observed": public_state(await self.session.state(entity_id)),
+            "note": "Service accepted; observed state may lag and does not independently confirm physical execution."}
 
 
 class GetStatistics(BaseTool):
@@ -210,7 +231,7 @@ class GetStatistics(BaseTool):
         await self.session.require_found(entity_id)
         state = await self.session.state(entity_id)
         if not entity_id.startswith("sensor."):
-            raise HomeAssistantError("Recorded numeric statistics require a sensor entity")
+            raise HomeAssistantError("This is not a sensor. FindEntities with domain sensor and the device plus measurement name, then retry GetStatistics. For energy consumption use the cumulative energy total sensor; this error does not mean history is missing.")
         start, end = period_bounds(args["period"], dt_util.now(), args.get("start"), args.get("end"))
         result = await get_instance(self.session.hass).async_add_executor_job(partial(
             statistic_during_period, self.session.hass, dt_util.as_utc(start), dt_util.as_utc(end),
@@ -219,4 +240,15 @@ class GetStatistics(BaseTool):
         return {"entity_id": entity_id, "name": state["name"], "start": start.isoformat(), "end_exclusive": end.isoformat(),
             "unit": result.get("unit_of_measurement", state["attributes"].get("unit_of_measurement")),
             "statistics": values, "available": bool(values),
-            "note": "Only recorded data. Gaps and the unfinished current interval may be missing; not necessarily complete coverage."}
+            "note": "Recorded data only; gaps and unfinished intervals may be missing."}
+
+
+class GetDateTime(BaseTool):
+    # HA omits its changing timestamp prompt when this tool is available.
+    name = "GetDateTime"
+    description = "Read the current Home Assistant local date, time and timezone. Use when asked about the current time; GetStatistics already resolves relative periods itself."
+    parameters = vol.Schema({})
+
+    async def run(self, args):
+        now = dt_util.now()
+        return {"datetime": now.isoformat(), "timezone": self.session.hass.config.time_zone}
