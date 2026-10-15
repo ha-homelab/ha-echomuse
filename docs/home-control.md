@@ -80,6 +80,34 @@ provisioning, apply `examples/home-voice-offline.yaml` and verify both blocked
 outbound connections and working HA inference. Namespace labels alone do not
 establish isolation unless the cluster's network plugin enforces the policies.
 
+## Voice and grammatical gender
+
+The example agent prompt uses feminine Russian forms when the assistant refers
+to itself, such as «поняла» and «готова». It preserves the normal gender of device
+names and other subjects. It also preserves action verification: a feminine
+confirmation must not imply that a requested action succeeded before the tool
+confirms it. Copy the updated prompt into the local Ollama conversation agent's
+instructions to apply this change; editing the example file alone does not
+update Home Assistant. Keep the agent's model, API permissions and local-only
+data handling unchanged.
+
+The intended female speech voice is **Piper Irina medium**. Voice selection is
+separate from the agent prompt: provision and validate the pinned Irina assets
+in the Russian speech service, then select the voice actually advertised by its
+Wyoming integration in **Settings → Voice assistants → Local Russian Home**.
+Keep a receipt of the previous service image, voice configuration and pipeline
+for rollback. Do not relabel Denis as Irina; the loaded model must match the
+advertised voice. Verify both Assistant selectors on each Dot still use the
+intended pipeline. Other satellites using that same pipeline also inherit its
+TTS choice.
+
+After applying both changes, fetch an actual Russian WAV from the selected TTS
+entity and test each satellite. Ask «Ты готова?» to check the model's self-reference,
+then ask for a current device reading and compare it with HA. Native intent
+responses use their own templates and do not pass through the model prompt.
+These instructions describe the rollout; they are not proof that a live voice
+or pipeline has been changed.
+
 ## Tools and behavior
 
 - **FindEntities** searches current names, IDs, aliases and assigned rooms. It
