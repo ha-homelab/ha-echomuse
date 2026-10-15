@@ -45,6 +45,9 @@ and the limits of SSH, Telnet and ADB.
 For Lovelace, follow [EchoMuse controls in the existing Media dashboard](docs/dashboard.md)
 to replace obsolete EchoLocal cards and select the current music and voice entities.
 
+For interrupted audio, see [music troubleshooting](docs/music-troubleshooting.md),
+including source-file checks, queue repair and the limits of a `playing` state.
+
 1. Read the [migration runbook](docs/migration.md) and identify the exact model,
    Fire OS generation, boot layout and recovery path.
 2. Deploy the [controller](docs/controller.md) using either

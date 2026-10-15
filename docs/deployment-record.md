@@ -387,3 +387,21 @@ The controller also recorded source/decoder stalls, so this correction makes no
 claim of glitch-free playback. The first Dot was unavailable in HA and Music
 Assistant during this check; its sentence mapping was verified without claiming
 a successful physical playback test.
+
+## October 14, 2026 — current dashboard and missing music source
+
+The Media dashboard still contained obsolete EchoLocal satellite cards alongside
+the new EchoMuse players. The old cards were replaced with one EchoMuse section
+containing the current MA players, voice status, microphone state and selectors
+for each Dot. All twelve entity references existed and the saved configuration
+was read back. See the [dashboard procedure and verification limits](dashboard.md).
+
+The operator then confirmed audible interruptions on the second Dot. Checking
+the 25-item queue found one Plex item with valid metadata but an HTTP 404 from
+its underlying file. The missing item was removed from the canonical private
+seed, live native-command scripts and second-Dot queue. The remaining order was
+preserved, and playback resumed at the saved item and position. The operator
+confirmed smooth playback after the repair. See the [music diagnosis and queue
+repair procedure](music-troubleshooting.md) for the independent source-stall and
+device-link observations; this is not a claim that every possible dropout was
+eliminated. The first Dot remains pending a physical power/reconnection check.
