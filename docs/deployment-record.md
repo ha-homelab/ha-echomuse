@@ -351,3 +351,39 @@ After the correction, the operator repeated the power question with the action
 button on each Dot and confirmed that both answered in Russian without hanging.
 This is attended acceptance of that specific query; the documented CPU limits
 still apply to complex model-driven questions.
+
+## October 14, 2026 — music request falling through to the model
+
+The operator reported that a request to play music received an unsupported-playback
+answer. The matching second-Dot trace contained the English transcript
+`play something`, even though the running Parakeet adapter explicitly requested
+`ru-RU`. The transcript missed the native music grammar. Assist marked the turn
+`processed_locally: false`, and the local conversation model refused playback
+without invoking Music Assistant. This trace identifies the routing failure;
+it does not establish why the recognizer returned English.
+
+The [shared native voice generator correction](https://github.com/ha-homelab/ha-echo-show-5/pull/59)
+accepts `play something` as an alternative
+to `play music`, retaining the existing optional provider and configured-device
+suffixes. The change adds no arbitrary media search or destinations. Only the
+six corresponding English sentence patterns were changed in the live HA package;
+the existing actions, scripts, queue policy and device bindings were preserved.
+HA configuration validation passed and automations were reloaded without a
+restart. A private backup of the package was retained.
+
+All 16 native voice tests passed in an isolated HA runtime with fake media
+services, including original Russian commands, the observed English phrase,
+explicit destinations and rejection of unsupported/negated phrases. Live
+intent-stage requests from the second Dot's device context then handled both
+`play something` and «Играй музыку» locally. Starting playback took 3.35 seconds
+in the intent stage; the repeated Russian request took 0.005 seconds with music
+already playing. These are different queue states, not comparable cold-start
+latency measurements.
+
+Both the native and Music Assistant player entities reported `playing`, and
+the controller logged audio frames sent to the second Dot. These checks bypassed
+microphone recognition and did not by themselves establish audible quality.
+The controller also recorded source/decoder stalls, so this correction makes no
+claim of glitch-free playback. The first Dot was unavailable in HA and Music
+Assistant during this check; its sentence mapping was verified without claiming
+a successful physical playback test.
