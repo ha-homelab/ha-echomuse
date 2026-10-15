@@ -42,6 +42,9 @@ For everyday administration, see [device access and administrator credentials](d
 what emOS and EchoMuse run, where to sign in, the root Console, USB recovery,
 and the limits of SSH, Telnet and ADB.
 
+For Lovelace, follow [EchoMuse controls in the existing Media dashboard](docs/dashboard.md)
+to replace obsolete EchoLocal cards and select the current music and voice entities.
+
 1. Read the [migration runbook](docs/migration.md) and identify the exact model,
    Fire OS generation, boot layout and recovery path.
 2. Deploy the [controller](docs/controller.md) using either
