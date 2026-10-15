@@ -407,3 +407,35 @@ only the intended light in the success list, and HA observed `on` → `off`.
 The Irina response audio was generated and downloaded in 2.93 seconds total.
 These measurements exclude microphone capture, STT and speaker playback. The
 entity-area correction is shared by all satellites using this HA instance.
+
+
+## Relay-controlled kitchen lighting
+
+Room membership does not change an entity's domain. The kitchen's under-cabinet
+LEDs and tea-table light were exposed as `switch` entities, so a native request
+for lights would exclude them even after assigning Kitchen. The operator
+confirmed that the tea-table relay controls lighting, not unrelated appliances.
+
+Use HA's **Change device type of a switch** helper (`switch_as_x`) with target
+**Light** and inversion disabled for each confirmed lighting relay. Assign the
+helper to Kitchen, expose the light to Assist and add Russian aliases such as
+«подсветка под шкафом» and «свет чайного столика». Hide the underlying switch
+from Assist to avoid duplicate targets. Keep its entity ID and automations
+intact: the helper forwards on/off commands to the original relay and mirrors
+its state. It does not add physical dimming or color support.
+
+Replace the two source switches with their light helpers in the local home
+API's reviewed control list and alias map, validate configuration and reload
+the API configuration before testing. For this YAML-configured integration,
+that required a Home Assistant restart. Do not classify an unidentified relay
+as lighting just because it shares a room; a light-off command must not cut
+power to a kettle, heater or another appliance.
+
+After configuration reload, a read-only native `HassGetState` query for lights
+in «кухне» resolved exactly the main kitchen lamp and the two new light helpers.
+Individual queries for «подсветка под шкафом» and «свет чайного столика» resolved
+only their intended helper. Both source relays were available and each helper's
+state matched its source. No on/off commands were sent during this validation.
+All four Echo satellites returned to idle with Local Russian Home and Irina
+still selected. These checks verify targeting and state mirroring; they do not
+claim a fresh physical switching or microphone test.
