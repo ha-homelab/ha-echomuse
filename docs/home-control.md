@@ -262,6 +262,14 @@ updated suite passed 55 policy/source tests and 19 isolated HA runtime tests,
 including native exposure, user permissions, unavailable readings and the
 control-capable pipeline's intent filter.
 
+The operator then repeated «Какова мощность первого обогревателя» by pressing
+the action button on each Dot and confirmed that **both answered in Russian
+without the previous hang**. The first recorded button turn shows 24 ms from
+STT result to the TTS URL, followed by a device-reported playback completion;
+its complete turn took 17.24 seconds, including captured speech, recognition,
+audio generation and playback. This validates that specific attended question
+on both Dots, not every possible local-model request.
+
 The final action check used **ControlDevice** to resolve and turn on one lamp.
 HA emitted the expected `light.turn_on` event and reported `on`; the test then
 sent `light.turn_off` and verified restoration to `off`. This cold-prompt test

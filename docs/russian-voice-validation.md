@@ -119,6 +119,9 @@ The controller now permits the upstream-supported 120-second wait. Common state
 questions use a native read-only intent, avoiding slow model/tool round trips.
 The corrected power query completed its intent stage in approximately half a
 second for each device context; two simultaneous generated audio responses were
-fetched in 4.7 seconds. This is still a service test, with renewed attended
-microphone/playback verification requested. Details and limits are in the
+fetched in 4.7 seconds. Those timings are service measurements. The subsequent
+attended button test used «Какова мощность первого обогревателя» on each Dot;
+the operator confirmed that both answered in Russian without the previous hang.
+The first button turn also logged completed device playback, with 24 ms from
+STT result to the TTS URL and 17.24 seconds for the entire turn. Details and limits are in the
 [local-home record](home-control.md#deployed-local-home-assistant--october-14-2026).

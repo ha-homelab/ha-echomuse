@@ -346,3 +346,8 @@ correction registers a native read-only state intent and changes the shared
 controller's supported response timeout to 120 seconds. See the same record for
 verification and remaining performance limits; the earlier text API checks did
 not establish full voice-path success.
+
+After the correction, the operator repeated the power question with the action
+button on each Dot and confirmed that both answered in Russian without hanging.
+This is attended acceptance of that specific query; the documented CPU limits
+still apply to complex model-driven questions.
