@@ -45,6 +45,10 @@ and the limits of SSH, Telnet and ADB.
 For Lovelace, follow [EchoMuse controls in the existing Media dashboard](docs/dashboard.md)
 to replace obsolete EchoLocal cards and select the current music and voice entities.
 
+For [early speech, voice interruption, wake feedback, announcements and timers](docs/voice-features.md),
+see the voice-feature runbook. For BLE sensors, follow the separate
+[Bluetooth proxy enrollment](docs/bluetooth-proxy.md).
+
 For interrupted audio, see [music troubleshooting](docs/music-troubleshooting.md),
 including source-file checks, queue repair and the limits of a `playing` state.
 
