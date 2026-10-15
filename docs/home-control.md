@@ -357,7 +357,9 @@ During final device checks, the first Dot lost its network connection. Its
 address had not changed, the access point could not resolve it, and the shared
 controller remained healthy with the second Dot connected. The voice settings
 are persisted, but playback on an offline device requires restoring its
-connection first. This observation does not establish the cause of the outage.
+connection first. The operator power-cycled only that Dot; it reconnected without
+reloading the integration. This observation does not establish the cause of the
+outage.
 
 The second Dot accepted the synthetic Irina announcement and reported playback
 completion through its device connection. Its native media player's state
@@ -365,3 +367,12 @@ remained `idle`: this announcement path does not reliably expose `playing` as
 a music-player state. Use the controller's device-confirmed completion event
 for this check; a short poll of the player's state alone can miss successful
 speech. Acoustical quality still requires a listener.
+
+After recovery, the first Dot also accepted a fresh Irina announcement and
+reported device-confirmed playback completion (6.8 seconds). Final readback
+confirmed all four Dot Assistant selectors and both Echo Show selectors use
+Local Russian Home with `piper-ru-irina`; all four satellites were available
+and idle. The Echo Show maintenance chat separately completed sequential
+synthesis/announcement checks on both Shows. The global preferred pipeline was
+unchanged. These are device/service confirmations; no new attended microphone
+or subjective listening-quality claim is implied.
