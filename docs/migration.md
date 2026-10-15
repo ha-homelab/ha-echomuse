@@ -231,6 +231,10 @@ prepared image and boot selection is verified.
 
 ## 7. Boot emOS and enroll the pilot
 
+For ongoing access after enrollment, see
+[device access and administrator credentials](device-access.md), including
+the network Console, optional USB password and the absence of ADB in emOS.
+
 Watch the first boot through the USB serial console. emOS has **no ADB daemon**;
 loss of network ADB is expected and is not proof of failure. Verify emOS's
 reported version, Wi-Fi association, an IP lease, and the controller

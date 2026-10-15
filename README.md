@@ -38,6 +38,10 @@ forced on this pilot.
 
 ## Start here
 
+For everyday administration, see [device access and administrator credentials](docs/device-access.md):
+what emOS and EchoMuse run, where to sign in, the root Console, USB recovery,
+and the limits of SSH, Telnet and ADB.
+
 1. Read the [migration runbook](docs/migration.md) and identify the exact model,
    Fire OS generation, boot layout and recovery path.
 2. Deploy the [controller](docs/controller.md) using either

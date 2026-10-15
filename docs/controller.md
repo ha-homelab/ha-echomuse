@@ -6,9 +6,14 @@ pilot. Reviewed on 2026-10-13 against upstream controller tag
 `controller-v2.26.0`, source commit
 `e119433c0845dfe80f4b1ec44c9e8e8028adbb07`.
 
-The initial scope is one previously converted second-generation Echo Dot. Leave
-the first Dot on EchoLocal for comparison. Do not import EchoLocal runtime state
-into EchoMuse's database or copy its wake-word files as if they were compatible.
+The initial pilot covered one previously converted second-generation Echo Dot,
+with the first Dot left on EchoLocal for comparison. Both have since migrated;
+see the [current status](../README.md#current-status). The enrollment sequence
+below records the initial pilot. Do not import EchoLocal runtime state into
+EchoMuse's database or copy its wake-word files as if they were compatible.
+
+For dashboard credentials, the per-device root Console and USB access, follow
+[device access and administrator credentials](device-access.md).
 
 ## Version and image identity
 
