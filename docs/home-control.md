@@ -242,8 +242,8 @@ Instruct (Q4_K_M). The reviewed control list contains 119 household entities;
 Russian entity and room aliases support device discovery. Home state and
 statistics go to the local model. The inference workload denies outbound
 connections after provisioning; the previous external general-question route
-has no automatic fallback from this pipeline. Russian synthesis remains local
-Piper Denis. Speech recognition still uses the existing cloud FCC service.
+has no automatic fallback from this pipeline. The initial Russian synthesis
+used local Piper Denis; the subsequent Irina cutover is recorded below. Speech recognition still uses the existing cloud FCC service.
 
 The dedicated model runs on an existing two-core/four-thread, 8 GB server, with
 one active inference request, a bounded queue, a 5 GiB memory limit and a
@@ -318,3 +318,50 @@ Assistant players were available and idle. The primary wake word remained
 **Hey Jarvis**, with the secondary wake word disabled. The prior FCC pipeline
 remains available for rollback. Fresh attended microphone, wake and listening
 acceptance is separate from these verified server-side results.
+
+
+## Female voice cutover — October 14, 2026
+
+The shared Russian speech service now selects **Piper Irina medium**, advertised
+as `piper-ru-irina`. Both its inference and Wyoming containers use the same
+voice setting. Home Assistant's existing Wyoming integration was reloaded, and
+both **Local Russian Home** and **FCC Russian Local Voice** were updated to the
+new voice. This prevents the fallback profile from requesting the no-longer
+advertised Denis voice. The global preferred pipeline, conversation engines,
+recognition providers and wake words were preserved. Both Assistant selectors
+on both Dots still select Local Russian Home, including when a device is offline.
+
+The private image retains the pinned Denis assets for rollback. Restore the
+previous image/voice setting, reload Wyoming and restore `tts_voice` in every
+pipeline using this service together; changing only the display name is not a
+rollback. The companion speech repository documents the exact renderer option,
+model provenance and asset checks. Models, generated WAVs, credentials and site
+receipts remain private.
+
+An isolated canary on the production CPU verified both voice assets, application
+hashes, Irina discovery and two simultaneous syntheses: 3.50 and 5.82 seconds,
+with non-silent 24 kHz, mono, 16-bit audio. After promotion, native power queries
+in both actual Dot device contexts generated and returned Irina audio in 3.854
+seconds each. These measurements cover service generation and download, not
+microphone capture or listening quality. The speech repository passed 115 tests
+with one optional skip, Ruff/Bandit, independent review and its full CI gate;
+CI now synthesizes with both Denis and Irina offline.
+
+The live local-agent prompt also received the feminine self-reference rule.
+A text check returned «Да, поняла.». Its first request after the prompt change
+took 109.65 seconds on the existing CPU server; the voice change does not solve
+cold-prompt reasoning latency. Existing tool permissions and local household
+inference were preserved.
+
+During final device checks, the first Dot lost its network connection. Its
+address had not changed, the access point could not resolve it, and the shared
+controller remained healthy with the second Dot connected. The voice settings
+are persisted, but playback on an offline device requires restoring its
+connection first. This observation does not establish the cause of the outage.
+
+The second Dot accepted the synthetic Irina announcement and reported playback
+completion through its device connection. Its native media player's state
+remained `idle`: this announcement path does not reliably expose `playing` as
+a music-player state. Use the controller's device-confirmed completion event
+for this check; a short poll of the player's state alone can miss successful
+speech. Acoustical quality still requires a listener.
