@@ -56,6 +56,14 @@ HA's entity settings and expose those devices to Assist for the faster built-in
 intent path. Add Russian aliases to areas. Names and room assignments should
 reflect actual wiring; do not infer an unidentified outlet's load from its ID.
 
+A room alias alone is insufficient for commands such as «Выключи свет на кухне».
+Assign the actual light entity to that HA area, or let it inherit the correct
+area from its device. Verify the entity's effective area in addition to Assist
+exposure and aliases. An entity whose name contains “Kitchen” but whose effective
+area is empty will not satisfy a native light-in-Kitchen command. Use existing
+verified automations or a physical check to establish identity; old cloud entries,
+duplicate names and indicator LEDs are not evidence of room lighting membership.
+
 A reproducible starting profile is Qwen3 4B Instruct (`Q4_K_M`, approximately 4.0
 billion parameters) with Ollama 0.40.4. Provision it before denying outbound
 connections:
@@ -376,3 +384,26 @@ and idle. The Echo Show maintenance chat separately completed sequential
 synthesis/announcement checks on both Shows. The global preferred pipeline was
 unchanged. These are device/service confirmations; no new attended microphone
 or subjective listening-quality claim is implied.
+
+
+## Kitchen area command correction — October 14, 2026
+
+An attended «Выключи свет на кухне» was transcribed exactly. HA recognized a
+native `HassTurnOff` request for the kitchen area, but returned `no_valid_targets`:
+the area and its Russian aliases existed, while the working kitchen light had
+no entity or device area. The failed native request then reached the local model,
+which spent another 15.75 seconds producing a not-found answer. This was an HA
+entity-to-area configuration failure, not a wake-word or speech-recognition error.
+
+The existing kitchen automation set established which live light was intended.
+Its entity was assigned to Kitchen and its existing aliases were preserved,
+with additional Russian light/lighting aliases. Old integration duplicates and
+the socket's indicator LED were not added to the area. The prior registry entry
+was backed up privately; no firmware, model or conversation prompt changed.
+
+The exact command was then run through the first Dot's actual Assist device
+context. It completed with `processed_locally: true` in 0.331 seconds, returned
+only the intended light in the success list, and HA observed `on` → `off`.
+The Irina response audio was generated and downloaded in 2.93 seconds total.
+These measurements exclude microphone capture, STT and speaker playback. The
+entity-area correction is shared by all satellites using this HA instance.
