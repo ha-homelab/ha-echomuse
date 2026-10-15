@@ -24,6 +24,36 @@ prove that the speaker is receiving continuous audio.
    from a valid catalog entry. Keep source URLs, authentication and media names
    private. An initial Range success does not validate the entire track.
 
+## A short stop command asks what to stop
+
+The observed utterance was transcribed correctly as `stop`, but the original
+native grammar required `stop music`. The unmatched short command reached the
+conversation model, which asked whether to stop a light or heater. This was
+command routing, not a misheard wake phrase.
+
+The [native voice package](https://github.com/ha-homelab/ha-echo-show-5/pull/59)
+now handles `stop`, `стоп`, `stop music` and `останови музыку` locally. It stops
+only the originating satellite's registered Music Assistant player; an explicit
+registered target can override the origin. `pause` and `пауза` remain separate
+pause commands. No household-control service is inferred from a bare stop.
+Unknown origins request a target without acting. Unavailable players report
+unavailability, and already-idle players produce an already-stopped reply.
+
+Keep **Prefer handling commands locally** enabled on the pipeline. Reload
+scripts and conversation-trigger automations after installing the package.
+For a normal voice check, say **Hey Jarvis**, wait for its wake cue, then say
+**stop** or **стоп**. The configured wake phrase is not Hey Jasper. The repaired
+route also works within an existing conversation; another wake word is not
+required while the assistant is already listening.
+
+On October 14, replaying the recognized `stop` in the affected conversation was
+handled locally in 0.352 seconds. Both current Dot 2 player entities changed
+from playing to idle. A subsequent `стоп` returned an already-stopped response
+in 0.026 seconds. The test left music stopped and excluded microphone recognition
+and spoken-answer latency. The first Dot remained offline; its HA routing was
+updated, but its physical test awaits reconnection. Wake thresholds and firmware
+were unchanged.
+
 ## Repair a missing source without changing the library
 
 Remove a confirmed missing track from the private native-command seed list and
