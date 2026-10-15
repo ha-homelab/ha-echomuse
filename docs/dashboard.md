@@ -15,7 +15,8 @@ the corresponding Music Assistant player:
   refers to that Dot's current native ESPHome player.
 - Use the **current ESPHome assist satellite** for voice status.
 - Use the current device's **Microphone Muted** binary sensor, **Assistant**
-  selector, **Wake word** selector and optional **Wake word 2** selector.
+  selector and **Wake word** selector. Omit **Wake word 2** for the current
+  controller: it supports only one active wake model.
 
 Do not infer the player solely from its display name or a suffix such as `_2`.
 In this deployment `_2` distinguishes the MA wrapper from the native player,
@@ -41,6 +42,22 @@ change the corresponding selectors. These controls do not flash firmware or
 replace HA integrations. Hidden power controls avoid implying that the music
 card can switch off the physical Dot's USB power.
 
+## Why the second wake word is empty
+
+The deployed EchoMuse Controller 2.26.0 advertises `max_active_wake_words=1` and
+only its currently configured model through the ESPHome API. HA may still expose
+a second selector, but it does not enable a second simultaneous wake phrase.
+The live choices were `no_wake_word` and `hey jarvis`, with the second selector
+set to `no_wake_word`. The card therefore omits that unsupported control.
+
+Change the actual model in the **EchoMuse Controller** dashboard. This version
+offers **Hey Jarvis**, **Alexa**, **Hey Mycroft** and **Hey Rhasspy**, or a compatible
+custom openWakeWord ONNX model. These are alternatives for the one active model.
+The HA selector turns detection of that selected model on or off; it is not the
+full model catalog. A custom Russian phrase requires a compatible trained model
+and validation on the device. A model used by the previous EchoLocal deployment
+is not automatically installed or validated by the emOS/EchoMuse migration.
+
 ## Distinguish stale cards from an offline device
 
 An obsolete card can show unavailable while the new EchoMuse player works.
@@ -58,7 +75,9 @@ removed, and the current players and voice controls were consolidated into one
 EchoMuse section. Other dashboard cards were retained. A private before-copy
 was saved, and the full configuration was read back after saving.
 
-All twelve entity references existed. Dot 2's native and MA players reported
+All twelve initial entity references existed. A follow-up check confirmed the
+one-active-model limit, so both unsupported second-wake-word rows were removed,
+leaving ten references without changing wake settings. Dot 2's native and MA players reported
 playing, its voice satellite was idle, and its microphone was unmuted. Dot 1
 was disconnected in both HA and the controller; the operator could not power
 it on for this check. Its new card is configured but physical reconnection

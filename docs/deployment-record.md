@@ -394,7 +394,9 @@ The Media dashboard still contained obsolete EchoLocal satellite cards alongside
 the new EchoMuse players. The old cards were replaced with one EchoMuse section
 containing the current MA players, voice status, microphone state and selectors
 for each Dot. All twelve entity references existed and the saved configuration
-was read back. See the [dashboard procedure and verification limits](dashboard.md).
+was read back. A subsequent check confirmed that the controller supports only
+one active wake model; both second-wake-word rows were removed, leaving ten
+current references. See the [dashboard procedure and verification limits](dashboard.md).
 
 The operator then confirmed audible interruptions on the second Dot. Checking
 the 25-item queue found one Plex item with valid metadata but an HTTP 404 from

@@ -73,3 +73,10 @@ interruption or establish long-term playback reliability.
 After the queue repair, the operator confirmed that music played smoothly on
 the second Dot. The first Dot was disconnected and could not be powered on for
 this check, so this is not listening acceptance for both devices.
+
+Seven subsequent samples over 150 seconds kept the second player available and
+playing, including an automatic track transition. The controller log since the
+restart contained a 2.7-second initial decode wait and one 664 ms source read
+stall, with no new device-link timeouts or send failures. No new Plex 404 was
+logged in that interval. These bounded observations support the attended result
+without claiming uninterrupted playback under all conditions.

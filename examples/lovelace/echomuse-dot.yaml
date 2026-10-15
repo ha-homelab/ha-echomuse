@@ -20,5 +20,3 @@ cards:
         name: Assistant
       - entity: select.REPLACE_WITH_WAKE_WORD
         name: Wake word
-      - entity: select.REPLACE_WITH_SECOND_WAKE_WORD
-        name: Second wake word
