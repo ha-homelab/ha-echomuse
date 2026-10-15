@@ -10,16 +10,19 @@ from types import SimpleNamespace
 from homeassistant import loader
 from homeassistant.bootstrap import async_load_base_functionality
 from homeassistant.config_entries import ConfigEntries
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import llm
+from homeassistant.helpers import intent, llm, template
+from homeassistant.components.homeassistant.exposed_entities import async_expose_entity
 from homeassistant.components.ollama.entity import _parse_tool_args
+from homeassistant.setup import async_setup_component
 from hassil import Intents, recognize
 import probatio
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from custom_components.echomuse_home import HomeAPI, ControlEntity
+from custom_components.echomuse_home.intent import async_setup_intents
 
 
 class HomeToolsRuntimeTest(unittest.IsolatedAsyncioTestCase):
@@ -76,9 +79,56 @@ class HomeToolsRuntimeTest(unittest.IsolatedAsyncioTestCase):
         for text in ["Включён ли первый обогреватель", "Первый обогреватель сейчас включен"]:
             result = recognize(text, grammar)
             self.assertIsNotNone(result, text)
-            self.assertEqual(result.intent.name, "HassGetState")
+            self.assertEqual(result.intent.name, "EchoMuseGetState")
             self.assertEqual(result.entities["state"].value, "on")
         self.assertIsNone(recognize("Выключи первый обогреватель", grammar))
+
+    async def test_fast_sensor_grammar_keeps_history_and_actions_out(self):
+        from homeassistant.components.assist_pipeline.default_pipeline import _async_local_fallback_intent_filter
+        data = yaml.safe_load((Path(__file__).resolve().parents[1] / "examples/custom_sentences/ru/echomuse_home.yaml").read_text())
+        data["lists"]["name"] = {"values": [{"in": "мощность первого обогревателя", "context": {"domain": "sensor"}}]}
+        grammar = Intents.from_dict(data)
+        for prefix in ("Какова", "Какая", "Скажи текущую"):
+            result = recognize(prefix + " мощность первого обогревателя", grammar)
+            self.assertIsNotNone(result)
+            self.assertEqual(result.intent.name, "EchoMuseGetState")
+            self.assertFalse(_async_local_fallback_intent_filter(result))
+        for text in ("Включи мощность первого обогревателя", "Какая мощность первого обогревателя вчера", "Сколько энергии потребил первый обогреватель в этом месяце"):
+            self.assertIsNone(recognize(text, grammar))
+
+    async def test_fast_state_is_readonly_checks_exposure_and_reports_unavailable(self):
+        self.assertTrue(await async_setup_component(self.hass, "homeassistant", {}))
+        await async_setup_intents(self.hass)
+        self.hass.states.async_set("sensor.test_power", "212", {"friendly_name": "Мощность первого обогревателя", "unit_of_measurement": "W"})
+        async_expose_entity(self.hass, "conversation", "sensor.test_power", True)
+        slots = {"name": {"value": "Мощность первого обогревателя"}, "domain": {"value": "sensor"}}
+        async def request(user_id=None):
+            return await intent.async_handle(self.hass, "conversation", "EchoMuseGetState", slots,
+                context=Context(user_id=user_id), language="ru", assistant="conversation")
+        response = await request()
+        self.assertEqual(response.matched_states[0].state, "212")
+        data = yaml.safe_load((Path(__file__).resolve().parents[1] / "examples/custom_sentences/ru/echomuse_home.yaml").read_text())
+        speech = template.Template(data["responses"]["intents"]["EchoMuseGetState"]["one"], self.hass)
+        variables = {"query": {"matched": response.matched_states}, "slots": {"name": "Мощность первого обогревателя"}}
+        self.assertIn("212 ватт", speech.async_render(variables))
+        yesno = template.Template(data["responses"]["intents"]["EchoMuseGetState"]["one_yesno"], self.hass)
+        # HA's speech slot is not necessarily the normalized scalar "on".
+        # Derive the reported state from the actual query result instead.
+        for state, matched, expected in (("on", True, "Да, включено"), ("off", True, "Да, выключено"), ("off", False, "Нет, выключено"), ("unavailable", False, "недоступны")):
+            row = SimpleNamespace(state=state)
+            query = {"matched": [row] if matched else [], "unmatched": [] if matched else [row]}
+            self.assertIn(expected, yesno.async_render({"query": query, "slots": {"state": [state]}}))
+        self.hass.states.async_set("sensor.test_power", "unavailable", {"friendly_name": "Мощность первого обогревателя"})
+        variables["query"]["matched"] = (await request()).matched_states
+        self.assertIn("недоступны", speech.async_render(variables))
+        denied_user = SimpleNamespace(permissions=SimpleNamespace(check_entity=lambda *_: False))
+        with patch.object(self.hass, "auth", new=SimpleNamespace(async_get_user=AsyncMock(return_value=denied_user)), create=True):
+            with self.assertRaises(intent.IntentHandleError):
+                await request("denied-user")
+        async_expose_entity(self.hass, "conversation", "sensor.test_power", False)
+        with self.assertRaises(intent.MatchFailedError):
+            await request()
+        self.assertEqual(self.calls, [])
 
     async def test_lookup_and_control_actual_isolated_service(self):
         found = await self.tool("FindEntities", query="лампа на кухне", domain="light")

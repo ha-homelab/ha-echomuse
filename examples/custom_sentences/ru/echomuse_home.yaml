@@ -1,4 +1,5 @@
-# Use HA's state-query handler, accepting both е and ё spellings.
+# The custom intent stays on HA's prefer-local path with a control-capable LLM.
+# Requires custom_components/echomuse_home; names come from exposed HA aliases.
 language: ru
 lists:
   echomuse_on_off_states:
@@ -8,7 +9,7 @@ lists:
       - in: "(выключен|выключён|выключена|выключено|выключены)"
         out: "off"
 intents:
-  HassGetState:
+  EchoMuseGetState:
     data:
       - sentences:
           - "{echomuse_on_off_states:state} ли [сейчас] {name}"
@@ -16,3 +17,51 @@ intents:
         requires_context:
           domain: [light, switch, fan]
         response: one_yesno
+      - sentences:
+          - "(какая|какой|какое|каков|какова|каково|сколько) [сейчас] {name}"
+          - "(скажи|покажи|сообщи) [текущую|текущий|текущее] {name}"
+        requires_context:
+          domain: sensor
+        slots:
+          domain: sensor
+        response: one
+      - sentences:
+          - "какие (лампы|светильники) [сейчас] {echomuse_on_off_states:state}"
+        slots:
+          domain: light
+        response: which
+responses:
+  intents:
+    EchoMuseGetState:
+      one: >-
+        {% if query.matched | count == 1 %}
+          {% set s = query.matched[0] %}
+          {% if s.state in ['unknown', 'unavailable'] %}
+            Данные сейчас недоступны.
+          {% else %}
+            {% set units = {'W': 'ватт', 'kW': 'киловатт', 'kWh': 'киловатт-часа', '°C': 'градусов Цельсия', 'V': 'вольт', 'A': 'ампер', '%': 'процентов'} %}
+            {{ slots.name }}: {{ s.state }} {{ units.get(s.attributes.get('unit_of_measurement', ''), s.attributes.get('unit_of_measurement', '')) }}.
+          {% endif %}
+        {% else %}
+          Уточните название датчика.
+        {% endif %}
+      one_yesno: >-
+        {% set all = query.matched + query.unmatched %}
+        {% if all | count != 1 %}
+          Уточните название устройства.
+        {% elif all[0].state in ['unknown', 'unavailable'] %}
+          Данные сейчас недоступны.
+        {% elif query.matched %}
+          Да, {{ 'включено' if all[0].state == 'on' else 'выключено' }}.
+        {% else %}
+          Нет, {{ 'включено' if all[0].state == 'on' else 'выключено' }}.
+        {% endif %}
+      which: >-
+        {% if query.matched %}
+          {{ query.matched | map(attribute='name') | join(', ') }}.
+        {% else %}
+          Таких светильников нет.
+        {% endif %}
+        {% if query.unmatched | selectattr('state', 'in', ['unknown', 'unavailable']) | list %}
+          Часть светильников недоступна.
+        {% endif %}

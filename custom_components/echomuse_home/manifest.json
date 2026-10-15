@@ -1,9 +1,9 @@
 {
   "domain": "echomuse_home",
   "name": "EchoMuse Home Tools",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "documentation": "https://github.com/ha-homelab/ha-echomuse/blob/main/docs/home-control.md",
-  "dependencies": ["conversation", "recorder"],
+  "dependencies": ["conversation", "intent", "recorder"],
   "codeowners": [],
   "iot_class": "local_push",
   "requirements": []

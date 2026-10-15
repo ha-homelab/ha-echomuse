@@ -105,3 +105,20 @@ The new Russian voice and the newly migrated first Dot still need attended
 button, wake and music checks. Service readiness alone does not establish
 physical success. See the [deployment record](deployment-record.md#october-14-2026--first-dot-migration)
 and [repeat migration procedure](migration.md#9-migrate-another-existing-echolocal-unit).
+
+## Local-home voice deadline correction
+
+The first attended test of Local Russian Home failed on both Dots. Their heater
+power questions were transcribed correctly, but the controller's 30-second
+response wait cancelled the model before speech was generated. An earlier
+greeting followed an unrelated `uh` transcript. These observations supersede any
+inference that the successful text and generated-audio tests proved complete
+voice-path operation.
+
+The controller now permits the upstream-supported 120-second wait. Common state
+questions use a native read-only intent, avoiding slow model/tool round trips.
+The corrected power query completed its intent stage in approximately half a
+second for each device context; two simultaneous generated audio responses were
+fetched in 4.7 seconds. This is still a service test, with renewed attended
+microphone/playback verification requested. Details and limits are in the
+[local-home record](home-control.md#deployed-local-home-assistant--october-14-2026).

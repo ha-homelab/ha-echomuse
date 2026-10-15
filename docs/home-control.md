@@ -13,7 +13,9 @@ No firmware change or USB connection is needed for this feature.
    Run both isolated runtime tests before using a different HA version.
 2. Copy `custom_components/echomuse_home` into HA's `custom_components` directory.
 3. Add the configuration below to a package, replacing example entities with
-   your reviewed device list. Validate configuration and restart HA once.
+   your reviewed device list. Copy `examples/custom_sentences/ru/echomuse_home.yaml`
+   to `custom_sentences/ru/echomuse_home.yaml` in HA's configuration directory.
+   Validate configuration and restart HA once.
 4. Run Ollama on an always-on local server. Store model files on persistent
    storage. Keep the API private; allow HA to reach it, not the internet. Disable
    Ollama cloud features and, after downloading the model, deny workload egress.
@@ -29,6 +31,10 @@ No firmware change or USB connection is needed for this feature.
 7. Assign the new pipeline to both Assistant selectors on each satellite. Keep
    the previous FCC pipeline for rollback. Do not route unmatched household
    requests automatically to an external model.
+8. For a CPU-based local model, set the EchoMuse controller environment variable
+   `EM_TTS_WAIT_TIMEOUT=120` and restart the controller. Its upstream default is
+   30 seconds; the supported ceiling is 120 seconds. This is separate from an
+   Assist WebSocket test's timeout. Increasing one does not increase the other.
 
 ```yaml
 echomuse_home:
@@ -108,16 +114,22 @@ Examples to say after the wake word:
 - «Выключи второй обогреватель»
 - «Какие лампы сейчас включены?»
 - «Первый обогреватель сейчас включён?»
-- «Какая мощность у третьего обогревателя?»
+- «Какая мощность третьего обогревателя?»
 - «Сколько энергии потребил первый обогреватель вчера?»
 - «Какая средняя температура была вчера?» — specify the room or sensor when asked.
 
 In HA 2026.10, the pipeline deliberately filters `HassGetState` and standard
 media-search intents out of the built-in fallback when the selected model has
 control support. Therefore “prefer handling commands locally” does not make every
-state question bypass the model. The optional state-sentence example also works
-with the standalone Home Assistant agent, but does not override this pipeline
-filter. Existing sentence-trigger music routing remains separate and takes priority.
+state question bypass the model. The included sentence file uses the distinct
+**EchoMuseGetState** intent, registered by this integration, for common sensor
+readings, on/off questions and lists of active lights. It reuses HA's native target
+matching and Assist exposure checks, checks user read permissions and never
+calls an actuator. Sensor aliases should contain the measurement as well as the
+device, for example «мощность первого обогревателя». Both «Какая» and «Какова»
+are accepted. Unknown/unavailable readings are reported explicitly. Period
+questions stay outside this current-state grammar and retain the Recorder path.
+Existing sentence-trigger music routing remains separate and takes priority.
 
 The existing deterministic IGW energy sentences remain available. They return
 the measured energy report without using the LLM. Do not interpret watts as
@@ -185,7 +197,8 @@ light command and confirm its state, then check each satellite separately. Do no
 use heater activation as a generic acceptance test.
 
 Rollback: select the previous pipeline on both Assistant selectors of each Dot.
-Remove the `echomuse_home` package and custom component, validate and restart HA.
+Remove the `echomuse_home` package, custom component and its custom sentence file,
+validate and restart HA. Restore the prior controller timeout if needed.
 Restore only aliases/exposure settings changed by this rollout from the private
 journal. Preserve other concurrent HA changes and model storage unless deliberately
 retiring the local service.
@@ -209,7 +222,7 @@ one active inference request, a bounded queue, a 5 GiB memory limit and a
 256 MiB prompt cache limit. The running model occupied approximately 4 GiB.
 This is a functional CPU deployment, not an instant-response benchmark.
 
-Validation includes 55 policy/source tests and 17 tests in an isolated HA
+Initial validation included 55 policy/source tests and 17 tests in an isolated HA
 runtime. Live text checks distinguished on/off and unavailable states without
 sending control commands. A monthly energy question invoked FindEntities and
 GetStatistics on the cumulative sensor, with the correct calendar interval,
@@ -224,6 +237,30 @@ every request: the GetDateTime tool suppresses HA's automatically appended
 seconds-level clock. A broad sensor search can still require substantial CPU
 time. These samples are text-service timings, excluding microphone capture,
 recognition and playback; they do not establish sustained-load performance.
+
+The first attended test exposed a deadline that those text-only tests did not
+exercise. Both Dots correctly transcribed «Какова мощность первого обогревателя».
+The controller then cancelled the HA turn 30 seconds after audio ended, before
+the model finished. HA showed `run-end` without `intent-end` or `tts-end`; the
+controller logged `Timeout waiting for TTS response from HA`. A preceding
+attempt had transcribed only `uh`, explaining the unrelated greeting. These
+were separate recognition and response-wait failures.
+
+The correction adds the fast native state intent above and raises the shared
+controller's response wait to 120 seconds. It does not make this CPU model faster:
+uncached multi-step history requests can still exceed that ceiling. Validate a
+real satellite turn, including its controller log, before claiming voice success.
+
+After the correction, simultaneous requests in the two actual Dot device
+contexts took 0.518 and 0.487 seconds in the intent stage. Both were marked
+`processed_locally: true` and returned the current heater power in Russian with
+watts pronounced explicitly. Generated audio was fetched in 4.708 and 4.707
+seconds total. These are intent-to-audio service measurements, excluding the
+microphone, STT and physical playback. Both pipelines and all four Assistant
+selectors were rechecked; both satellites and players were available. The
+updated suite passed 55 policy/source tests and 19 isolated HA runtime tests,
+including native exposure, user permissions, unavailable readings and the
+control-capable pipeline's intent filter.
 
 The final action check used **ControlDevice** to resolve and turn on one lamp.
 HA emitted the expected `light.turn_on` event and reported `on`; the test then

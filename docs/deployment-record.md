@@ -338,3 +338,11 @@ migration checkpoints, not the final active configuration.
 See the [local-home deployment record](home-control.md#deployed-local-home-assistant--october-14-2026)
 for the verified control/read separation, real lamp restoration, generated
 audio for both device contexts, CPU latency limits and remaining attended tests.
+
+The first attended local-home test failed on both devices despite correct
+transcription of the heater power question. Controller traces identified its
+30-second response deadline cancelling the still-running local model. The
+correction registers a native read-only state intent and changes the shared
+controller's supported response timeout to 120 seconds. See the same record for
+verification and remaining performance limits; the earlier text API checks did
+not establish full voice-path success.
