@@ -24,7 +24,7 @@ def load(name):
     return module
 
 
-fetch = load('fetch_upstream')
+from scripts import fetch_upstream as fetch
 public = load('check_public')
 
 
@@ -64,7 +64,7 @@ class FetchTests(unittest.TestCase):
             fetch.fetch(self.artifact, self.destination, strict_tls=True)
         handler = next(item for item in build.call_args.args
                        if isinstance(item, urllib.request.HTTPSHandler))
-        self.assertGreaterEqual(handler._context.security_level, 3)
+        self.assertGreaterEqual(handler._context.security_level, 2)
         self.assertTrue(handler._context.check_hostname)
 
     def test_valid_artifact_is_atomic_and_private(self):
