@@ -1,5 +1,4 @@
 """Exercise actual HA service/schema behavior in a separate, isolated runtime."""
-import asyncio
 from pathlib import Path
 import sys
 import tempfile
