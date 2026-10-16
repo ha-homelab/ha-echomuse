@@ -25,10 +25,10 @@ class Diagram:
             f'viewBox="0 0 1280 {height}" role="img" aria-labelledby="title desc">',
             f'<title id="title">{escape(title)}</title><desc id="desc">{escape(description)}</desc>',
             '<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" '
-            'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
-            '<path d="M0 0 L10 5 L0 10 Z" fill="#758399"/></marker></defs>',
+            + 'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
+            + '<path d="M0 0 L10 5 L0 10 Z" fill="#758399"/></marker></defs>',
             '<style>text{font-family:Arial,Helvetica,sans-serif} '
-            '.edge{fill:none;stroke:#758399;stroke-width:2.5;marker-end:url(#arrow)}</style>',
+            + '.edge{fill:none;stroke:#758399;stroke-width:2.5;marker-end:url(#arrow)}</style>',
         ]
         self.rect(0, 0, 1280, height, "#f7f9fd", radius=24)
         self.rect(0, 0, 1280, 9, "#6d4ad1", radius=0)
