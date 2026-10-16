@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="780" viewBox="0 0 1280 780" role="img" aria-labelledby="title desc">
+<title id="title">A tracker is a consumer, not another proxy</title><desc id="desc">A beacon broadcasts advertisements. The Dot radio receives them, the controller exposes an encrypted BLE proxy endpoint and Home Assistant Bluetooth distributes the observations to iBeacon Tracker or other integrations. The voice endpoint is enrolled separately.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#758399"/></marker></defs>
+<style>text{font-family:Arial,Helvetica,sans-serif} .edge{fill:none;stroke:#758399;stroke-width:2.5;marker-end:url(#arrow)}</style>
+<rect x="0" y="0" width="1280" height="780" rx="24" fill="#f7f9fd"/>
+<rect x="0" y="0" width="1280" height="9" rx="0" fill="#6d4ad1"/>
+<text x="60" y="49" font-size="14" fill="#6d4ad1" font-weight="700">04 / BLUETOOTH ROLES</text>
+<text x="60" y="96" font-size="35" fill="#172b4d" font-weight="700">A tracker is a consumer, not another proxy</text>
+<text x="60" y="132" font-size="18" fill="#4b6178">Follow the data from a nearby transmitter to a Home Assistant entity</text>
+<path class="edge" d="M290 270 H326"/>
+<path class="edge" d="M580 270 H616"/>
+<path class="edge" d="M900 270 H936"/>
+<path class="edge" d="M1080 370 V444"/>
+<rect x="60" y="180" width="230" height="190" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="61" y="181" width="228" height="47" rx="17" fill="#fff2d9"/>
+<text x="82" y="210" font-size="14" fill="#a85a06" font-weight="700">TRANSMITTER</text>
+<text x="82" y="262" font-size="24" fill="#172b4d" font-weight="700">BLE beacon</text>
+<text x="82" y="296" font-size="18" fill="#304a64">Broadcasts</text>
+<text x="82" y="322" font-size="18" fill="#304a64">advertisements.</text>
+<text x="82" y="348" font-size="18" fill="#304a64">No pairing implied.</text>
+<rect x="330" y="180" width="250" height="190" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="331" y="181" width="248" height="47" rx="17" fill="#f0ebff"/>
+<text x="352" y="210" font-size="14" fill="#6d4ad1" font-weight="700">PHYSICAL RADIO</text>
+<text x="352" y="262" font-size="24" fill="#172b4d" font-weight="700">Echo Dot</text>
+<text x="352" y="296" font-size="18" fill="#304a64">Receives nearby</text>
+<text x="352" y="322" font-size="18" fill="#304a64">BLE advertisements.</text>
+<text x="352" y="348" font-size="18" fill="#304a64">Radio coverage matters.</text>
+<rect x="620" y="180" width="280" height="190" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="621" y="181" width="278" height="47" rx="17" fill="#e2f6f1"/>
+<text x="642" y="210" font-size="14" fill="#087f78" font-weight="700">CONTROLLER ENDPOINT</text>
+<text x="642" y="262" font-size="24" fill="#172b4d" font-weight="700">BLE proxy</text>
+<text x="642" y="296" font-size="18" fill="#304a64">Separate assigned port</text>
+<text x="642" y="322" font-size="18" fill="#304a64">and Noise encryption key.</text>
+<text x="642" y="348" font-size="18" fill="#304a64">Enroll with ESPHome.</text>
+<rect x="940" y="180" width="280" height="190" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="941" y="181" width="278" height="47" rx="17" fill="#e8f1ff"/>
+<text x="962" y="210" font-size="14" fill="#2563a6" font-weight="700">HA ROUTING</text>
+<text x="962" y="262" font-size="24" fill="#172b4d" font-weight="700">Bluetooth</text>
+<text x="962" y="296" font-size="18" fill="#304a64">Receives observations</text>
+<text x="962" y="322" font-size="18" fill="#304a64">from configured scanners.</text>
+<text x="962" y="348" font-size="18" fill="#304a64">Feeds integrations.</text>
+<rect x="850" y="448" width="370" height="202" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="851" y="449" width="368" height="47" rx="17" fill="#ffebf2"/>
+<text x="872" y="478" font-size="14" fill="#af3e68" font-weight="700">CONSUMER INTEGRATION</text>
+<text x="872" y="530" font-size="24" fill="#172b4d" font-weight="700">iBeacon Tracker</text>
+<text x="872" y="564" font-size="18" fill="#304a64">Recognizes supported beacon data.</text>
+<text x="872" y="590" font-size="18" fill="#304a64">Can create tracking entities.</text>
+<text x="872" y="616" font-size="18" fill="#304a64">Does not add another radio.</text>
+<rect x="60" y="448" width="730" height="202" rx="18" fill="#f0ebff"/>
+<text x="84" y="488" font-size="14" fill="#6d4ad1" font-weight="700">COUNT THE RIGHT THING</text>
+<text x="84" y="528" font-size="18" fill="#304a64">One Dot can expose voice and BLE endpoints: two different jobs.</text>
+<text x="84" y="557" font-size="18" fill="#304a64">A BLE consumer is software using received observations.</text>
+<text x="84" y="586" font-size="18" fill="#304a64">Adding iBeacon Tracker alone does not create a nearby beacon.</text>
+<text x="84" y="615" font-size="18" fill="#304a64">Remove obsolete entries only after the replacement works.</text>
+<text x="60" y="709" font-size="18" fill="#172b4d">Troubleshoot in order: transmitter → radio → proxy connection → HA observations → consumer support.</text>
+<text x="60" y="756" font-size="14" fill="#4b6178">EchoMuse project guide · recorded baseline, not live device status</text>
+</svg>

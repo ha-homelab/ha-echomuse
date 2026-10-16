@@ -9,7 +9,9 @@ EchoMuse и emOS. Это независимый проект: воспроизв
 
 [Документация](docs/README.md) · [Эксплуатация](docs/operations.md) · [Совместимость](docs/compatibility.md) · [Устранение проблем](docs/troubleshooting.md) · [Wiki](https://github.com/ha-homelab/ha-echomuse/wiki)
 
-![Пути голоса, музыки и Bluetooth между Echo Dot, контроллером и Home Assistant; подписи на английском](docs/assets/architecture.svg)
+![Шесть этапов от определения модели Echo Dot до проверки голосового ответа; подписи на английском](docs/assets/conversion-journey.svg)
+
+**[Наглядно: процесс и результат](docs/visual-guide.md)** — этапы конверсии, путь голосового запроса, измеренные задержки, роли Bluetooth и проверка результата. Руководство и схемы на английском; соединения описаны в [архитектуре](docs/architecture.md).
 
 ## Возможности
 

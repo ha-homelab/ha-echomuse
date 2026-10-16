@@ -9,7 +9,9 @@ an official EchoMuse distribution or a replacement firmware for every Echo.
 
 [Documentation](docs/README.md) · [Operations](docs/operations.md) · [Compatibility](docs/compatibility.md) · [Troubleshooting](docs/troubleshooting.md) · [Wiki](https://github.com/ha-homelab/ha-echomuse/wiki)
 
-![Voice, music and Bluetooth paths between the Echo Dot, EchoMuse Controller and Home Assistant](docs/assets/architecture.svg)
+![Six stages from identifying the Echo Dot to an attended Home Assistant voice test](docs/assets/conversion-journey.svg)
+
+**[Visual walkthrough: process and result](docs/visual-guide.md)** — conversion stages, voice request flow, measured timing, Bluetooth roles and acceptance checks. [Service architecture](docs/architecture.md) explains the connections.
 
 ## What you get
 

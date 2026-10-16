@@ -6,6 +6,10 @@ Start with the task you need to complete. Detailed runbooks are maintained in
 English. The localized project READMEs cover the same scope, prerequisites,
 installation sequence, boundaries and support links.
 
+Start with the **[illustrated process and result guide](visual-guide.md)** for
+the conversion journey, request flow, measured response timeline and observable
+acceptance targets. Its color diagrams link back to the detailed runbooks below.
+
 ## Choose and migrate hardware
 
 - [Compatibility and decision points](compatibility.md): supported evidence,

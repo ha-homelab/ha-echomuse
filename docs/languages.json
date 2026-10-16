@@ -10,7 +10,7 @@
     "fr": {"label": "Français", "readme": "README.fr.md"}
   },
   "required_readme_links": [
-    "docs/README.md", "docs/operations.md", "docs/compatibility.md",
+    "docs/README.md", "docs/visual-guide.md", "docs/operations.md", "docs/compatibility.md",
     "docs/troubleshooting.md", "docs/migration.md", "docs/controller.md",
     "docs/device-access.md", "docs/home-control.md", "docs/energy-assist.md",
     "docs/dashboard.md", "docs/bluetooth-proxy.md", "docs/voice-features.md",
