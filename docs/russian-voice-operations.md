@@ -17,12 +17,13 @@ receive home state or history through a fallback.
 ## Current household baseline
 
 Both Dots were assigned **Local Russian Home** with the local household model
-and **Piper Irina medium** (`piper-ru-irina`). Speech recognition still uses the
+and **Silero Baya**. The settings-capable service uses `silero-ru-default`
+to follow the shared [voice controls](speech-settings.md). Speech recognition still uses the
 configured FCC cloud service, so this is not a fully offline voice pipeline.
 Keep household state, tools and statistics on the local conversation route.
 The female-voice cutover and generated-audio evidence are recorded in
 [home control](home-control.md#female-voice-cutover--october-14-2026). The later
-Wyoming 0.2.0 adapter supports [sentence streaming](voice-features.md).
+Wyoming adapter supports [sentence streaming](voice-features.md).
 
 For a new household setup, first deploy and validate these services, then use
 the [operations handbook](operations.md#service-startup-and-enrollment-order)

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="980" viewBox="0 0 1280 980" role="img" aria-labelledby="title desc">
-<title id="title">What happens after “Hey Jarvis”</title><desc id="desc">Wake detection is local. The recorded FCC service transcribes audio in the cloud. Home Assistant routes the request to native intents or the local Ollama home tools. Local Irina synthesis returns audio to the originating Dot. Streaming can overlap generation.</desc>
+<title id="title">What happens after “Hey Jarvis”</title><desc id="desc">Wake detection is local. The recorded FCC service transcribes audio in the cloud. Home Assistant routes the request to native intents or the local Ollama home tools. Local Silero synthesis returns audio to the originating Dot. Streaming can overlap generation.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#758399"/></marker></defs>
 <style>text{font-family:Arial,Helvetica,sans-serif} .edge{fill:none;stroke:#758399;stroke-width:2.5;marker-end:url(#arrow)}</style>
 <rect x="0" y="0" width="1280" height="980" rx="24" fill="#f7f9fd"/>
@@ -55,7 +55,7 @@
 <rect x="460" y="670" width="760" height="160" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
 <rect x="461" y="671" width="758" height="47" rx="17" fill="#e2f6f1"/>
 <text x="482" y="700" font-size="14" fill="#087f78" font-weight="700">4 / LOCAL SYNTHESIS</text>
-<text x="482" y="752" font-size="24" fill="#172b4d" font-weight="700">Irina through the Wyoming adapter</text>
+<text x="482" y="752" font-size="24" fill="#172b4d" font-weight="700">Silero through the Wyoming adapter</text>
 <text x="482" y="786" font-size="18" fill="#304a64">A complete sentence can become audio while more text is generated.</text>
 <text x="482" y="812" font-size="18" fill="#304a64">Streamed text, streamed TTS and device playback must all cooperate.</text>
 <rect x="60" y="670" width="360" height="160" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
