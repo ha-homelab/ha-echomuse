@@ -165,3 +165,16 @@ and reload Wyoming. Disable the settings integration while running a service
 without `/v1/settings`. Preserve its PVC for a later upgrade. Piper rollback
 also requires the matching Piper backend and pipeline voice, as described in
 the speech service runbook.
+
+## Settings rollout — October 16, 2026
+
+The pinned model generated valid audio for all five installed voices. On the
+NUC, the final image passed two concurrent Wyoming requests in 3.50 and 5.80
+seconds (6.90 seconds of output each). Its streaming probe delivered first audio
+in 2.32 seconds, before input ended. The inference container retained its two-CPU,
+1 GiB limit; the adapter retained its 250m CPU and 128 MiB limits.
+
+The probe exercised speech-rate and pitch boundaries, all three emphasis levels,
+forced sentence types, pauses, and disabled pronunciation aids. Settings were
+saved on a persistent volume. These are generated-audio and protocol checks,
+not a listening preference test or an end-to-end microphone latency measurement.
