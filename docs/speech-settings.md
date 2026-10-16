@@ -12,6 +12,10 @@ Speech**. The device has ten configuration entities. The entity labels are
 translated into English, Russian, German, Spanish and French using the HA
 profile language. Voice names remain unchanged.
 
+The existing **Media** dashboard can show the same controls using the
+[entities card example](../examples/lovelace/russian-speech-settings.yaml).
+Check entity IDs in your own registry before copying it.
+
 In **Settings → Voice assistants**, edit each relevant assistant. Keep its
 existing conversation agent and speech recognition. Under text-to-speech,
 choose **Local Russian Speech**, Russian, and **silero-ru-default**. This alias
@@ -178,3 +182,10 @@ The probe exercised speech-rate and pitch boundaries, all three emphasis levels,
 forced sentence types, pauses, and disabled pronunciation aids. Settings were
 saved on a persistent volume. These are generated-audio and protocol checks,
 not a listening preference test or an end-to-end microphone latency measurement.
+
+The settings integration was also installed in the active HA instance. A rate
+change from 100 to 101 and back to 100 was made through the actual HA number
+service and verified against the HTTPS API. Both shared TTS pipelines selected
+`silero-ru-default`; both Dot satellites reported idle. HA generated a 48,164-byte
+audio response, which was not played. The Media dashboard configuration was
+saved and read back with all ten control references present.

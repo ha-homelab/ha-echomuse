@@ -1,0 +1,15 @@
+# Verify entity IDs in your registry; HA can allocate suffixes on another installation.
+type: entities
+title: Local Russian Speech
+show_header_toggle: false
+entities:
+  - select.local_russian_speech_voice
+  - number.local_russian_speech_speech_rate
+  - number.local_russian_speech_pitch_adjustment
+  - number.local_russian_speech_added_sentence_pause
+  - select.local_russian_speech_intonation
+  - text.local_russian_speech_words_to_emphasize_comma_separated
+  - number.local_russian_speech_emphasis_strength
+  - switch.local_russian_speech_automatic_stress
+  - switch.local_russian_speech_automatic_e
+  - button.local_russian_speech_reset_voice_settings
