@@ -9,7 +9,9 @@ d’exploitation. Ce n’est ni une distribution officielle d’EchoMuse ni un m
 
 [Documentation](docs/README.md) · [Exploitation](docs/operations.md) · [Compatibilité](docs/compatibility.md) · [Dépannage](docs/troubleshooting.md) · [Wiki](https://github.com/ha-homelab/ha-echomuse/wiki)
 
-![Circuits voix, musique et Bluetooth entre Echo Dot, contrôleur et Home Assistant ; légendes en anglais](docs/assets/architecture.svg)
+![Six étapes de l’identification du Echo Dot à la vérification de sa réponse vocale ; légendes en anglais](docs/assets/conversion-journey.svg)
+
+**[Guide visuel : processus et résultat](docs/visual-guide.md)** — conversion, parcours vocal, durées mesurées, rôles Bluetooth et vérifications. Le guide et les graphiques sont en anglais ; les connexions sont détaillées dans l’[architecture](docs/architecture.md).
 
 ## Fonctionnalités
 

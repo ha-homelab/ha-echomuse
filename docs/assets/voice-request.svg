@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="980" viewBox="0 0 1280 980" role="img" aria-labelledby="title desc">
+<title id="title">What happens after “Hey Jarvis”</title><desc id="desc">Wake detection is local. The recorded FCC service transcribes audio in the cloud. Home Assistant routes the request to native intents or the local Ollama home tools. Local Irina synthesis returns audio to the originating Dot. Streaming can overlap generation.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#758399"/></marker></defs>
+<style>text{font-family:Arial,Helvetica,sans-serif} .edge{fill:none;stroke:#758399;stroke-width:2.5;marker-end:url(#arrow)}</style>
+<rect x="0" y="0" width="1280" height="980" rx="24" fill="#f7f9fd"/>
+<rect x="0" y="0" width="1280" height="9" rx="0" fill="#6d4ad1"/>
+<text x="60" y="49" font-size="14" fill="#6d4ad1" font-weight="700">02 / VOICE REQUEST</text>
+<text x="60" y="96" font-size="35" fill="#172b4d" font-weight="700">What happens after “Hey Jarvis”</text>
+<text x="60" y="132" font-size="18" fill="#4b6178">Conceptual service flow · physical transport runs through the controller · not a timing diagram</text>
+<path class="edge" d="M420 257 H456"/>
+<path class="edge" d="M820 257 H856"/>
+<path class="edge" d="M1040 335 V368 H640 V405"/>
+<path class="edge" d="M1040 368 V405"/>
+<path class="edge" d="M640 600 V670"/>
+<path class="edge" d="M1040 600 V670"/>
+<path class="edge" d="M460 745 H424"/>
+<rect x="60" y="175" width="360" height="160" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="61" y="176" width="358" height="47" rx="17" fill="#f0ebff"/>
+<text x="82" y="205" font-size="14" fill="#6d4ad1" font-weight="700">1 / ON THE DOT</text>
+<text x="82" y="257" font-size="24" fill="#172b4d" font-weight="700">Wake and capture</text>
+<text x="82" y="291" font-size="18" fill="#304a64">Local wake model or action button.</text>
+<text x="82" y="317" font-size="18" fill="#304a64">Audio goes to the selected pipeline.</text>
+<rect x="460" y="175" width="360" height="160" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="461" y="176" width="358" height="47" rx="17" fill="#fff2d9"/>
+<text x="482" y="205" font-size="14" fill="#a85a06" font-weight="700">2 / CLOUD IN THE RECORDED SETUP</text>
+<text x="482" y="257" font-size="24" fill="#172b4d" font-weight="700">Speech to text</text>
+<text x="482" y="291" font-size="18" fill="#304a64">FCC receives the spoken request.</text>
+<text x="482" y="317" font-size="18" fill="#304a64">Its transcript returns to HA.</text>
+<rect x="860" y="175" width="360" height="160" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="861" y="176" width="358" height="47" rx="17" fill="#e8f1ff"/>
+<text x="882" y="205" font-size="14" fill="#2563a6" font-weight="700">3 / HOME ASSISTANT</text>
+<text x="882" y="257" font-size="24" fill="#172b4d" font-weight="700">Route the request</text>
+<text x="882" y="291" font-size="18" fill="#304a64">Prefer supported native commands.</text>
+<text x="882" y="317" font-size="18" fill="#304a64">Use the local model when needed.</text>
+<rect x="460" y="405" width="360" height="195" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="461" y="406" width="358" height="47" rx="17" fill="#e2f6f1"/>
+<text x="482" y="435" font-size="14" fill="#087f78" font-weight="700">3A / NATIVE INTENT</text>
+<text x="482" y="487" font-size="24" fill="#172b4d" font-weight="700">A matching command</text>
+<text x="482" y="521" font-size="18" fill="#304a64">Resolve the exposed entity or area.</text>
+<text x="482" y="547" font-size="18" fill="#304a64">Handle supported local intents.</text>
+<text x="482" y="573" font-size="18" fill="#304a64">Return a result or a clear error.</text>
+<rect x="860" y="405" width="360" height="195" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="861" y="406" width="358" height="47" rx="17" fill="#f0ebff"/>
+<text x="882" y="435" font-size="14" fill="#6d4ad1" font-weight="700">3B / LOCAL OLLAMA + HOME TOOLS</text>
+<text x="882" y="487" font-size="24" fill="#172b4d" font-weight="700">A broader question</text>
+<text x="882" y="521" font-size="18" fill="#304a64">Read permitted states or statistics.</text>
+<text x="882" y="547" font-size="18" fill="#304a64">Control only reviewed targets.</text>
+<text x="882" y="573" font-size="18" fill="#304a64">Reject ambiguous device matches.</text>
+<rect x="60" y="405" width="360" height="195" rx="18" fill="#fff2d9"/>
+<text x="82" y="443" font-size="14" fill="#a85a06" font-weight="700">A CUE IS ONLY A CUE</text>
+<text x="82" y="484" font-size="18" fill="#304a64">A light or wake sound confirms</text>
+<text x="82" y="510" font-size="18" fill="#304a64">the trigger, not the transcript,</text>
+<text x="82" y="536" font-size="18" fill="#304a64">a successful action or an</text>
+<text x="82" y="562" font-size="18" fill="#304a64">answer heard in the room.</text>
+<rect x="460" y="670" width="760" height="160" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="461" y="671" width="758" height="47" rx="17" fill="#e2f6f1"/>
+<text x="482" y="700" font-size="14" fill="#087f78" font-weight="700">4 / LOCAL SYNTHESIS</text>
+<text x="482" y="752" font-size="24" fill="#172b4d" font-weight="700">Irina through the Wyoming adapter</text>
+<text x="482" y="786" font-size="18" fill="#304a64">A complete sentence can become audio while more text is generated.</text>
+<text x="482" y="812" font-size="18" fill="#304a64">Streamed text, streamed TTS and device playback must all cooperate.</text>
+<rect x="60" y="670" width="360" height="160" rx="18" fill="#ffffff" stroke="#d9e2ee" stroke-width="1.5"/>
+<rect x="61" y="671" width="358" height="47" rx="17" fill="#ffebf2"/>
+<text x="82" y="700" font-size="14" fill="#af3e68" font-weight="700">5 / ORIGINATING DOT</text>
+<text x="82" y="752" font-size="24" fill="#172b4d" font-weight="700">Play the answer</text>
+<text x="82" y="786" font-size="18" fill="#304a64">Fetch and play the HA audio.</text>
+<text x="82" y="812" font-size="18" fill="#304a64">Verify completeness by listening.</text>
+<rect x="60" y="867" width="1160" height="53" rx="18" fill="#f0ebff"/>
+<text x="82" y="900" font-size="20" fill="#172b4d">During playback: say “Hey Jarvis”, wait for the cue, then give the next request.</text>
+<text x="60" y="956" font-size="14" fill="#4b6178">EchoMuse project guide · recorded baseline, not live device status</text>
+</svg>

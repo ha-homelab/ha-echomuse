@@ -6,6 +6,9 @@ runbooks. The recorded baseline is **emOS 0.10, EchoMuse firmware 2.18.0 and
 Controller 2.26.0**. It is a deployment record, not a claim that these are the
 latest upstream releases or that both devices are online now.
 
+The [visual process and result guide](visual-guide.md) shows the full journey,
+request path and acceptance targets before you work through these steps.
+
 ## Start with the right layer
 
 ![Services and trust boundaries](assets/architecture.svg)
@@ -83,6 +86,12 @@ recording to investigate a routine service failure. Treat console output and
 nearby Bluetooth inventories as private diagnostic data.
 
 ## Acceptance after a change
+
+![Observable pass conditions for voice, home actions, statistics, music, Bluetooth and reconnection](assets/acceptance-targets.svg)
+
+These are test targets, not a live dashboard. The
+[text equivalent](visual-guide.md#4-verify-the-result-feature-by-feature)
+explains what to observe in each area.
 
 Record the version, time, changed layer and rollback before testing. Test one
 Dot, then repeat on the other; saved settings on an offline Dot are pending.

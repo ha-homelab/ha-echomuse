@@ -17,6 +17,35 @@ title and a text description. The linked prose provides a full text equivalent.
   There is one HA run and one pair of concurrent service requests. The two
   scopes have different time origins and scales; no percentile or paired
   non-streaming comparison can be derived from them.
+- **[conversion-journey.svg](conversion-journey.svg)** — six ordered conversion
+  stages, the stop conditions before flashing, and the intended everyday result.
+- **[voice-request.svg](voice-request.svg)** — conceptual request routing,
+  including the recorded cloud-recognition boundary and local answer path.
+- **[acceptance-targets.svg](acceptance-targets.svg)** — observable pass
+  conditions for six feature areas; these are not a live status report.
+- **[bluetooth-roles.svg](bluetooth-roles.svg)** — the difference between a
+  physical radio, a proxy endpoint and an iBeacon consumer integration.
+- **[reply-timeline.svg](reply-timeline.svg)** — a second view of the *same*
+  recorded HA run, showing the interval from first MP3 to `intent-end`. It adds
+  no new experiment, acoustic timing or baseline comparison.
+
+The [visual guide](../visual-guide.md) gives text equivalents for all five new
+figures and links each process stage to its detailed runbook. Numbered steps,
+roles and pass conditions carry meaning independently of color. The process
+illustrations use a light canvas and contrasting text for GitHub's light and
+dark themes; no external fonts, scripts, embedded images or web requests are used.
+
+## Reproduce the process illustrations
+
+The four process figures use only the Python standard library:
+
+```sh
+python3 docs/assets/render_process.py
+```
+
+Edit their labels and layout in `render_process.py`, regenerate the SVGs and
+visually inspect the result. Keep the text equivalent in `visual-guide.md`
+synchronized. Arrows describe conceptual order, not network packets or duration.
 
 ## Reproduce the plot
 
@@ -25,10 +54,12 @@ environment with matplotlib installed, then run:
 
 ```sh
 python docs/assets/render_latency.py
+python docs/assets/render_reply_timeline.py
 ```
 
-The script reads only the public JSON values and writes `latency.svg`. For a
-local review image, add `--png /path/to/private/preview.png`. No credentials,
+Both plot scripts read only the public JSON values. They write `latency.svg`
+and `reply-timeline.svg`, respectively. For a local review image, add
+`--png /path/to/private/preview.png` to either command. No credentials,
 network access or running device is required. Matplotlib's SVG text remains
 searchable; deterministic IDs and omitted timestamp metadata avoid incidental
 diffs. Font geometry can differ across matplotlib/font versions, so visually

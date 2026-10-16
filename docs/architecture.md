@@ -59,6 +59,9 @@ Do not infer trust merely from a hostname ending in an internal DNS suffix.
 
 ## Measured streaming behavior
 
+For the request stages and a single-run timeline, see the
+[illustrated process guide](visual-guide.md#3-what-the-timing-measurements-actually-show).
+
 ![One recorded HA run: first MP3 payload at 20.275 seconds and intent end at 53.753 seconds; a separate two-request service test delivered first PCM at 2.220 and 4.740 seconds](assets/latency.svg)
 
 The upper plot uses one real HA run with six Russian sentences. The client

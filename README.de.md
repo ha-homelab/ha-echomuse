@@ -9,7 +9,9 @@ Es ist keine offizielle EchoMuse-Distribution und keine Universalfirmware für a
 
 [Dokumentation](docs/README.md) · [Betrieb](docs/operations.md) · [Kompatibilität](docs/compatibility.md) · [Fehlersuche](docs/troubleshooting.md) · [Wiki](https://github.com/ha-homelab/ha-echomuse/wiki)
 
-![Sprach-, Musik- und Bluetooth-Verbindungen zwischen Echo Dot, Controller und Home Assistant; englische Beschriftung](docs/assets/architecture.svg)
+![Sechs Schritte von der Identifizierung des Echo Dot bis zum überprüften Sprachergebnis; englische Beschriftung](docs/assets/conversion-journey.svg)
+
+**[Visueller Leitfaden: Ablauf und Ergebnis](docs/visual-guide.md)** — Konvertierung, Sprachverarbeitung, gemessene Zeiten, Bluetooth-Rollen und Abnahmeprüfungen. Leitfaden und Grafiken sind auf Englisch; die Verbindungen erklärt die [Architektur](docs/architecture.md).
 
 ## Funktionen
 
