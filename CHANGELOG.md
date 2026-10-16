@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add the Russian Speech Settings integration (0.1.0): five local Silero voices,
+  bounded prosody and pronunciation controls, persistent service settings, cache
+  invalidation and English/Russian/German/Spanish/French UI translations.
+
 - Add an opt-in verified strict TLS profile for pinned artifact downloads, with synthetic full-chain and handler-wiring tests.
 - Add a real CLI regression proving public-source scans never print matched
   credential or private-address contents; document the CodeQL false positive.
