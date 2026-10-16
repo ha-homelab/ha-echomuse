@@ -12,7 +12,7 @@ class HomeStateIntent(GetStateIntentHandler):
 
     HA excludes HassGetState from prefer-local handling for control-capable LLMs.
     A distinct custom intent keeps explicit state questions on the native path.
-    Responses are defined in the accompanying Russian sentence file.
+    Responses are defined in the accompanying per-language sentence files.
     """
 
     intent_type = "EchoMuseGetState"

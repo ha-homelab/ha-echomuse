@@ -59,6 +59,7 @@ jobs:
           python -m compileall -q scripts tests custom_components
           python -m json.tool upstream-lock.json > /dev/null
           python scripts/check_public.py
+          python scripts/check_docs.py
       - name: Validate intents in an isolated Home Assistant runtime
         run: >-
           docker run --rm --network none

@@ -12,8 +12,10 @@ conversation. Tests exercise the actual HA intent/script engine, simultaneous
 requests and failure handling. IGW formats the Russian reports; neither the
 conversation model nor the speech model calculates their values.
 
-The chosen Russian speech backend is **Piper Denis medium**, served through
-Wyoming. The larger **KittenTTS 2** remains experimental: in a synthetic CPU
+The initial Russian speech backend was **Piper Denis medium**, served through
+Wyoming. The later [female-voice cutover](home-control.md#female-voice-cutover--october-14-2026)
+selected **Piper Irina medium**; the measurements in this original evaluation
+remain measurements of their stated test models and hosts. The larger **KittenTTS 2** remains experimental: in a synthetic CPU
 benchmark it needed 14.24 seconds to generate 2.08 seconds of short speech,
 34.57 seconds for an energy report and 7.21 GiB peak process memory. Piper's
 two-thread Apple Silicon benchmark generated a short warm reply in 0.055
@@ -57,7 +59,7 @@ a server; this work does not require another firmware flash or USB connection.
 The existing EchoLocal and EchoMuse satellites can use the same HA voice services
 even though their device software and wake-word models differ.
 
-## What the current system actually does
+## What the system did at the original audit
 
 The Google display implementation is
 [google-home-voice-stats](https://github.com/4alvit/google-home-voice-stats).

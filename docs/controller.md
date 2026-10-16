@@ -8,7 +8,7 @@ pilot. Reviewed on 2026-10-13 against upstream controller tag
 
 The initial pilot covered one previously converted second-generation Echo Dot,
 with the first Dot left on EchoLocal for comparison. Both have since migrated;
-see the [current status](../README.md#current-status). The enrollment sequence
+see the [current status](../README.md#verification-and-limits). The enrollment sequence
 below records the initial pilot. Do not import EchoLocal runtime state into
 EchoMuse's database or copy its wake-word files as if they were compatible.
 
@@ -69,8 +69,9 @@ to the trusted LAN/private routed network and do not expose them publicly.
   `_esphomelib._tcp` discovery. Routed VLANs require an existing reflector or
   explicitly configured controller endpoints/manual HA entry; publishing a
   Kubernetes Service does not make mDNS cross a routed boundary.
-- Optional BLE proxy ports are satellite port +1000. BLE proxy and Sendspin remain
-  off for the initial pilot. No new router port forwarding or public ingress is
+- Optional BLE proxy ports are satellite port +1000. BLE proxy and Sendspin were
+  off for the initial pilot. The later [Bluetooth rollout](bluetooth-proxy.md)
+  enabled the proxy independently; Sendspin is still outside the validated path. No new router port forwarding or public ingress is
   required.
 
 Keep `DEVICE_APPROVAL=strict`. Approve only the intended pilot device after
@@ -87,7 +88,13 @@ trusted HTTPS reverse proxy or an SSH tunnel for administrator access if the LAN
 is not trusted. Do not publish bootstrap tokens, admin sessions, pairing keys,
 device identifiers, database files, support bundles or transcripts.
 
-## Home Assistant and the existing FCC pipeline
+## Initial Home Assistant enrollment
+
+The sequence below preserves the initial FCC pilot. For a new enrollment,
+select the validated current **Local Russian Home** pipeline with Irina and
+follow the [operations handbook](operations.md); do not send household tools
+or state to the external conversation model. The recognition stage still uses
+the configured cloud provider.
 
 Home Assistant Container on Kubernetes has no Supervisor add-on store. Run this
 separate controller and use HA's built-in **ESPHome** integration; no new custom

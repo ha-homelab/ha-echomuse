@@ -1,0 +1,7 @@
+{
+  "exceptions": {
+    "local_agent_required": {
+      "message": "Home data tools are restricted to the local Ollama agent."
+    }
+  }
+}

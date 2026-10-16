@@ -14,7 +14,7 @@ resolve to source commit `e119433c0845dfe80f4b1ec44c9e8e8028adbb07`.
 
 Select one pilot by its privately recorded hardware identity. Match its live
 identity before every session that can write to it. Keep another working Dot
-on EchoLocal as a comparison device. An IP address or room name alone is not
+unchanged as a comparison device; it need not be running EchoLocal. An IP address or room name alone is not
 an identity check.
 
 Read the OS version, root status, boot state, installed EchoLocal version,
@@ -349,8 +349,10 @@ Repeat the migration in this order:
    only this unit under its distinct label. Read its actual allocated ESPHome
    port; the working unit already owns its own port. Controller-wide TLS and
    recording settings do not need changing.
-7. Enroll a new HA ESPHome entry and assign **FCC Russian Local Voice** to both
-   Assistant selectors. Preserve the original first-unit entries for rollback.
+7. Enroll a new HA ESPHome entry and assign the validated household pipeline
+   to both Assistant selectors. The current documented baseline is **Local
+   Russian Home** with Irina; the original migration used **FCC Russian Local
+   Voice**. Preserve the original entry configuration privately for rollback.
    Resolve new entity IDs from the registry rather than guessing suffixes.
 8. Add its native player to the existing Music Assistant provider. Update only
    its originating-device music routes and add its card to the existing audio
@@ -392,9 +394,11 @@ deleting all of `/data` would destroy the configuration being restored.
 
 After reboot, verify the EchoLocal executable/version, its `ledcontroller`
 startup mapping, resident state, network address, and encrypted ESPHome
-connection. Re-enable the pilot's original HA entry and restore its dashboard
-entity mapping. Confirm a complete spoken exchange before declaring rollback
-complete.
+connection. Re-enable the pilot's original HA entry if retained; if it was
+removed during cleanup, re-enroll EchoLocal using its private preserved endpoint
+and key, then restore its dashboard and automation mappings. Entity IDs may
+change after re-enrollment. Confirm a complete spoken exchange before declaring
+rollback complete.
 
 emOS's automatic recovery handles some unsuccessful boots when its init runs
 and a known-good image is available. **It cannot recover a kernel or init that

@@ -2,8 +2,9 @@
 
 EchoLocal's `custom:echolocal-satellite-card` does not manage an EchoMuse
 satellite. After migration, replace those cards rather than changing their
-device IDs. The historical EchoLocal entities may remain in the registry for
-rollback, but they are not the new player or voice satellite.
+device IDs. Historical EchoLocal entities are not the new player or voice
+satellite. This deployment subsequently removed its obsolete EchoLocal entries
+after private backup and reference checks; see [Bluetooth cleanup](bluetooth-proxy.md#remove-obsolete-echolocal-entries).
 
 ## Choose the current entities
 

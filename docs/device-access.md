@@ -21,7 +21,7 @@ commit `e119433c0845dfe80f4b1ec44c9e8e8028adbb07`.
   reflashing the Dot.
 
 For the installed versions and migration evidence, see the
-[current status](../README.md#current-status) and
+[current status](../README.md#verification-and-limits) and
 [deployment record](deployment-record.md).
 
 ## Sign in to the controller
@@ -135,12 +135,13 @@ when the shell is password-protected.
 
 ## Validation and sources
 
-For this documentation update, the saved administrator credentials were tested
+In the recorded October 14 verification, the saved administrator credentials were tested
 against the running controller: login succeeded with the `admin` role, and the
 temporary session was explicitly logged out. The receipt was verified as
 owner-only and ignored by Git. No password was changed, no SSH service was
 enabled and neither Dot was reflashed. Console behavior above is based on the
-pinned implementation; this update did not open a new shell on either Dot.
+pinned implementation; that verification did not open a new shell on either Dot.
+The later documentation refresh did not repeat the login or change live devices.
 
 - [Pinned emOS documentation](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/emos/README.md)
 - [Device/controller shell protocol](https://github.com/wilbowes/EchoMuse/blob/e119433c0845dfe80f4b1ec44c9e8e8028adbb07/docs/device-controller-interface.md)

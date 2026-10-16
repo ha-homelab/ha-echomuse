@@ -8,6 +8,11 @@ No firmware change or USB connection is needed for this feature.
 
 ## Install
 
+For English sentence examples, translated native responses and the distinction
+between documentation languages, HA UI text and speech services, read the
+[internationalization guide](i18n.md). Language support does not install a new
+STT/TTS model or change the reviewed control list.
+
 1. Keep a working Assist pipeline and a backup of HA configuration. This
    integration targets Home Assistant 2026.10 and its `probatio`/`ToolResult` API.
    Run both isolated runtime tests before using a different HA version.

@@ -18,8 +18,15 @@ fails when any required job fails, is cancelled, is skipped, or is missing.
 - Shared security scanning runs CodeQL for Python and Actions, Trivy, and
   dependency review when applicable to a pull request.
 - The repository-specific job compiles Python, parses the upstream lock, and
-  runs `scripts/check_public.py` against tracked source. Device access,
-  recordings, live HA credentials, and deployment are not needed for CI.
+  runs `scripts/check_public.py` against tracked source. It also runs
+  `python scripts/check_docs.py` for local documentation links and anchors,
+  README language navigation, and accessible inert SVG assets.
+- The Python suite covers the documentation validator and wiki export with
+  immutable source revisions. These checks use the existing shared pipeline;
+  there is no separate documentation-only deployment workflow.
+
+Device access, recordings, live HA credentials, and deployment are not needed
+for CI.
 
 The ordinary validation jobs receive no `BOT_PAT`. The existing private-file
 exclusions and public-source audit remain in force.

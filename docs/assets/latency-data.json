@@ -1,0 +1,22 @@
+{
+  "recorded_date": "2026-10-14",
+  "unit": "seconds",
+  "source": "../voice-features.md#deployment-checks--october-14-2026",
+  "ha_run": {
+    "sample_count": 1,
+    "response_sentences": 6,
+    "first_mp3_payload": 20.275,
+    "intent_end": 53.753,
+    "scope": "Elapsed from the same HA run start; not microphone-to-speaker timing"
+  },
+  "service_test": {
+    "concurrent_requests": 2,
+    "first_pcm": [2.22, 4.74],
+    "scope": "Irina streaming service; excludes recognition, model, HA and speaker playback"
+  },
+  "limitations": [
+    "Separate test scopes must not be added together",
+    "No matched non-streaming baseline or latency distribution",
+    "No attended acoustic verification in these measurements"
+  ]
+}
