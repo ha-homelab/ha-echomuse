@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Document the failed literary-name and quotation investigation, rejected prompt candidates, native-intent checks, and requirements for a grounded literary feature.
+
 - Add an opt-in verified strict TLS profile for pinned artifact downloads, with synthetic full-chain and handler-wiring tests.
 - Add a real CLI regression proving public-source scans never print matched
   credential or private-address contents; document the CodeQL false positive.
