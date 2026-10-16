@@ -1,5 +1,7 @@
 # ha-echomuse
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15578/badge)](https://www.bestpractices.dev/projects/15578)
+
 [English](README.md) · [Русский](README.ru.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md)
 
 Turn an existing **Echo Dot 2** into a Home Assistant voice satellite with

@@ -58,6 +58,15 @@ class FetchTests(unittest.TestCase):
     def assert_no_files(self):
         self.assertFalse(list(self.destination.glob('*')))
 
+    def test_strict_download_uses_verified_https_handler(self):
+        opener = self.opener()
+        with unittest.mock.patch.object(fetch.urllib.request, 'build_opener', return_value=opener) as build:
+            fetch.fetch(self.artifact, self.destination, strict_tls=True)
+        handler = next(item for item in build.call_args.args
+                       if isinstance(item, urllib.request.HTTPSHandler))
+        self.assertGreaterEqual(handler._context.security_level, 3)
+        self.assertTrue(handler._context.check_hostname)
+
     def test_valid_artifact_is_atomic_and_private(self):
         old = os.umask(0)
         try:

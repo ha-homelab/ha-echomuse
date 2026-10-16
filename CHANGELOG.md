@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add an opt-in verified strict TLS profile for pinned artifact downloads, with synthetic full-chain and handler-wiring tests.
+
+## Unreleased
+
 - Add a real CLI regression proving public-source scans never print matched
   credential or private-address contents; document the CodeQL false positive.
 - Use module-qualified unittest mocking imports to resolve quality diagnostics.
