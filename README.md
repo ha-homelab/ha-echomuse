@@ -105,3 +105,6 @@ models, device identities, keys, tokens and backups do not belong in commits.
 
 See [LICENSE](LICENSE). Upstream components retain their own licenses; no Amazon
 firmware, release binaries or personal voice models are redistributed here.
+
+
+For certificate-chain and key-strength enforcement while fetching pinned public artifacts, use the optional [strict TLS download profile](docs/strict-tls.md).
