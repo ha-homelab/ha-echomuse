@@ -3,6 +3,8 @@
 
 import datetime
 import ssl
+import socket
+import threading
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,12 +15,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
-import importlib.util
-
-_spec = importlib.util.spec_from_file_location(
-    "fetch_upstream", Path(__file__).resolve().parents[1] / "scripts/fetch_upstream.py")
-fetch = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(fetch)
+from scripts import fetch_upstream as fetch
 client_context = fetch.client_context
 
 
@@ -90,7 +87,7 @@ def handshake(client, server, *, hostname="synthetic.test"):
 class StrictTlsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.strong = rsa.generate_private_key(public_exponent=65537, key_size=3072)
+        cls.strong = rsa.generate_private_key(public_exponent=65537, key_size=2048)
         cls.weak = rsa.generate_private_key(public_exponent=65537, key_size=2047)
 
     def contexts(self, directory, weak_part, version):
@@ -127,10 +124,44 @@ class StrictTlsTests(unittest.TestCase):
                 ):
                     client, server = self.contexts(d, weak_part, version)
                     if weak_part:
-                        with self.assertRaisesRegex(ssl.SSLCertVerificationError, "key too weak"):
+                        with self.assertRaisesRegex(ssl.SSLError, "below the supported security minimum|key too weak"):
                             handshake(client, server)
                     else:
                         self.assertEqual(handshake(client, server), version.name.replace("_", "."))
+
+    def test_socket_handshake_checks_every_key_before_application_data(self):
+        for version in (ssl.TLSVersion.TLSv1_2, ssl.TLSVersion.TLSv1_3):
+            for weak_part in (None, "root", "intermediate", "leaf"):
+                with self.subTest(version=version, weak_part=weak_part), tempfile.TemporaryDirectory() as d:
+                    client, server = self.contexts(d, weak_part, version)
+                    client_socket, server_socket = socket.socketpair()
+                    client_socket.settimeout(5)
+                    server_socket.settimeout(5)
+                    received = []
+
+                    def serve():
+                        try:
+                            with server.wrap_socket(server_socket, server_side=True) as stream:
+                                received.append(stream.recv(1))
+                        except (ssl.SSLError, BrokenPipeError, ConnectionResetError):
+                            # A rejected client closes TLS before sending HTTP or other data.
+                            received.append(b"")
+
+                    worker = threading.Thread(target=serve)
+                    worker.start()
+                    try:
+                        if weak_part:
+                            with self.assertRaisesRegex(ssl.SSLError, "below the supported security minimum|key too weak"):
+                                client.wrap_socket(client_socket, server_hostname="synthetic.test")
+                        else:
+                            with client.wrap_socket(client_socket, server_hostname="synthetic.test") as stream:
+                                stream.sendall(b"x")
+                    finally:
+                        client_socket.close()
+                        worker.join(6)
+                        server_socket.close()
+                    self.assertFalse(worker.is_alive())
+                    self.assertEqual(received, [b"" if weak_part else b"x"])
 
     def test_verifies_hostname_and_trust(self):
         with tempfile.TemporaryDirectory() as d:
