@@ -83,7 +83,8 @@ def main() -> None:
         'A separate concurrent Irina service test delivered first PCM at 2.22 and 4.74 seconds. '
         'The test scopes differ and do not measure audible response latency.</desc>'
     )
-    target.write_text(svg[:closing] + description + svg[closing:])
+    svg = svg[:closing] + description + svg[closing:]
+    target.write_text("\n".join(line.rstrip() for line in svg.splitlines()) + "\n")
     if args.png:
         fig.savefig(args.png, dpi=150, facecolor=fig.get_facecolor())
     plt.close(fig)
