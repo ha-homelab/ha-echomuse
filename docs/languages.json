@@ -1,0 +1,22 @@
+{
+  "canonical": "en",
+  "runbook_language": "en",
+  "reviewed_date": "2026-10-15",
+  "languages": {
+    "en": {"label": "English", "readme": "README.md"},
+    "ru": {"label": "Русский", "readme": "README.ru.md"},
+    "de": {"label": "Deutsch", "readme": "README.de.md"},
+    "es": {"label": "Español", "readme": "README.es.md"},
+    "fr": {"label": "Français", "readme": "README.fr.md"}
+  },
+  "required_readme_links": [
+    "docs/README.md", "docs/operations.md", "docs/compatibility.md",
+    "docs/troubleshooting.md", "docs/migration.md", "docs/controller.md",
+    "docs/device-access.md", "docs/home-control.md", "docs/energy-assist.md",
+    "docs/dashboard.md", "docs/bluetooth-proxy.md", "docs/voice-features.md",
+    "docs/music-troubleshooting.md", "docs/deployment-record.md",
+    "docs/russian-voice-validation.md", "docs/architecture.md", "docs/i18n.md",
+    "docs/wiki.md", "docs/ci.md", "CONTRIBUTING.md", "SECURITY.md", "LICENSE",
+    "scripts/build_emos.py", "upstream-lock.json"
+  ]
+}

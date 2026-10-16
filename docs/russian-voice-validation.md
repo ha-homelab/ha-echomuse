@@ -1,6 +1,9 @@
 # Russian voice rollout: 2026-10-14
 
-This record distinguishes service verification from physical listening tests.
+This dated record distinguishes service verification from physical listening tests.
+The later [Irina cutover](home-control.md#female-voice-cutover--october-14-2026)
+and [streaming rollout](voice-features.md#deployment-checks--october-14-2026)
+supersede the initial Denis voice described below. It is not a live health report.
 Use the [operations runbook](russian-voice-operations.md) for installation and
 rollback and the [energy guide](energy-assist.md) for supported questions.
 
@@ -8,9 +11,9 @@ The later [local household-assistant rollout](home-control.md#deployed-local-hom
 now supplies the conversation agent on both Dots. The FCC results below document
 the earlier general-question route, which remains available separately.
 
-## Russian speech
+## Initial Russian speech baseline
 
-The selected voice is **Piper Denis medium**, served through the new Wyoming
+The initial voice was **Piper Denis medium**, served through the new Wyoming
 integration. HA exposes `tts.local_russian_speech`; the initial pilot pipeline was named
 **FCC Russian Local Voice**. “Local Voice” refers to speech synthesis: general
 conversation and the existing speech recognition still use their configured
@@ -98,12 +101,14 @@ After migration, both Dots used **FCC Russian Local Voice** on both Assistant
 selectors; the later local-home rollout replaced that assignment. The
 operator initially postponed the new listening test, then connected the first
 unit for migration. Its emOS/EchoMuse conversion and distinct HA enrollment
-completed with its own verified recovery backups; the old EchoLocal entries
-remain available for rollback.
+completed with its own verified recovery backups. The old EchoLocal entries
+were subsequently removed after private backup; rollback now requires
+re-enrollment as described in the [migration runbook](migration.md#roll-back-to-echolocal).
 
-The new Russian voice and the newly migrated first Dot still need attended
-button, wake and music checks. Service readiness alone does not establish
-physical success. See the [deployment record](deployment-record.md#october-14-2026--first-dot-migration)
+At that initial checkpoint, the new Russian voice and newly migrated first Dot
+still needed attended button, wake and music checks. The later button confirmation
+is recorded below. Service readiness alone does not establish physical success;
+other acoustic checks are tracked separately in their feature runbooks. See the [deployment record](deployment-record.md#october-14-2026--first-dot-migration)
 and [repeat migration procedure](migration.md#9-migrate-another-existing-echolocal-unit).
 
 ## Local-home voice deadline correction

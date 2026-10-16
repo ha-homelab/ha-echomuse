@@ -1,0 +1,7 @@
+{
+  "exceptions": {
+    "local_agent_required": {
+      "message": "Las herramientas de acceso a los datos del hogar solo están disponibles para el agente local de Ollama."
+    }
+  }
+}

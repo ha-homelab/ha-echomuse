@@ -1,5 +1,9 @@
 # Deployment record
 
+This is a chronological record of observations, not a live health dashboard.
+Later entries supersede earlier configuration and acceptance states. Use the
+[operations handbook](operations.md) for the current documented baseline.
+
 ## October 13, 2026 — controller and pilot preparation
 
 The selected pilot is the second converted Dot. Its live USB identity was
@@ -407,3 +411,41 @@ confirmed smooth playback after the repair. See the [music diagnosis and queue
 repair procedure](music-troubleshooting.md) for the independent source-stall and
 device-link observations; this is not a claim that every possible dropout was
 eliminated. The first Dot remains pending a physical power/reconnection check.
+
+## October 14, 2026 — streaming, Bluetooth and obsolete entries
+
+Both persisted device configurations enabled streaming replies, wake feedback
+and wake-word interruption; the second Dot received them while online. The
+first was offline, so saved settings did not establish application or acoustic
+acceptance. The shared Irina service's streaming adapter passed 23 targeted
+tests and the HA integration advertised streaming. The [voice-feature record](voice-features.md)
+preserves the service timings, announcement acknowledgement and timer
+create/query/cancel checks, including their listening-test limits.
+
+The second Dot's encrypted BLE endpoint was enrolled in HA. Its scanner
+forwarded advertisements, and the connection-slot workaround restored three
+free slots with no active GATT clients. The first Dot's key and settings were
+prepared, but its offline state prevented enrollment. No arbitrary nearby
+device was connected as a test.
+
+Two obsolete EchoLocal ESPHome entries and their two Bluetooth entries were
+removed through HA's supported API after private backup and reference checks.
+Their 14 device records and 212 entity records were removed; unrelated entries
+and the current EchoMuse proxy were retained, and no HA restart was required.
+Old entries therefore no longer remain available to merely re-enable: an
+EchoLocal rollback must re-enroll them from the preserved configuration.
+
+At the later cleanup checkpoint the second Dot's voice satellite was already
+unavailable, despite a connected controller and idle native/MA players. This
+preceded the deletion; the cleanup did not establish its cause or repair it.
+That observation reinforces the need to verify voice, music and Bluetooth
+independently. It must not be presented as a new failure caused by this
+documentation refresh or as proof that the device is unavailable today.
+
+## October 15, 2026 — documentation consolidation
+
+The operations, compatibility and troubleshooting guides distinguish historical
+FCC/Denis results from the local household pipeline and Irina baseline. Vector
+diagrams and the streaming plot were added from the existing records. This
+documentation-only pass did not flash devices, change live settings, repeat
+acoustic tests or establish current device availability.

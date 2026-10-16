@@ -47,6 +47,62 @@ configuration have been allocated. Wait for it to reconnect before enrollment;
 do not fabricate a loaded HA entry or use another Dot's endpoint. Root Console
 sessions may pause Bluetooth while they are open.
 
+## See what the proxy receives
+
+Open HA's [Bluetooth panel](https://my.home-assistant.io/redirect/config_bluetooth/)
+under **Settings → Connectivity → Bluetooth**. Inspect the adapters and their
+capabilities, then the [advertisement monitor](https://my.home-assistant.io/redirect/bluetooth_advertisement_monitor/)
+and [connection monitor](https://my.home-assistant.io/redirect/bluetooth_connection_monitor/).
+The [official Bluetooth guide](https://www.home-assistant.io/integrations/bluetooth/)
+explains these views. Observed advertisements and active GATT connections are
+different: a working scanner can have no active connections.
+
+Confirm fresh timestamps or increasing counters over an observation interval;
+a single nonzero total may be old. Correlate the source with the current
+EchoMuse proxy. Multiple copies of a display name are not proof of multiple
+physical radios. Nearby addresses and payloads can identify household or
+neighbouring devices, so keep captures private.
+
+## iBeacon Tracker is a consumer, not another proxy
+
+The path is **beacon → Dot's BLE scanner → EchoMuse proxy → HA Bluetooth →
+iBeacon Tracker**. Adding iBeacon Tracker installs a consumer for supported
+beacon advertisements; it does not create another radio or require another Dot.
+It is optional for voice, music and other Bluetooth integrations.
+
+HA creates devices as qualifying beacons are discovered. An empty integration
+alone does not show that the proxy failed. Unnamed beacons require an explicit
+UUID allowlist in the integration options; changing major/minor identifiers can
+also prevent stable discovery. Estimated distance uses received signal strength
+and ideal radio assumptions. Treat it as rough proximity, not room-accurate
+position. Check the source attribute because the strongest receiving adapter
+can change. See the [official iBeacon Tracker documentation](https://www.home-assistant.io/integrations/ibeacon/)
+for configuration and calibration. Do not build critical actions on one
+unvalidated proximity sample.
+
+## Remove obsolete EchoLocal entries
+
+An old EchoLocal scanner may remain in HA after the same physical Dot has booted
+emOS. The new EchoMuse proxy has its own generated Bluetooth identity, so a
+different address is not evidence of an extra physical Dot. Compare the current
+controller endpoint, HA integration and active scanner before deleting anything.
+
+1. Save the old integration configuration and recovery information privately.
+   Check cards, scripts and automations for old entity references.
+2. Identify the obsolete **ESPHome** entry and its associated **Bluetooth**
+   entry. Keep the current EchoMuse voice entry and encrypted BLE entry.
+3. Remove only the obsolete entries through HA's integration controls. Do not
+   edit live `.storage` files or erase the Dot to clean up a registry record.
+4. Verify the current scanner, fresh advertisements, current voice/player
+   entities and dashboard references independently.
+
+During the October 14 cleanup, two former EchoLocal ESPHome entries and two
+associated Bluetooth entries were removed after backup. HA removed 14 old
+device records and 212 old entity records, with no HA restart required. The
+current EchoMuse BLE entry remained loaded with three free slots. These are
+results from that cleanup, not expected counts for other installations. The
+first Dot had not yet been enrolled as an active EchoMuse proxy at that checkpoint.
+
 ## Verified deployment — October 14, 2026
 
 Both Dots have Bluetooth scanning and active connections enabled in persisted

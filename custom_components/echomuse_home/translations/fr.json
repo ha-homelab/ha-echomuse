@@ -1,0 +1,7 @@
+{
+  "exceptions": {
+    "local_agent_required": {
+      "message": "Les outils d’accès aux données de la maison sont réservés à l’agent Ollama local."
+    }
+  }
+}

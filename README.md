@@ -1,117 +1,103 @@
 # ha-echomuse
 
-Reproducible EchoMuse deployment and Home Assistant integration for existing
-Amazon Echo Dot 2 devices. This is an independent deployment and migration
-project, not a fork or official distribution of
-[EchoMuse](https://github.com/wilbowes/EchoMuse).
+[English](README.md) · [Русский](README.ru.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md)
 
-## Current status
+Turn an existing **Echo Dot 2** into a Home Assistant voice satellite with
+EchoMuse and emOS. This independent project provides reproducible deployment,
+recovery procedures, local home tools, and operational documentation. It is not
+an official EchoMuse distribution or a replacement firmware for every Echo.
 
-Both existing Echo Dot 2 units now boot **emOS v0.10** and run **EchoMuse
-v2.18.0**. Each image was built around that unit's own ARM32 kernel from
-Fire OS 6 / Android 7.1.2, with separate credentials and verified private USB
-recovery backups. The second unit was the original pilot; the first unit was
-migrated on October 14. See the [repeat migration procedure](docs/migration.md#9-migrate-another-existing-echolocal-unit).
+[Documentation](docs/README.md) · [Operations](docs/operations.md) · [Compatibility](docs/compatibility.md) · [Troubleshooting](docs/troubleshooting.md) · [Wiki](https://github.com/ha-homelab/ha-echomuse/wiki)
 
-Controller **2.26.0** is deployed separately, and both units have reached it over
-WSS using device-specific credentials; TLS is required. Home Assistant
-ESPHome enrollment is complete for both. The initial pilot migration used the existing
-FCC Russian Backup pipeline; the current voice rollout is recorded in the
-[Russian voice validation](docs/russian-voice-validation.md). An attended
-button-triggered question during migration received
-the correct audible answer. An attended Hey Jarvis test at approximately one
-metre also produced the expected audible answer. After stream-address and
-native-command fixes and HA recovery, the operator confirmed that a spoken
-music request started playback on the second Dot without a device-selection
-question. After the operator reported audible hiccups and buffering,
-normalization was disabled only for the pilot's Music Assistant queue. A
-bounded trace showed improved delivery, but another source stall followed;
-the operator subsequently confirmed smooth music playback after the change.
-Long-term reliability remains unmeasured. An explicit
-player card was added to the existing Lovelace media view. A five-metre trial
-woke correctly but STT misheard the question. See the dated
-[deployment record](docs/deployment-record.md) for verified results and limits.
+![Voice, music and Bluetooth paths between the Echo Dot, EchoMuse Controller and Home Assistant](docs/assets/architecture.svg)
 
-EchoMuse's supported path for this operating-system base is **emOS**. The
-upstream FireOS in-place installation path supports Fire OS 5 and must not be
-forced on this pilot.
+## What you get
 
-## Start here
+- Reproducible, pinned controller and emOS preparation; **the builder does not flash devices**.
+- Home Assistant Assist through ESPHome, native music routing, announcements,
+  timers, early speech and wake-word interruption where supported.
+- A local Ollama tool API for current states, explicitly allowed device controls,
+  and Recorder statistics; bounded, read-only energy reports.
+- A separate encrypted Bluetooth proxy endpoint for BLE devices.
+- English, Russian, German, Spanish and French README guides and bounded
+  assistant-language selection. English and Russian native state-query examples
+  are included; see [language coverage](docs/i18n.md).
 
-For everyday administration, see [device access and administrator credentials](docs/device-access.md):
-what emOS and EchoMuse run, where to sign in, the root Console, USB recovery,
-and the limits of SSH, Telnet and ADB.
+## Before you start
 
-For Lovelace, follow [EchoMuse controls in the existing Media dashboard](docs/dashboard.md)
-to replace obsolete EchoLocal cards and select the current music and voice entities.
+The documented conversion target is **Echo Dot 2 / RS03QR (biscuit)**. Verify the
+exact model, installed OS, partition map and device-specific recovery copy before
+changing boot software. Other Echo generations and full-size Echo models are not
+validated by this runbook. Use a reliable power supply and a data-capable USB
+cable with a supported recovery host; Wi-Fi alone is not a recovery path.
 
-For [early speech, voice interruption, wake feedback, announcements and timers](docs/voice-features.md),
-see the voice-feature runbook. For BLE sensors, follow the separate
-[Bluetooth proxy enrollment](docs/bluetooth-proxy.md).
+You also need Home Assistant, an Assist speech pipeline and an EchoMuse
+Controller. Music Assistant, Plex, Ollama and the energy service are optional
+components for their respective features. **Do not apply placeholder deployment
+manifests unchanged.**
 
-For interrupted audio, see [music troubleshooting](docs/music-troubleshooting.md),
-including source-file checks, queue repair and the limits of a `playing` state.
+## Installation order
 
-1. Read the [migration runbook](docs/migration.md) and identify the exact model,
-   Fire OS generation, boot layout and recovery path.
-2. Deploy the [controller](docs/controller.md) using either
-   [Docker Compose](deployments/compose.yaml) or the
-   [Kubernetes template](deployments/kubernetes.yaml). Keep real configuration
-   and state private; do not apply the placeholder manifest unchanged.
-3. Verify the upstream files against [upstream-lock.json](upstream-lock.json)
-   with `python3 scripts/fetch_upstream.py` (see `--help`).
-4. Complete per-device escrow, then prepare an image with
-   [the offline builder](scripts/build_emos.py). The builder never flashes a
-   device and cannot verify a partition map on your behalf.
-5. Follow the migration runbook through verified USB installation, explicit
-   device approval, HA enrollment and attended acceptance.
+1. Check [compatibility](docs/compatibility.md), then read the entire
+   [migration runbook](docs/migration.md), including rollback.
+2. Deploy the [controller](docs/controller.md) with private persistent state,
+   TLS and separate credentials per device.
+3. Verify the pinned [upstream artifacts](upstream-lock.json), preserve each
+   device's recovery backup, and prepare its image with
+   [build_emos.py](scripts/build_emos.py). Never reuse another device's backup.
+4. Follow the USB installation procedure, approve the device in the controller,
+   and enroll its voice endpoint in Home Assistant's **ESPHome** integration.
+5. Assign the Assist pipeline, STT and TTS language/voice. Add optional
+   [home tools](docs/home-control.md) and [energy reports](docs/energy-assist.md).
+6. Add the current entities to [Lovelace](docs/dashboard.md). Enroll the
+   [BLE proxy](docs/bluetooth-proxy.md) separately if needed.
+7. Complete the [acceptance checklist](docs/operations.md) on each device before
+   repeating the migration. A connected controller does not prove audible speech.
 
-## Scope
+## Everyday use
 
-- Pin and verify upstream controller, firmware and emOS artifacts.
-- Preserve a device-specific recovery copy before changing boot software.
-- Deploy a local controller with private persistent data.
-- Connect the pilot through Home Assistant's ESPHome integration and retain
-  the chosen Assist pipeline.
-- Test wake detection, speech, playback and recovery before migrating another
-  device.
+Use the controller's authenticated web interface and root Console for device
+administration; see [access and credentials](docs/device-access.md). This project
+does not provision a universal SSH/Telnet login. Recovery access is documented
+separately from normal operation.
 
-All documentation and scripts are in English, except phrases a user must speak.
-Wi-Fi credentials, tokens, device identities, boot backups, captured audio and
-trained personal models stay outside the public repository.
+The tested wake phrase is **Hey Jarvis**. The documented firmware exposes one
+active wake model; a translated README does not install a translated wake word.
+[Voice features](docs/voice-features.md) explains interruption and streaming.
+[Music troubleshooting](docs/music-troubleshooting.md) covers missing sources,
+buffering and the difference between stopping and pausing the originating player.
+**iBeacon Tracker** consumes BLE advertisements; it is not another proxy.
 
-See [shared CI and PR automation](docs/ci.md) for required checks, independent
-bot approvals, opt-in merging, and Terraform-managed access.
+## Verification and limits
 
-See [Russian voice and energy reports](docs/russian-voice-roadmap.md) for the
-implementation choices, measured Piper/KittenTTS comparison, general-conversation
-model scope and the original audit. Software checks, runtime deployment and
-physical listening tests are tracked separately.
-Follow the [Russian voice operations runbook](docs/russian-voice-operations.md)
-for service order, HA integration, per-Dot assignment, acceptance and rollback.
+The recorded deployment used emOS **0.10**, EchoMuse **2.18.0**, Controller
+**2.26.0** and Home Assistant **2026.10.0**. These are a dated tested baseline,
+not a claim to be the latest releases or a live device-status display. Both Dot
+migrations and nearby Russian voice checks were recorded; distant speech and
+long-term reliability have limits. See [deployment evidence](docs/deployment-record.md),
+[voice validation](docs/russian-voice-validation.md) and the
+[measured latency chart](docs/architecture.md).
 
-The [Russian Assist energy adapter](docs/energy-assist.md) implements the first
-part of that plan: six read-only intents that return validated IGW reports to
-the originating conversation. The Russian IGW endpoint and HA package are now
-deployed; [service acceptance](docs/russian-voice-validation.md#local-energy-reports)
-is recorded separately from microphone and listening tests.
+The current recorded Russian voice is **Piper Irina**. Local home tools use
+Ollama, but the recorded STT provider is FCC cloud speech: **the full recorded
+pipeline is not offline**. A different language needs compatible STT, model and
+TTS selections and its own listening test. Never send household data to the
+optional general-question cloud route; see [privacy boundaries](docs/home-control.md).
 
-The optional [local home tools](docs/home-control.md) connect an Ollama
-conversation agent to current HA entity states, a reviewed device-control list
-and Recorder statistics. The integration discovers relevant entities on demand
-instead of sending the entire household catalog in every prompt. Its setup,
-access boundaries, Russian command examples and rollback are documented separately.
-Both EchoMuse units now select **Local Russian Home**; see the
-[deployment checks and measured limits](docs/home-control.md#deployed-local-home-assistant--october-14-2026).
+## Contributing and documentation
 
-## Upstream and related work
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for checks and translations,
+[SECURITY.md](SECURITY.md) for private reporting, and [shared CI](docs/ci.md) for
+review requirements. The [wiki source and publishing guide](docs/wiki.md)
+keeps the public wiki reproducible from reviewed documentation. Private recordings,
+models, device identities, keys, tokens and backups do not belong in commits.
 
-- [EchoMuse](https://github.com/wilbowes/EchoMuse): device software, controller,
-  emOS and the openWakeWord training workflow.
-- [EchoLocal deployment](https://github.com/ha-homelab/ha-echo-dot): existing
-  deployment and the source environment for this migration.
-- [Organization infrastructure](https://github.com/4alvit/terraform-github-ha-homelab):
-  Terraform ownership of this public repository.
+## Upstream and related projects
 
-Upstream software keeps its own licenses and attribution. No Amazon firmware,
-upstream release binaries or personal wake-word models are redistributed here.
+- [EchoMuse](https://github.com/wilbowes/EchoMuse): upstream device software, controller and emOS workflow.
+- [ha-echo-dot](https://github.com/ha-homelab/ha-echo-dot): EchoLocal conversion and wake-word training.
+- [ha-echo-show-5](https://github.com/ha-homelab/ha-echo-show-5): the separate Echo Show path.
+- [Repository infrastructure](https://github.com/4alvit/terraform-github-ha-homelab): Terraform-managed settings.
+
+See [LICENSE](LICENSE). Upstream components retain their own licenses; no Amazon
+firmware, release binaries or personal voice models are redistributed here.

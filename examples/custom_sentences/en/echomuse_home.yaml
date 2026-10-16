@@ -1,0 +1,66 @@
+# Read-only native state questions; requires custom_components/echomuse_home.
+# HA resolves names from the entities and aliases exposed to Assist.
+language: en
+lists:
+  echomuse_on_off_states:
+    values:
+      - in: "on"
+        out: "on"
+      - in: "off"
+        out: "off"
+intents:
+  EchoMuseGetState:
+    data:
+      - sentences:
+          - "is [the] {name} [currently] {echomuse_on_off_states:state}"
+        requires_context:
+          domain: [light, switch, fan]
+        response: one_yesno
+      - sentences:
+          - "what is [the] [current] {name}"
+          - "(tell me|show me) [the] [current] {name}"
+        requires_context:
+          domain: sensor
+        slots:
+          domain: sensor
+        response: one
+      - sentences:
+          - "which (lights|lamps) are [currently] {echomuse_on_off_states:state}"
+        slots:
+          domain: light
+        response: which
+responses:
+  intents:
+    EchoMuseGetState:
+      one: >-
+        {% if query.matched | count == 1 %}
+          {% set s = query.matched[0] %}
+          {% if s.state in ['unknown', 'unavailable'] %}
+            The reading is currently unavailable.
+          {% else %}
+            {% set units = {'W': 'watts', 'kW': 'kilowatts', 'kWh': 'kilowatt-hours', '°C': 'degrees Celsius', '°F': 'degrees Fahrenheit', 'V': 'volts', 'A': 'amps', '%': 'percent'} %}
+            {{ slots.name }}: {{ s.state }} {{ units.get(s.attributes.get('unit_of_measurement', ''), s.attributes.get('unit_of_measurement', '')) }}.
+          {% endif %}
+        {% else %}
+          Please specify the sensor name.
+        {% endif %}
+      one_yesno: >-
+        {% set all = query.matched + query.unmatched %}
+        {% if all | count != 1 %}
+          Please specify the device name.
+        {% elif all[0].state in ['unknown', 'unavailable'] %}
+          The device state is currently unavailable.
+        {% elif query.matched %}
+          Yes, it is {{ 'on' if all[0].state == 'on' else 'off' }}.
+        {% else %}
+          No, it is {{ 'on' if all[0].state == 'on' else 'off' }}.
+        {% endif %}
+      which: >-
+        {% if query.matched %}
+          {{ query.matched | map(attribute='name') | join(', ') }}.
+        {% else %}
+          No lights match that state.
+        {% endif %}
+        {% if query.unmatched | selectattr('state', 'in', ['unknown', 'unavailable']) | list %}
+          Some lights are unavailable.
+        {% endif %}
