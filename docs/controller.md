@@ -6,9 +6,14 @@ pilot. Reviewed on 2026-10-13 against upstream controller tag
 `controller-v2.26.0`, source commit
 `e119433c0845dfe80f4b1ec44c9e8e8028adbb07`.
 
-The initial scope is one previously converted second-generation Echo Dot. Leave
-the first Dot on EchoLocal for comparison. Do not import EchoLocal runtime state
-into EchoMuse's database or copy its wake-word files as if they were compatible.
+The initial pilot covered one previously converted second-generation Echo Dot,
+with the first Dot left on EchoLocal for comparison. Both have since migrated;
+see the [current status](../README.md#current-status). The enrollment sequence
+below records the initial pilot. Do not import EchoLocal runtime state into
+EchoMuse's database or copy its wake-word files as if they were compatible.
+
+For dashboard credentials, the per-device root Console and USB access, follow
+[device access and administrator credentials](device-access.md).
 
 ## Version and image identity
 
@@ -113,6 +118,25 @@ pipeline still calls FCC. No HA long-lived token is required by the controller's
 native ESPHome voice path. A hosted private-CA HA URL needs the relevant CA
 mounted in the controller and `EM_EXTRA_CA_CERT` set; test fetching the actual
 response URL rather than assuming that a working dashboard proves audio access.
+
+### A correctly recognized question ends without speech
+
+Check the controller log for `Timeout waiting for TTS response from HA`. The
+controller waits 30 seconds by default after mic streaming ends, then cancels
+the HA pipeline. A long timeout in an `assist_pipeline/run` diagnostic does
+not change that separate device-facing deadline. HA can therefore show an
+accurate transcript followed by `run-end`, without `intent-end` or `tts-end`.
+
+For the local CPU model, these deployment templates set
+`EM_TTS_WAIT_TIMEOUT=120`. Restart the controller after changing it. Upstream
+clamps this setting at 120 seconds so that the response wait ends before the
+thinking ring's 135-second expiry. Do not patch it to wait indefinitely.
+Use the [native state questions](home-control.md#tools-and-behavior) for routine
+readings; increasing the limit does not accelerate inference. Test the complete
+microphone-to-speaker path on each Dot, not just the text API.
+
+Sources: [response wait configuration](https://github.com/wilbowes/EchoMuse/blob/controller-v2.26.0/controller/em_turnclock.py)
+and [ESPHome voice-turn cancellation](https://github.com/wilbowes/EchoMuse/blob/controller-v2.26.0/controller/em_esphome.py).
 
 ### Diagnose a button that briefly lights and stops
 

@@ -231,6 +231,10 @@ prepared image and boot selection is verified.
 
 ## 7. Boot emOS and enroll the pilot
 
+For ongoing access after enrollment, see
+[device access and administrator credentials](device-access.md), including
+the network Console, optional USB password and the absence of ADB in emOS.
+
 Watch the first boot through the USB serial console. emOS has **no ADB daemon**;
 loss of network ADB is expected and is not proof of failure. Verify emOS's
 reported version, Wi-Fi association, an IP lease, and the controller
@@ -241,7 +245,8 @@ which sets raw mode, flushes pending input, and performs the newline handshake
 before issuing commands. After USB re-enumeration, match the device's serial
 and the node's major/minor numbers against sysfs; a retained node or buffered
 text alone is not evidence of a failed boot. emOS identifies itself as USB
-**1949:2007**, manufacturer **EchoMuse**, product **emOS console**. Confirm a
+**1949:2007**, manufacturer **EchoMuse**, product **emOS** in the tested v0.10
+payload (the pinned source also uses **emOS console**). Confirm a
 shell response and `/etc/os-release` before considering another reset.
 
 If Wi-Fi needs configuration, use `em-wifi` from the USB console or the
@@ -255,6 +260,18 @@ WPA2 network; do not assume WPA3-only service will work.
 Approve only the verified pilot in the EchoMuse dashboard. Credential issuance
 alone does not approve the device. Verify its version, link security,
 microphone state, loaded wake model, and allocated ESPHome port.
+
+In controller 2.26.0, an authenticated but unapproved device updates its pending
+record and then disconnects before joining the live device map. Consequently,
+`connected` and `linkTls` can remain false until approval. Before approving,
+require a recent authenticated contact for the exact device, the expected
+firmware, its separately issued credentials, and successful USB boot checks.
+After approving, require a live TLS connection and verify the emOS and firmware
+versions. Initial version telemetry can arrive after the connection becomes
+live; wait for all three conditions within a bounded deadline before enrolling
+HA, without issuing a second approval or rotating credentials. A record
+created during credential issuance alone is not proof that
+the device has booted or contacted the controller.
 
 In Home Assistant, use **Settings → Devices & services → ESPHome**. Accept
 the discovered EchoMuse satellite, or add the controller's address and the
@@ -289,6 +306,77 @@ speech recognition, conversation, or playback.
 
 Do not migrate another Dot or deploy the custom Russian wake phrase until the
 pilot meets the agreed acceptance checks.
+
+## 9. Migrate another existing EchoLocal unit
+
+Treat each Dot as a separate migration even when the model, Fire OS release and
+intended EchoMuse version match. The second hardware unit completed the earlier
+button, wake and music checks. The operator has now requested the same system on
+the first unit, while postponing the newer Russian-voice listening test. That
+test remains pending independently of firmware preparation.
+
+The first unit's historical inventory identified an unlocked Dot 2 with amonet2,
+Fire OS 6 / Android 7.1.2 and TWRP 3.7. That supported preparing the same ARM32
+emOS route, but did not replace current USB inventory. Work stopped at local
+preparation until physical USB became available. On October 14 the operator
+connected the first unit, its live identity and layout were verified, and it
+was migrated using its own fresh recovery copies. The [deployment record](deployment-record.md#october-14-2026--first-dot-migration)
+separates completed firmware and integration checks from acoustic acceptance.
+
+Repeat the migration in this order:
+
+1. Connect the intended first Dot to the NAS with a tested USB data cable,
+   initially without holding buttons. Match its USB serial to the private
+   inventory. A unit in an unexpected state must be investigated before any
+   reboot. Keep the already working EchoMuse unit running normally.
+2. Create a separate per-device workspace and isolated USB maintenance session.
+   Read current firmware, root access, partition map and identity. Never import
+   the completed pilot's target state or run its dated private scripts unchanged.
+3. Take fresh full boot, recovery and boot-control backups, plus EchoLocal
+   runtime and Wi-Fi state. Verify independent partition reads and copy the
+   verified escrow to another host. An old pre-wipe or pre-conversion backup is
+   recovery insurance, not the current EchoLocal configuration to restore.
+4. Enter and verify recovery, inspect both donor slots read-only, then build the
+   image from this unit's own verified boot backup. Derive the system partition
+   from that inspection. Do not reuse another Dot's prepared image, even when
+   both devices report the same release.
+5. Issue separate device credentials and prepare the pinned firmware and wake
+   assets. Stage only the new EchoMuse paths, preserving Wi-Fi and EchoLocal
+   state. Review a dry-run result before explicitly enabling the target boot
+   write. Independently verify readback and unchanged retained partitions
+   before requesting a boot.
+6. Verify emOS through USB and the authenticated controller connection. Approve
+   only this unit under its distinct label. Read its actual allocated ESPHome
+   port; the working unit already owns its own port. Controller-wide TLS and
+   recording settings do not need changing.
+7. Enroll a new HA ESPHome entry and assign **FCC Russian Local Voice** to both
+   Assistant selectors. Preserve the original first-unit entries for rollback.
+   Resolve new entity IDs from the registry rather than guessing suffixes.
+8. Add its native player to the existing Music Assistant provider. Update only
+   its originating-device music routes and add its card to the existing audio
+   view. Preserve the other unit's routes and card. Apply the proven per-queue
+   normalization choice to the new queue explicitly, without changing global
+   normalization settings.
+9. Verify transport and actual generated audio, then perform the deferred
+   attended button, wake and music checks when the operator is available. Mark
+   firmware, HA integration and acoustic acceptance separately.
+
+The matching wake baseline is **Hey Jarvis**. The old personal microWakeWord
+TFLite files cannot be copied into EchoMuse's ONNX detector. Firmware conversion
+does not establish Russian wake-word accuracy or solve speech-model errors by
+itself. See the [Russian voice operations](russian-voice-operations.md) for the
+independent server-side pipeline and rollback.
+
+If adding the new native player causes Music Assistant exports to disappear
+while the native HA players remain available, inspect the HA provider connection
+before changing speaker settings. During this migration, the `hass_players`
+reload encountered a disconnected HA client. Reloading only the HA connection
+provider and then `hass_players`, through `config/providers/reload`, restored
+both Dots. Preserve the complete selected-player list and other provider
+configuration, and verify the existing Dot as well as the new one. An unrelated
+selected player that was already unavailable should not trigger repeated
+reloads. This recovery does not establish that the underlying client error is
+permanently fixed.
 
 ## Roll back to EchoLocal
 

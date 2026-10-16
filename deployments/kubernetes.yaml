@@ -57,7 +57,7 @@ spec:
             - {name: REQUIRE_DEVICE_TLS, value: "0"}
             - {name: OWW_MODEL, value: hey_jarvis}
             - {name: OWW_THRESHOLD, value: "0.5"}
-            - {name: EM_TTS_WAIT_TIMEOUT, value: "30"}
+            - {name: EM_TTS_WAIT_TIMEOUT, value: "120"}
             - {name: DEBUG, value: "0"}
           volumeMounts:
             - {name: data, mountPath: /app/data}

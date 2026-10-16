@@ -268,3 +268,142 @@ No controlled stock-versus-EchoMuse loudness measurement was performed.
 The operator subsequently accepted the current pilot setup and authorized
 publication of the findings. Flat EQ and volume limits remain unchanged;
 the playback and far-field test limitations recorded above still apply.
+
+## October 14, 2026 — first Dot migration
+
+The operator connected the first, still-EchoLocal Dot to the maintenance host
+and authorized its conversion. A new isolated USB session matched its serial
+and Wi-Fi identity before any device write. Live inspection confirmed the
+expected Fire OS 6 / Android 7.1.2 / SDK 25, EchoLocal 0.0.8, active slot A,
+amonet2 and TWRP 3.7 environment.
+
+Fresh full copies of both boot partitions, recovery, boot-control metadata and
+the EchoLocal/Wi-Fi runtime archive passed independent second reads. All five
+files were then copied to the Mac and checked against the same hashes. The
+new emOS image used this first Dot's own boot backup and dynamically verified
+donor system partition. It did not reuse the completed pilot's prepared image
+or credentials.
+
+Thirteen firmware, startup, wake and connection files were staged with verified
+hashes and permissions; the Wi-Fi configuration remained unchanged. Only
+`boot_a` was written. Its full uncached readback matched the new image plus
+the preserved partition remainder; the alternate boot partition, recovery and
+boot-control bytes remained unchanged. A separate reboot guard rechecked the
+boot contents and retained partitions before starting emOS.
+
+USB console inspection confirmed **emOS v0.10**, **EchoMuse v2.18.0**, a running
+server and Wi-Fi connectivity. The v0.10 payload reports USB product **emOS**;
+the source also contains **emOS console**, so the product string alone must not
+override the exact serial, physical USB mapping and verified image. The device
+reached the intended controller over WSS and waited for approval. Its separate
+credentials and recovery files remain private.
+
+After authenticated first contact, only the new first unit was approved. Its
+initial live connection arrived before complete version telemetry; the check
+waited for TLS and both expected versions without issuing another approval or
+rotating credentials. A distinct ESPHome entry was enrolled in HA. Both
+Assistant selectors use **FCC Russian Local Voice**; the primary wake word is
+**Hey Jarvis** and the secondary wake word is disabled.
+
+The new native player was appended to Music Assistant's existing selected-player
+list. That provider reload exposed a disconnected HA client and temporarily
+removed the MA exports. A scoped reload of the HA connection provider and then
+`hass_players` restored both Dots without restarting MA or changing credentials,
+stream addresses or configured player selections. Only the new first queue's
+normalization was disabled to match the second queue.
+
+The first unit's originating-device music routes now target its new MA player.
+The private canonical bindings reproduce the live scripts. An **EchoMuse Dot
+001** card was added beside the existing **EchoMuse Dot 002** card in Lovelace's
+media view. Existing HA entries, pipelines, second-unit routes and its card were
+preserved; the original first EchoLocal entry remains available for rollback.
+
+Final read-only checks confirmed both units connected through TLS and HA,
+matching firmware/emOS versions, local wake listening without continuous
+microphone streaming, matching Assistant/wake selectors, and **57 matching
+effective settings**. Persisted device volume is intentionally independent.
+No music playback, microphone recording or attended acoustic test was performed
+during this first-unit migration. Its button, wake and audible playback checks
+remain separate acceptance work.
+
+
+## October 14, 2026 — local household assistant
+
+Both EchoMuse units now use **Local Russian Home** on both Assistant selectors.
+The local Ollama service provides household reasoning, guarded device commands
+and Recorder statistics; local Piper provides Russian speech. The existing
+cloud recognition provider is retained. The earlier FCC assignments above are
+migration checkpoints, not the final active configuration.
+
+See the [local-home deployment record](home-control.md#deployed-local-home-assistant--october-14-2026)
+for the verified control/read separation, real lamp restoration, generated
+audio for both device contexts, CPU latency limits and remaining attended tests.
+
+The first attended local-home test failed on both devices despite correct
+transcription of the heater power question. Controller traces identified its
+30-second response deadline cancelling the still-running local model. The
+correction registers a native read-only state intent and changes the shared
+controller's supported response timeout to 120 seconds. See the same record for
+verification and remaining performance limits; the earlier text API checks did
+not establish full voice-path success.
+
+After the correction, the operator repeated the power question with the action
+button on each Dot and confirmed that both answered in Russian without hanging.
+This is attended acceptance of that specific query; the documented CPU limits
+still apply to complex model-driven questions.
+
+## October 14, 2026 — music request falling through to the model
+
+The operator reported that a request to play music received an unsupported-playback
+answer. The matching second-Dot trace contained the English transcript
+`play something`, even though the running Parakeet adapter explicitly requested
+`ru-RU`. The transcript missed the native music grammar. Assist marked the turn
+`processed_locally: false`, and the local conversation model refused playback
+without invoking Music Assistant. This trace identifies the routing failure;
+it does not establish why the recognizer returned English.
+
+The [shared native voice generator correction](https://github.com/ha-homelab/ha-echo-show-5/pull/59)
+accepts `play something` as an alternative
+to `play music`, retaining the existing optional provider and configured-device
+suffixes. The change adds no arbitrary media search or destinations. Only the
+six corresponding English sentence patterns were changed in the live HA package;
+the existing actions, scripts, queue policy and device bindings were preserved.
+HA configuration validation passed and automations were reloaded without a
+restart. A private backup of the package was retained.
+
+All 16 native voice tests passed in an isolated HA runtime with fake media
+services, including original Russian commands, the observed English phrase,
+explicit destinations and rejection of unsupported/negated phrases. Live
+intent-stage requests from the second Dot's device context then handled both
+`play something` and «Играй музыку» locally. Starting playback took 3.35 seconds
+in the intent stage; the repeated Russian request took 0.005 seconds with music
+already playing. These are different queue states, not comparable cold-start
+latency measurements.
+
+Both the native and Music Assistant player entities reported `playing`, and
+the controller logged audio frames sent to the second Dot. These checks bypassed
+microphone recognition and did not by themselves establish audible quality.
+The controller also recorded source/decoder stalls, so this correction makes no
+claim of glitch-free playback. The first Dot was unavailable in HA and Music
+Assistant during this check; its sentence mapping was verified without claiming
+a successful physical playback test.
+
+## October 14, 2026 — current dashboard and missing music source
+
+The Media dashboard still contained obsolete EchoLocal satellite cards alongside
+the new EchoMuse players. The old cards were replaced with one EchoMuse section
+containing the current MA players, voice status, microphone state and selectors
+for each Dot. All twelve entity references existed and the saved configuration
+was read back. A subsequent check confirmed that the controller supports only
+one active wake model; both second-wake-word rows were removed, leaving ten
+current references. See the [dashboard procedure and verification limits](dashboard.md).
+
+The operator then confirmed audible interruptions on the second Dot. Checking
+the 25-item queue found one Plex item with valid metadata but an HTTP 404 from
+its underlying file. The missing item was removed from the canonical private
+seed, live native-command scripts and second-Dot queue. The remaining order was
+preserved, and playback resumed at the saved item and position. The operator
+confirmed smooth playback after the repair. See the [music diagnosis and queue
+repair procedure](music-troubleshooting.md) for the independent source-stall and
+device-link observations; this is not a claim that every possible dropout was
+eliminated. The first Dot remains pending a physical power/reconnection check.

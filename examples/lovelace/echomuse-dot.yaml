@@ -1,0 +1,22 @@
+# Copy once per physical Dot; replace every placeholder from the HA registry.
+# Requires the Mini Media Player custom card.
+type: vertical-stack
+cards:
+  - type: custom:mini-media-player
+    entity: media_player.REPLACE_WITH_MUSIC_ASSISTANT_PLAYER
+    name: EchoMuse Dot
+    icon: mdi:speaker
+    artwork: cover
+    hide:
+      power: true
+  - type: entities
+    show_header_toggle: false
+    entities:
+      - entity: assist_satellite.REPLACE_WITH_CURRENT_SATELLITE
+        name: Voice status
+      - entity: binary_sensor.REPLACE_WITH_MICROPHONE_MUTED
+        name: Microphone muted
+      - entity: select.REPLACE_WITH_ASSISTANT
+        name: Assistant
+      - entity: select.REPLACE_WITH_WAKE_WORD
+        name: Wake word
