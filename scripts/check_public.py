@@ -41,6 +41,9 @@ ASSIGNMENT = re.compile(
 PLAIN_ASSIGNMENT = re.compile(
     r"(?i)^\s*(?:-\s*)?(?:api[_-]?key|access[_-]?token|auth[_-]?token|password|passwd|psk|secret|token)\s*[:=]\s*([^\s\"'#]{4,})\s*(?:#.*)?$"
 )
+# Exact translated form labels, not credential values. Keep this list narrow.
+SAFE_UI_LABELS = frozenset({"Service token", "Токен сервиса", "Dienst-Token",
+                            "Token del servicio", "Jeton du service"})
 
 
 def path_problem(name: str) -> str | None:
@@ -87,7 +90,8 @@ def content_problems(data: bytes) -> list[tuple[int, str]]:
             value = match.group(1)
             if not (value.startswith(("${", "<", "REPLACE_", "EXAMPLE_"))
                     or value.lower().startswith(("example", "dummy", "test", "placeholder"))
-                    or value.lower() in {"none", "null", "false", "true", "redacted"}):
+                    or value.lower() in {"none", "null", "false", "true", "redacted"}
+                    or value in SAFE_UI_LABELS):
                 problems.add((line_no, "possible credential assignment"))
     return sorted(problems)
 

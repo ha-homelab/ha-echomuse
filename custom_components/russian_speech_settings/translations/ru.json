@@ -1,0 +1,85 @@
+{
+  "title": "Russian Speech Settings",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Local Russian Speech",
+        "description": "Подключите локальный сервис русской речи. Настройки применяются к клиентам с голосом silero-ru-default.",
+        "data": {
+          "endpoint": "HTTPS-адрес сервиса",
+          "token": "Токен сервиса",
+          "ca_file": "Путь к сертификату CA внутри HA"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Токен сервиса",
+        "data": {
+          "token": "Токен сервиса"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Не удалось подключиться. Проверьте адрес, сертификат CA и сервис.",
+      "invalid_auth": "Сервис отклонил токен."
+    },
+    "abort": {
+      "already_configured": "Сервис уже настроен.",
+      "reauth_successful": "Токен обновлён."
+    }
+  },
+  "entity": {
+    "select": {
+      "voice": {
+        "name": "Голос",
+        "state": {
+          "silero-ru-baya": "Baya",
+          "silero-ru-kseniya": "Kseniya",
+          "silero-ru-xenia": "Xenia",
+          "silero-ru-aidar": "Aidar",
+          "silero-ru-eugene": "Eugene"
+        }
+      },
+      "intonation": {
+        "name": "Интонация",
+        "state": {
+          "auto": "Автоматически",
+          "statement": "Утверждение",
+          "question": "Вопрос",
+          "exclamation": "Восклицание"
+        }
+      }
+    },
+    "number": {
+      "rate": {
+        "name": "Темп речи"
+      },
+      "pitch": {
+        "name": "Изменение высоты"
+      },
+      "sentence_pause_ms": {
+        "name": "Дополнительная пауза"
+      },
+      "emphasis_intensity": {
+        "name": "Сила выделения"
+      }
+    },
+    "text": {
+      "emphasis_words": {
+        "name": "Выделяемые слова (через запятую)"
+      }
+    },
+    "switch": {
+      "auto_stress": {
+        "name": "Автоматические ударения"
+      },
+      "auto_yo": {
+        "name": "Автоматическая ё"
+      }
+    },
+    "button": {
+      "reset": {
+        "name": "Сбросить настройки голоса"
+      }
+    }
+  }
+}

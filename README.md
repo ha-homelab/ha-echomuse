@@ -108,3 +108,7 @@ firmware, release binaries or personal voice models are redistributed here.
 
 
 For certificate-chain and key-strength enforcement while fetching pinned public artifacts, use the optional [strict TLS download profile](docs/strict-tls.md).
+
+For [local Russian voice settings and the voice catalog](docs/speech-settings.md),
+use the companion HA integration to choose a Silero speaker, adjust prosody,
+and manage pronunciation without restarting the Dots.

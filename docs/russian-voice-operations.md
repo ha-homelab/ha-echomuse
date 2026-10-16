@@ -1,5 +1,9 @@
 # Operate the Russian voice pipeline
 
+For the current Silero Baya service, all five installed voices and live HA
+controls, follow [Local Russian voice settings](speech-settings.md). The Piper
+procedure below remains the alternative-backend and rollback reference.
+
 This runbook connects the energy reports, general conversation and Russian
 speech services. It applies to both EchoLocal and EchoMuse Assist satellites.
 No USB connection or new Dot firmware is required for these server-side changes.
