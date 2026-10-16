@@ -10,7 +10,7 @@ import struct
 import subprocess
 import tempfile
 import unittest
-from unittest import mock
+import unittest.mock
 
 
 MODULE = Path(__file__).resolve().parents[1] / "scripts/build_emos.py"
@@ -52,14 +52,14 @@ class ImageGatesTests(unittest.TestCase):
 
     def test_corrupt_reference_stops_before_loading_code(self):
         self.reference.write_bytes(self.reference.read_bytes() + b"corruption")
-        with mock.patch.object(build, "validate_source"), mock.patch.object(build, "load_builder") as load:
+        with unittest.mock.patch.object(build, "validate_source"), unittest.mock.patch.object(build, "load_builder") as load:
             with self.assertRaisesRegex(build.PreparationError, "reference SHA-256 mismatch"):
                 build.prepare(self.args)
         load.assert_not_called()
         self.no_artifacts()
 
     def test_corrupt_payload_stops_before_loading_code(self):
-        with mock.patch.object(build, "validate_source"), mock.patch.object(build, "load_builder") as load:
+        with unittest.mock.patch.object(build, "validate_source"), unittest.mock.patch.object(build, "load_builder") as load:
             with self.assertRaisesRegex(build.PreparationError, "payload SHA-256 mismatch"):
                 build.prepare(self.args)
         load.assert_not_called()
@@ -73,7 +73,7 @@ class ImageGatesTests(unittest.TestCase):
 
     def test_invalid_topology_number_is_rejected_before_source_lookup(self):
         for value in (0, -1, 128, True, "13"):
-            with self.subTest(value=value), mock.patch.object(build, "validate_source") as source:
+            with self.subTest(value=value), unittest.mock.patch.object(build, "validate_source") as source:
                 self.args.system_part = value
                 with self.assertRaisesRegex(build.PreparationError, "system partition"):
                     build.prepare(self.args)
@@ -111,7 +111,7 @@ class ImageGatesTests(unittest.TestCase):
                 receipt.write_bytes(b"another writer")
             return original_open(path, flags, mode)
 
-        with mock.patch.object(build.os, "open", side_effect=race):
+        with unittest.mock.patch.object(build.os, "open", side_effect=race):
             with self.assertRaises(FileExistsError):
                 build.write_outputs(self.args.output, b"image", {})
         self.assertFalse(self.args.output.exists())
@@ -127,7 +127,7 @@ class ImageGatesTests(unittest.TestCase):
             self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
 
     def test_wrong_architecture_is_not_silently_given_a_32bit_init(self):
-        upstream = mock.Mock()
+        upstream = unittest.mock.Mock()
         upstream.BuildError = type("BuildError", (Exception,), {})
         upstream.read_payload_bundle.return_value = {
             "version": build.EMOS_VERSION,
@@ -135,9 +135,9 @@ class ImageGatesTests(unittest.TestCase):
         }
         upstream.reference_kernel_arch.return_value = "arm64"
         payload_hash = hashlib.sha256(self.payload.read_bytes()).hexdigest()
-        with mock.patch.object(build, "validate_source"), \
-             mock.patch.object(build, "load_builder", return_value=upstream), \
-             mock.patch.object(build, "PAYLOAD_SHA256", payload_hash):
+        with unittest.mock.patch.object(build, "validate_source"), \
+             unittest.mock.patch.object(build, "load_builder", return_value=upstream), \
+             unittest.mock.patch.object(build, "PAYLOAD_SHA256", payload_hash):
             with self.assertRaisesRegex(build.PreparationError, "ARM32"):
                 build.prepare(self.args)
         upstream.build_emos_image.assert_not_called()
@@ -197,7 +197,7 @@ class PartitionBoundaryTests(unittest.TestCase):
                     build.boot_image_from_escrow(bytes(data))
 
     def test_missing_openssl_is_an_explicit_refusal(self):
-        with mock.patch.object(build.subprocess, "run", side_effect=FileNotFoundError):
+        with unittest.mock.patch.object(build.subprocess, "run", side_effect=FileNotFoundError):
             with self.assertRaisesRegex(build.PreparationError, "OpenSSL could not parse"):
                 build.boot_image_from_escrow(reference_fixture() + self.certificate)
 
@@ -226,25 +226,25 @@ class SourceGatesTests(unittest.TestCase):
 
     def test_modified_tracked_file_is_refused(self):
         self.module.write_text("raise RuntimeError('changed')\n")
-        with mock.patch.object(build, "SOURCE_COMMIT", self.commit):
+        with unittest.mock.patch.object(build, "SOURCE_COMMIT", self.commit):
             with self.assertRaisesRegex(build.PreparationError, "modified tracked"):
                 build.validate_source(self.root)
 
     def test_assume_unchanged_does_not_hide_modified_executable_source(self):
         self.run_git("update-index", "--assume-unchanged", "controller/em_emos_build.py")
         self.module.write_text("raise RuntimeError('hidden change')\n")
-        with mock.patch.object(build, "SOURCE_COMMIT", self.commit):
+        with unittest.mock.patch.object(build, "SOURCE_COMMIT", self.commit):
             with self.assertRaisesRegex(build.PreparationError, "committed blob"):
                 build.validate_source(self.root)
 
     def test_subdirectory_is_not_accepted_as_checkout_root(self):
-        with mock.patch.object(build, "SOURCE_COMMIT", self.commit):
+        with unittest.mock.patch.object(build, "SOURCE_COMMIT", self.commit):
             with self.assertRaisesRegex(build.PreparationError, "root of the upstream"):
                 build.validate_source(self.module.parent)
 
     def test_clean_commit_is_accepted_and_untracked_notes_are_not_executed(self):
         (self.root / "private-note.txt").write_text("not source code\n")
-        with mock.patch.object(build, "SOURCE_COMMIT", self.commit):
+        with unittest.mock.patch.object(build, "SOURCE_COMMIT", self.commit):
             self.assertEqual(build.validate_source(self.root), self.module)
 
 

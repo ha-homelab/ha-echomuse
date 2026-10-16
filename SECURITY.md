@@ -6,10 +6,9 @@ separate release and security policies. Follow their advisories as well.
 
 ## Report privately
 
-For a vulnerability, use the repository's **Security → Report a vulnerability**
-option when available. If private reporting is unavailable, ask a maintainer for
-a private channel without describing the exploit or including secrets in a
-public issue. Do not post credentials, device dumps or household data.
+For a vulnerability, use [GitHub private reporting](https://github.com/ha-homelab/ha-echomuse/security/advisories/new)
+or email **alvit.work@gmail.com**. Do not post credentials, device dumps or
+household data in public issues.
 
 Include the affected commit, component, a minimal sanitized reproduction and
 impact. Use documentation addresses and placeholders, not live network details.
@@ -31,3 +30,15 @@ Do not upload Amazon firmware or personal voice recordings.
 [Access](docs/device-access.md), [home tools](docs/home-control.md),
 [operations](docs/operations.md) and [public-source checks](CONTRIBUTING.md)
 explain the corresponding setup and validation.
+
+
+## Response and supported source
+
+The current main-branch tools and latest 0.3 integration source receive security
+fixes. Include the exact Git revision and integration version with a report.
+The maintainer aims to acknowledge within 14 days, reproduce privately, assess
+impact, test the fix and coordinate disclosure. Critical vulnerabilities are
+addressed immediately; other medium-or-higher findings should be fixed within
+60 days. Release notes include available CVE/GHSA identifiers and reporter credit
+unless anonymity is requested. Retry the alternative private contact if needed.
+There is no independent security team or backup maintainer.

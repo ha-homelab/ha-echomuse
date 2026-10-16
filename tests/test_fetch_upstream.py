@@ -7,10 +7,11 @@ import json
 import os
 from pathlib import Path
 import stat
+import sys
 import subprocess
 import tempfile
 import unittest
-from unittest import mock
+import unittest.mock
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,10 +53,19 @@ class FetchTests(unittest.TestCase):
         }
 
     def opener(self, body=None, length=None):
-        return mock.Mock(open=mock.Mock(return_value=Response(self.body if body is None else body, length)))
+        return unittest.mock.Mock(open=unittest.mock.Mock(return_value=Response(self.body if body is None else body, length)))
 
     def assert_no_files(self):
         self.assertFalse(list(self.destination.glob('*')))
+
+    def test_strict_download_uses_verified_https_handler(self):
+        opener = self.opener()
+        with unittest.mock.patch.object(fetch.urllib.request, 'build_opener', return_value=opener) as build:
+            fetch.fetch(self.artifact, self.destination, strict_tls=True)
+        handler = next(item for item in build.call_args.args
+                       if isinstance(item, urllib.request.HTTPSHandler))
+        self.assertGreaterEqual(handler._context.security_level, 3)
+        self.assertTrue(handler._context.check_hostname)
 
     def test_valid_artifact_is_atomic_and_private(self):
         old = os.umask(0)
@@ -81,9 +91,9 @@ class FetchTests(unittest.TestCase):
 
     def test_interrupted_transfer_is_rejected_and_cleaned(self):
         response = Response(self.body)
-        response.read = mock.Mock(side_effect=[self.body[:3], http.client.IncompleteRead(b'part')])
+        response.read = unittest.mock.Mock(side_effect=[self.body[:3], http.client.IncompleteRead(b'part')])
         with self.assertRaisesRegex(fetch.FetchError, 'download failed'):
-            fetch.fetch(self.artifact, self.destination, opener=mock.Mock(open=mock.Mock(return_value=response)))
+            fetch.fetch(self.artifact, self.destination, opener=unittest.mock.Mock(open=unittest.mock.Mock(return_value=response)))
         self.assert_no_files()
 
     def test_oversize_transfer_without_length_is_bounded(self):
@@ -119,7 +129,7 @@ class FetchTests(unittest.TestCase):
         def competing_link(source, destination):
             Path(destination).write_bytes(b'other process')
             return actual_link(source, destination)
-        with mock.patch.object(fetch.os, 'link', side_effect=competing_link):
+        with unittest.mock.patch.object(fetch.os, 'link', side_effect=competing_link):
             with self.assertRaises(fetch.FetchError):
                 fetch.fetch(self.artifact, self.destination, opener=self.opener())
         self.assertEqual((self.destination / self.artifact['filename']).read_bytes(), b'other process')
@@ -170,6 +180,25 @@ class PublicAuditTests(unittest.TestCase):
         self.assertEqual({label for _, label in problems},
                          {'live IPv4 address', 'device MAC address', 'GitHub credential'})
         self.assertNotIn(credential, repr(problems))
+
+    def test_cli_omits_matched_values_from_both_output_streams(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(['git', 'init', '--quiet', str(root)], check=True)
+            credential = 'gh' + 'p_' + 'q' * 36
+            address = '.'.join(('10', '12', '13', '14'))
+            (root / 'notes.txt').write_text(credential + '\n' + address + '\n')
+            subprocess.run(['git', '-C', str(root), 'add', 'notes.txt'], check=True)
+            result = subprocess.run(
+                [sys.executable, str(ROOT / 'scripts/check_public.py'), '--root', str(root)],
+                text=True, capture_output=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertEqual(result.stdout, '')
+            self.assertIn('notes.txt:1: GitHub credential', result.stderr)
+            self.assertIn('notes.txt:2: live IPv4 address', result.stderr)
+            self.assertNotIn(credential, result.stdout + result.stderr)
+            self.assertNotIn(address, result.stdout + result.stderr)
 
     def test_documentation_and_bind_addresses_are_allowed(self):
         self.assertEqual(public.content_problems(b'192.0.2.10 198.51.100.10 203.0.113.10 127.0.0.1 0.0.0.0'), [])

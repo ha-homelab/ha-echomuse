@@ -1,5 +1,7 @@
 # ha-echomuse
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15578/badge)](https://www.bestpractices.dev/projects/15578)
+
 [English](README.md) · [Русский](README.ru.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md)
 
 Turn an existing **Echo Dot 2** into a Home Assistant voice satellite with
@@ -103,3 +105,6 @@ models, device identities, keys, tokens and backups do not belong in commits.
 
 See [LICENSE](LICENSE). Upstream components retain their own licenses; no Amazon
 firmware, release binaries or personal voice models are redistributed here.
+
+
+For certificate-chain and key-strength enforcement while fetching pinned public artifacts, use the optional [strict TLS download profile](docs/strict-tls.md).

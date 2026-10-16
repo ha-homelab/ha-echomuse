@@ -52,3 +52,8 @@ merging; do not disable checks or rely on approval of an older commit. Render
 wiki checkout before pushing, preserving pages this exporter does not own.
 Documentation changes do not authorize a firmware upgrade or modification of
 live household devices.
+
+
+## Project participation
+
+Use public GitHub issues and pull requests for questions, proposals and reproducible non-sensitive bugs. English is the shared discussion language. Read [governance](GOVERNANCE.md), [Code of Conduct](CODE_OF_CONDUCT.md) and the [roadmap](ROADMAP.md). All major functionality changes require automated regression coverage, including relevant negative cases, and updated interface documentation. Resolve review findings and required CI failures before normal merge. Original contributions are accepted under the repository MIT license; preserve third-party licensing and attribution.

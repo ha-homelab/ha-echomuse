@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import ssl
 import sys
 import tempfile
 import time
@@ -107,14 +108,37 @@ def private_directory(path: Path) -> None:
     # Change only the requested destination; existing ancestors are untouched.
 
 
-def fetch(artifact: dict, destination: Path, *, opener=None) -> Path:
+def client_context(*, strict=False, cafile=None):
+    """Keep platform trust and optionally require 128-bit transport security.
+
+    OpenSSL security level 3 rejects RSA/DH keys below 3072 bits (including
+    marginal keys rounded by level 2), short EC keys and static RSA exchange.
+    Preserve a stronger system policy and its existing cipher selection.
+    """
+    context = ssl.create_default_context(cafile=cafile)
+    context.minimum_version = max(context.minimum_version, ssl.TLSVersion.TLSv1_2)
+    if strict:
+        if ssl.OPENSSL_VERSION_INFO < (3, 0, 0):
+            raise RuntimeError("Strict TLS requires OpenSSL 3 or newer")
+        if context.security_level < 3:
+            suites = ":".join(
+                cipher["name"]
+                for cipher in context.get_ciphers()
+                if cipher["protocol"] != "TLSv1.3"
+            )
+            context.set_ciphers(f"{suites}:@SECLEVEL=3")
+    return context
+
+
+def fetch(artifact: dict, destination: Path, *, opener=None, strict_tls=False) -> Path:
     validate_url(artifact["url"], initial=True)
     private_directory(destination)
     os.chmod(destination, 0o700)
     output = destination / artifact["filename"]
     if verify_existing(output, artifact):
         return output
-    opener = opener or urllib.request.build_opener(ReleaseRedirects())
+    opener = opener or urllib.request.build_opener(
+        ReleaseRedirects(), urllib.request.HTTPSHandler(context=client_context(strict=strict_tls)))
     temporary = None
     try:
         fd, name = tempfile.mkstemp(prefix=".download-", suffix=".partial", dir=destination)
@@ -160,6 +184,8 @@ def main(argv=None) -> int:
     cli.add_argument("artifacts", nargs="*", help="artifact names; defaults to all locked artifacts")
     cli.add_argument("--lock", type=Path, default=ROOT / "upstream-lock.json")
     cli.add_argument("--destination", type=Path, default=ROOT / "private/artifacts")
+    cli.add_argument("--strict-tls", action="store_true",
+                     help="Require OpenSSL 3 and a 128-bit minimum transport security profile")
     args = cli.parse_args(argv)
     try:
         artifacts = load_artifacts(args.lock)
@@ -167,7 +193,7 @@ def main(argv=None) -> int:
         if any(name not in artifacts for name in selected):
             raise FetchError("unknown artifact name")
         for name in selected:
-            result = fetch(artifacts[name], args.destination)
+            result = fetch(artifacts[name], args.destination, strict_tls=args.strict_tls)
             print(f"Verified {name}: {result.name} ({artifacts[name]['bytes']} bytes)")
     except FetchError as exc:
         print(f"Artifact fetch failed: {exc}", file=sys.stderr)
