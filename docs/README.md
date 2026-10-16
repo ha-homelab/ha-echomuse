@@ -32,6 +32,7 @@ acceptance targets. Its color diagrams link back to the detailed runbooks below.
   and the limits of speech support.
 - [Energy reports](energy-assist.md): bounded read-only reports.
 - [Dashboard](dashboard.md): current voice and music entities in Lovelace.
+- [Voice settings and catalog](speech-settings.md): live Silero controls and all installed speakers.
 - [Voice features](voice-features.md): streaming speech, interruption, cues,
   announcements and timers.
 - [Bluetooth proxy](bluetooth-proxy.md): separate enrollment, connection slots,

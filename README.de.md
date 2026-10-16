@@ -76,7 +76,7 @@ Sprachtests aus der Nähe sind belegt; Fernfeld-Erkennung und Langzeitstabilitä
 haben Grenzen. Siehe [Protokoll](docs/deployment-record.md),
 [Sprachvalidierung](docs/russian-voice-validation.md) und [Latenzmessungen](docs/architecture.md).
 
-Die dokumentierte aktuelle russische Stimme ist **Piper Irina**. Hauswerkzeuge
+Die dokumentierte aktuelle russische Stimme ist **Silero Baya**. Hauswerkzeuge
 laufen lokal über Ollama, STT verwendet jedoch FCC cloud speech: **die gesamte
 Pipeline ist nicht offline**. Andere Sprachen benötigen passende STT-, Modell-
 und TTS-Einstellungen und eigene Hörtests. Keine Hausdaten an die optionale
@@ -99,3 +99,5 @@ und Sicherungen bleiben privat. Detaillierte Betriebsanleitungen sind auf Englis
 
 [LICENSE](LICENSE) gilt für dieses Projekt; Upstream-Komponenten behalten ihre
 Lizenzen. Keine Amazon-Firmware, Release-Binärdateien oder persönlichen Sprachmodelle werden verteilt.
+
+[Russische Spracheinstellungen und Stimmenkatalog](docs/speech-settings.md): fünf Silero-Stimmen, Tempo, Tonhöhe, Pausen und Aussprache sind in HA einstellbar. Die Anleitung ist auf Englisch.

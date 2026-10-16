@@ -82,7 +82,7 @@ long-term reliability have limits. See [deployment evidence](docs/deployment-rec
 [voice validation](docs/russian-voice-validation.md) and the
 [measured latency chart](docs/architecture.md).
 
-The current recorded Russian voice is **Piper Irina**. Local home tools use
+The current recorded Russian voice is **Silero Baya**. Local home tools use
 Ollama, but the recorded STT provider is FCC cloud speech: **the full recorded
 pipeline is not offline**. A different language needs compatible STT, model and
 TTS selections and its own listening test. Never send household data to the
@@ -108,3 +108,6 @@ firmware, release binaries or personal voice models are redistributed here.
 
 
 For certificate-chain and key-strength enforcement while fetching pinned public artifacts, use the optional [strict TLS download profile](docs/strict-tls.md).
+
+
+[Local Russian voice settings and the voice catalog](docs/speech-settings.md) expose five Silero speakers, speech rate, pitch, pauses and pronunciation controls in HA.

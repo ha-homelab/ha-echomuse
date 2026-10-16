@@ -1,0 +1,85 @@
+{
+  "title": "Russian Speech Settings",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Local Russian Speech",
+        "description": "Connect the private Russian speech service. All settings apply to clients using silero-ru-default.",
+        "data": {
+          "endpoint": "HTTPS service origin",
+          "token": "Service token",
+          "ca_file": "CA certificate path inside HA"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Service token",
+        "data": {
+          "token": "Service token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect. Check the address, CA certificate and service.",
+      "invalid_auth": "The service rejected the token."
+    },
+    "abort": {
+      "already_configured": "Service already configured.",
+      "reauth_successful": "Token updated."
+    }
+  },
+  "entity": {
+    "select": {
+      "voice": {
+        "name": "Voice",
+        "state": {
+          "silero-ru-baya": "Baya",
+          "silero-ru-kseniya": "Kseniya",
+          "silero-ru-xenia": "Xenia",
+          "silero-ru-aidar": "Aidar",
+          "silero-ru-eugene": "Eugene"
+        }
+      },
+      "intonation": {
+        "name": "Intonation",
+        "state": {
+          "auto": "Automatic",
+          "statement": "Statement",
+          "question": "Question",
+          "exclamation": "Exclamation"
+        }
+      }
+    },
+    "number": {
+      "rate": {
+        "name": "Speech rate"
+      },
+      "pitch": {
+        "name": "Pitch adjustment"
+      },
+      "sentence_pause_ms": {
+        "name": "Added sentence pause"
+      },
+      "emphasis_intensity": {
+        "name": "Emphasis strength"
+      }
+    },
+    "text": {
+      "emphasis_words": {
+        "name": "Words to emphasize (comma-separated)"
+      }
+    },
+    "switch": {
+      "auto_stress": {
+        "name": "Automatic stress"
+      },
+      "auto_yo": {
+        "name": "Automatic ё"
+      }
+    },
+    "button": {
+      "reset": {
+        "name": "Reset voice settings"
+      }
+    }
+  }
+}

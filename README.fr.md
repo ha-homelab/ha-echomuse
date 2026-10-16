@@ -78,7 +78,7 @@ la reconnaissance à distance et la fiabilité prolongée ont des limites. Voir 
 [journal](docs/deployment-record.md), la [validation vocale](docs/russian-voice-validation.md)
 et les [mesures de latence](docs/architecture.md).
 
-La voix russe actuelle dans ce registre est **Piper Irina**. Les outils de la
+La voix russe actuelle dans ce registre est **Silero Baya**. Les outils de la
 maison utilisent Ollama localement, mais STT utilise FCC cloud speech : **la chaîne
 complète n’est pas hors ligne**. Toute autre langue exige des réglages STT, modèle
 et TTS compatibles et son propre test d’écoute. N’envoyez pas les données domestiques
@@ -101,3 +101,5 @@ restent privés. Les procédures détaillées sont maintenues en anglais.
 
 Voir [LICENSE](LICENSE). Les composants amont gardent leurs licences ; aucun
 micrologiciel Amazon, binaire de version ou modèle vocal personnel n’est redistribué.
+
+[Réglages de voix russe et catalogue](docs/speech-settings.md) : cinq voix Silero, débit, hauteur, pauses et prononciation réglables dans HA. Le guide détaillé est en anglais.

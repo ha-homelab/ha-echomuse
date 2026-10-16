@@ -1,5 +1,9 @@
 # Operate the Russian voice pipeline
 
+For the current Silero Baya service, all five installed voices and live HA
+controls, follow [Local Russian voice settings](speech-settings.md). The Piper
+procedure below remains the alternative-backend and rollback reference.
+
 This runbook connects the energy reports, general conversation and Russian
 speech services. It applies to both EchoLocal and EchoMuse Assist satellites.
 No USB connection or new Dot firmware is required for these server-side changes.
@@ -13,12 +17,13 @@ receive home state or history through a fallback.
 ## Current household baseline
 
 Both Dots were assigned **Local Russian Home** with the local household model
-and **Piper Irina medium** (`piper-ru-irina`). Speech recognition still uses the
+and **Silero Baya**. The settings-capable service uses `silero-ru-default`
+to follow the shared [voice controls](speech-settings.md). Speech recognition still uses the
 configured FCC cloud service, so this is not a fully offline voice pipeline.
 Keep household state, tools and statistics on the local conversation route.
 The female-voice cutover and generated-audio evidence are recorded in
 [home control](home-control.md#female-voice-cutover--october-14-2026). The later
-Wyoming 0.2.0 adapter supports [sentence streaming](voice-features.md).
+Wyoming adapter supports [sentence streaming](voice-features.md).
 
 For a new household setup, first deploy and validate these services, then use
 the [operations handbook](operations.md#service-startup-and-enrollment-order)
