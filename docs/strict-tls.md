@@ -1,7 +1,9 @@
 # Strict artifact-download transport
 
 `scripts/fetch_upstream.py --strict-tls` requires CPython 3.11 or newer and
-OpenSSL 3. Install the hash-locked development requirements first:
+OpenSSL 3. On Linux or Apple silicon macOS, install the hash-locked
+development requirements first. These include cryptography and the synthetic
+fixture test dependencies:
 
 ```sh
 python -m pip install --require-hashes -r requirements-dev.txt
@@ -21,7 +23,14 @@ policy and existing cipher restrictions are preserved.
 Certificate metadata normally uses `cryptography`. On Intel macOS, the native
 Security framework reads RSA/EC key metadata; it does not replace OpenSSL trust
 verification, and unknown algorithms are rejected. The strict profile does not
-require `cryptography` on that platform. The native helper and policy are MIT
+require `cryptography` on that platform, so Intel runtime-only users skip the
+requirements installation above and run the standard-library download command
+directly. The current fixture requirements include cryptography and are qualified
+on Linux and Apple silicon macOS; they are not an Intel installation recipe.
+The native metadata implementation has been calibrated on Apple silicon with
+exact RSA2047 rejection and RSA2048 acceptance. That does not establish a full
+Intel runtime qualification, which remains pending.
+The native helper and policy are MIT
 adaptations credited in [third-party notices](../THIRD_PARTY_NOTICES.md).
 
 Every accepted redirect remains HTTPS on the GitHub release-host allowlist and
