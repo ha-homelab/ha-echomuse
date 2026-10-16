@@ -168,6 +168,11 @@ provider routing was changed. The proposed name hint is not shipped as a
 validated fix in the example prompt. The incident remains an accuracy limitation
 of this local model/profile; the poetry capability was not completed.
 
+A final direct-model check after restoring the original options also did not
+return the requested current sensor reading. Native intent checks still did.
+This does not establish that the trial prompts introduced the underlying
+grounding limitation; neither candidate provided a validated solution.
+
 All four Assistant selectors across the two Dots retained the local pipeline.
 Separate text-only intent-stage checks for a current heater reading completed
 through native HA matching in under 0.2 seconds in both device contexts. These
