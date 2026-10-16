@@ -76,6 +76,7 @@ def handshake(client, server, *, hostname="synthetic.test"):
                     peer.do_handshake()
                     done[i] = True
                 except ssl.SSLWantReadError:
+                    # MemoryBIO needs peer bytes; the transfer below resumes the handshake.
                     pass
         for source, target in [(cout, sin), (sout, cin)]:
             data = source.read()
