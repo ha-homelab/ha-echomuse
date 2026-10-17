@@ -55,6 +55,14 @@ run is rejected. Use a fresh private work directory and prepare features again;
 do not copy old features into it or overwrite the receipt to bypass this check.
 Freezing also requires the training recipe's recorded source-manifest hash.
 
+The exporter dependency is pinned to ONNX 1.22.0. ONNX 1.21.0 fixes the older
+model-loading advisories but remains affected by the
+[Upsample](https://github.com/advisories/GHSA-hwpq-hmq9-wj77) and
+[Gemm](https://github.com/advisories/GHSA-p893-rvq9-2xf9) converter advisories;
+both list 1.22.0 as fixed. Updating this dependency does not retrain or replace
+deployed models. Keep frozen artifacts unchanged and verify numerical and
+decision parity when exporting with a different dependency version.
+
 ## Commands
 
 Set these paths to your private work directory, previous project, and exact
