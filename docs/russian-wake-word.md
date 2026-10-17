@@ -200,9 +200,17 @@ paths were unreachable. Earlier node-readiness transitions overlap the observed
 transport interruptions; this is evidence of a host or connectivity problem,
 not proof of a wake-model failure. The exact cause still requires host access.
 
-The recorder save/close fix and completed-inventory probe guard passed local
-tests and were prepared as a new pinned overlay. That overlay was **not deployed
-during the outage**. Restore host connectivity before rolling it out and checking
-each Dot's model, local inference, HA connection and normal voice pipeline again.
-Do not interpret stale `Running` pod status as evidence that an unreachable node
-is serving requests.
+After connectivity returned without a host reboot, the recorder save/close fix
+and completed-inventory probe guard were deployed as a new pinned overlay.
+The Controller rollout completed, all three mounted source hashes matched,
+and Dot 002 returned to local detection with the expected model checksum and
+threshold. A fresh telemetry interval contained processed frames with zero
+inference errors or dropped frames. Both saved HA selectors retained the single
+Russian phrase; Dot 001 remained offline, and its owner deferred restoring power.
+
+The host's intermittent connectivity cause is still unresolved. Its last metrics
+did not show memory exhaustion, disk exhaustion or an OOM kill. Preserve the
+existing network configuration and collected logs while investigating; neither a
+successful rollout nor stale `Running` pod status establishes sustained service
+availability. The full spoken pipeline and fresh room-distance acceptance test
+still require an attended check.
