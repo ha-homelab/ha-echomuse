@@ -61,8 +61,10 @@ Utilisez l’interface web authentifiée du contrôleur et sa root Console pour
 l’administration : [accès et identifiants](docs/device-access.md). Le projet ne
 crée pas de connexion SSH/Telnet universelle ; la récupération est traitée séparément.
 
-La phrase testée est **Hey Jarvis**. Le micrologiciel documenté expose un seul
-modèle d’activation actif ; traduire le README n’installe pas de phrase française.
+Les deux Dot pilotes utilisent désormais **«Привет, Мышка»**, entraîné localement,
+à la place de Hey Jarvis. Voir [entraînement, installation et limites des tests](docs/russian-wake-word.md).
+Le micrologiciel utilise un seul modèle actif ; les poids personnels ne sont
+pas inclus dans le dépôt.
 Les [fonctions vocales](docs/voice-features.md) expliquent streaming et interruption.
 Le [dépannage musical](docs/music-troubleshooting.md) couvre les sources absentes,
 la mise en mémoire tampon, l’arrêt et la pause sur le lecteur d’origine.

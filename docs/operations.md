@@ -54,7 +54,8 @@ assume a Supervisor add-on store.
 
 - **Wake phrase, cue, barge-in, audio processing and BLE:** per-device EchoMuse
   configuration. Save all unrelated effective values and section overrides.
-  Current support is one active wake model. The baseline is **Hey Jarvis**.
+  Current support is one active wake model. Both pilot Dots now use the private
+  [«Привет, Мышка» model](russian-wake-word.md); Hey Jarvis is the earlier stock baseline.
 - **Voice language and voice persona:** HA's selected Assist pipeline and the
   speech server's installed model. Changing display language or a prompt does
   not install a Russian voice. Irina replaces the earlier Denis baseline.
@@ -98,11 +99,11 @@ Dot, then repeat on the other; saved settings on an offline Dot are pending.
 
 1. Press the action button and ask «Сколько будет два плюс два?»; listen for a
    complete answer on that same Dot. This bypasses wake detection.
-2. Say **Hey Jarvis**, wait for feedback, then ask a short question. Repeat from
+2. Say the selected wake phrase (**«Привет, Мышка»** on the pilot Dots), wait for feedback, then ask a short question. Repeat from
    the intended location and record background conditions and misses.
 3. Ask a read-only home question and compare the result with HA. Test a
    deliberately chosen light action separately; inspect room membership first.
-4. Say «Играй музыку», listen through a track transition, then **Hey Jarvis**,
+4. Say «Играй музыку», listen through a track transition, then **«Привет, Мышка»**,
    wait, and say «Стоп». Verify the intended queue stops.
 5. For voice features, test a long answer, wake-word interruption, an
    announcement and a short attended timer. Cancel or dismiss test timers.
