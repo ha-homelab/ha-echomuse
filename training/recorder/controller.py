@@ -102,6 +102,7 @@ class Session:
                 elif self.state == "recording" and self.last_frame and now-self.last_frame > 1.5:
                     await self.close("Audio stalled; incomplete take discarded")
         except asyncio.CancelledError:
+            # close() owns stream restoration and cancels this lease watcher.
             pass
 
     def feed(self, pcm, seq):

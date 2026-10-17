@@ -39,6 +39,7 @@ class App:
             try:
                 self.request("/api/auth/logout", {})
             except Exception:
+                # An expired or unreachable old login must not prevent a new one.
                 pass
             self.token = None
         data = self.request('/api/auth/login', {k: self.creds[k] for k in ('username', 'password')})
@@ -149,7 +150,7 @@ def main():
         def do_GET(self):
             if self.headers.get('Host')!=expected or self.path!='/':
                 return self.reply(404,{'error':'Not found'})
-            self.reply(200,page,'text/html; charset=utf-8')
+            return self.reply(200,page,'text/html; charset=utf-8')
         def do_POST(self):
             if (self.headers.get('Host')!=expected or
                 self.headers.get('Origin') not in (None,'http://'+expected) or
@@ -159,21 +160,25 @@ def main():
                 length=int(self.headers.get('Content-Length','0'))
                 if not 0<length<=2048:raise ValueError('Invalid request size')
                 body=json.loads(self.rfile.read(length))
-                self.reply(200,app.action(self.path.removeprefix('/api/'),body))
+                return self.reply(200,app.action(self.path.removeprefix('/api/'),body))
             except urllib.error.HTTPError as exc:
-                self.reply(409,{'error':f'Controller refused the request (HTTP {exc.code}). Check that the Dot is idle, connected and unmuted.'})
+                return self.reply(409,{'error':f'Controller refused the request (HTTP {exc.code}). Check that the Dot is idle, connected and unmuted.'})
             except Exception:
-                self.reply(503,{'error':'Cannot complete the request. Saved takes are retained; an active recording expires automatically.'})
+                return self.reply(503,{'error':'Cannot complete the request. Saved takes are retained; an active recording expires automatically.'})
     server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler)
     print(f'Recorder ready at http://{expected}/ — no recording has started.',flush=True)
     try:server.serve_forever()
     finally:
         if app.session and not app.session.get('closed'):
             try:app.action('close',{'session_id':app.session['id']})
-            except Exception:pass
+            except Exception:
+                # If the Controller is unreachable, its bounded lease ends capture.
+                pass
         if app.token:
             try:app.request('/api/auth/logout',{})
-            except Exception:pass
+            except Exception:
+                # Shutdown must complete even if logout cannot reach the Controller.
+                pass
         server.server_close()
 
 if __name__=='__main__':main()
