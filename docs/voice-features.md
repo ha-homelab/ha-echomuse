@@ -16,13 +16,16 @@ Save and read back each device's effective configuration. Per-device overrides
 are scoped by section: retain unrelated values when saving an override. An
 offline device can have saved settings without having received them yet.
 
-Barge-in listens for the configured wake phrase while speech is playing. With
-the current model, say **“Hey Jarvis”**, wait for the wake feedback, then give the
-next request. Arbitrary background speech is not a stop command. The deployed
-normal threshold is 0.5 and the playback threshold is 0.25; do not lower them
-merely to make interruption easier, especially after false activations. Keep
+Barge-in listens for the configured wake phrase while speech is playing. Both
+pilot Dots now use **«Привет, Мышка»**: say the phrase, wait for wake feedback,
+then give the next request. Arbitrary background speech is not a stop command.
+The current [Russian-model trial](russian-wake-word.md) uses **0.5** for both
+normal and playback thresholds; the earlier stock model used 0.25 for playback.
+Do not carry a previous model's threshold into a new model without validation,
+or lower it merely to make interruption easier after false activations. Keep
 acoustic echo cancellation enabled so the device does not wake on its own
-speech. Verify interruption by ear with a long answer before judging range.
+speech. The new model's room-distance and music tests are still pending. Verify
+interruption by ear with a long answer before judging range.
 
 The wake cue is a short two-tone confirmation of a detected wake word. It does
 not mean recognition, a home-control action, or a generated answer succeeded.

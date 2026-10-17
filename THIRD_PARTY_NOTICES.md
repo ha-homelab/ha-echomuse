@@ -1,5 +1,15 @@
 # Third-party notices
 
+The optional wake-word training workflow downloads frozen models and feature
+data from [openWakeWord](https://github.com/dscripka/openWakeWord) and
+[davidscripka/openwakeword_features](https://huggingface.co/datasets/davidscripka/openwakeword_features).
+The feature dataset is CC BY-NC-SA 4.0; its terms are separate from this
+repository's code license. It includes derived features from ACAV100M, DiPCo,
+the Santa Barbara Corpus and MUSDB. Held-out raw speech comes from
+[LibriSpeech / OpenSLR 12](https://www.openslr.org/12), CC BY 4.0. Existing Piper
+voice provenance remains in the private input manifest. No downloaded weights,
+personal models, recordings or derived voice features are bundled here.
+
 The exact certificate-key guard in `scripts/tls_key_policy.py` and native macOS
 metadata helper in `scripts/_darwin_certificate.py` adapt the MIT-licensed
 [google-home-voice-stats TLS policy](https://github.com/4alvit/google-home-voice-stats/tree/4cbd3296bd08c515198136cb9480e3a6ba734768/igw_google_voice),

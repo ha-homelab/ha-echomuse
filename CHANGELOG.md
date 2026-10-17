@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add a local Russian openWakeWord training, validation, calibration and deployment workflow; record the two-Dot switch to «Привет, Мышка» and its measured limits.
+- Add attended button-controlled recording with serialized save/close handling, verified feature-cache provenance, and a pinned Controller overlay that treats incomplete wake-model inventories as unknown rather than missing.
 - Document the failed literary-name and quotation investigation, rejected prompt candidates, native-intent checks, and requirements for a grounded literary feature.
 
 - Add an opt-in verified strict TLS profile for pinned artifact downloads, with synthetic full-chain and handler-wiring tests.

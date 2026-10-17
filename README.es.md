@@ -61,8 +61,10 @@ Administra el dispositivo mediante la interfaz web autenticada del controlador
 y su root Console: [acceso y credenciales](docs/device-access.md). El proyecto no
 crea un acceso SSH/Telnet universal; la recuperación tiene su propio procedimiento.
 
-La frase probada es **Hey Jarvis**. El firmware documentado admite un modelo de
-activación activo; traducir el README no instala una frase en español.
+Ambos Dot piloto usan ahora **«Привет, Мышка»**, entrenada localmente, en lugar de
+Hey Jarvis. Véanse [entrenamiento, instalación y límites de las pruebas](docs/russian-wake-word.md).
+El firmware admite un solo modelo activo; los pesos personales no se incluyen
+en el repositorio.
 [Funciones de voz](docs/voice-features.md) explica la interrupción y el streaming.
 [Diagnóstico de música](docs/music-troubleshooting.md) cubre fuentes ausentes,
 buffering y la diferencia entre detener y pausar el reproductor de origen.

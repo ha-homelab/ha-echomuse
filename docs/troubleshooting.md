@@ -28,8 +28,10 @@ music or BLE health as evidence that the satellite is healthy. See the
 
 ## It wakes without speech, or misses the wake phrase
 
-First check which model is actually active: the baseline is **Hey Jarvis**, not
-“Hey Jasper” or the old «Привет, Мышка». The second HA wake selector does not add
+First check which model is actually active. Both pilot Dots now select the new
+openWakeWord [«Привет, Мышка» model](russian-wake-word.md); Hey Jarvis is their
+earlier stock baseline. The old EchoLocal TFLite file is not compatible with
+this detector. The second HA wake selector does not add
 a simultaneous model in Controller 2.26.0. Then separate quiet-room, TV, music
 and normal-voice trials. Record intended wake attempts and false activations
 with test duration; do not call an unlabelled wake event a false positive.

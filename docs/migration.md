@@ -363,7 +363,9 @@ Repeat the migration in this order:
    attended button, wake and music checks when the operator is available. Mark
    firmware, HA integration and acoustic acceptance separately.
 
-The matching wake baseline is **Hey Jarvis**. The old personal microWakeWord
+The original migration wake baseline was **Hey Jarvis**. Both pilot Dots later
+received the [«Привет, Мышка» model trial](russian-wake-word.md); its independent
+room-distance acceptance remains pending. The old personal microWakeWord
 TFLite files cannot be copied into EchoMuse's ONNX detector. Firmware conversion
 does not establish Russian wake-word accuracy or solve speech-model errors by
 itself. See the [Russian voice operations](russian-voice-operations.md) for the

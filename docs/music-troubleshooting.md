@@ -41,10 +41,11 @@ unavailability, and already-idle players produce an already-stopped reply.
 
 Keep **Prefer handling commands locally** enabled on the pipeline. Reload
 scripts and conversation-trigger automations after installing the package.
-For a normal voice check, say **Hey Jarvis**, wait for its wake cue, then say
-**stop** or **стоп**. The configured wake phrase is not Hey Jasper. The repaired
-route also works within an existing conversation; another wake word is not
-required while the assistant is already listening.
+For a normal voice check on the pilot Dots, say **«Привет, Мышка»**, wait for its
+wake cue, then say **stop** or **стоп**. This [Russian-model trial](russian-wake-word.md)
+replaced Hey Jarvis on October 16; its music-interruption test is still pending.
+The repaired route also works within an existing conversation; another wake
+word is not required while the assistant is already listening.
 
 On October 14, replaying the recognized `stop` in the affected conversation was
 handled locally in 0.352 seconds. Both current Dot 2 player entities changed

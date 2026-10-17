@@ -41,6 +41,8 @@ credentials.tfrc.json
 *.uint16
 *.h5
 *.keras
+*.pt
+*.pth
 *.tar.gz
 *.tar
 *.tgz
