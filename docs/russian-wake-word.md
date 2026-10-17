@@ -193,3 +193,16 @@ reconnections were still under investigation; their cause had not been
 established, and they must not be attributed to the model merely because they
 were observed after deployment. Neither this operational check nor the earlier
 installation checks replace the pending independent room-distance voice test.
+
+At **03:30 UTC**, the NUC hosting the Controller and local speech services
+stopped renewing its Kubernetes lease and became `NotReady`. Both host network
+paths were unreachable. Earlier node-readiness transitions overlap the observed
+transport interruptions; this is evidence of a host or connectivity problem,
+not proof of a wake-model failure. The exact cause still requires host access.
+
+The recorder save/close fix and completed-inventory probe guard passed local
+tests and were prepared as a new pinned overlay. That overlay was **not deployed
+during the outage**. Restore host connectivity before rolling it out and checking
+each Dot's model, local inference, HA connection and normal voice pipeline again.
+Do not interpret stale `Running` pod status as evidence that an unreachable node
+is serving requests.
