@@ -38,16 +38,19 @@ A device switch alone is insufficient. All three parts must support streaming:
    **Local Russian Home** Ollama agent supports it.
 2. The selected TTS integration must advertise streamed synthesis. The local
    Russian Wyoming adapter supports this starting with version **0.2.0**. It
-   renders complete sentences while more text arrives, keeping **Irina** as
-   the selected voice. See the [speech service runbook](https://github.com/4alvit/google-home-voice-stats/blob/feat/russian-tts2-pilot/docs/russian-speech.md).
+   renders complete sentences while more text arrives. That first streaming
+   rollout used **Irina**; the later settings-capable deployment uses **Silero
+   Baya** by default. See the [speech service runbook](https://github.com/4alvit/google-home-voice-stats/blob/feat/russian-tts2-pilot/docs/russian-speech.md).
 3. EchoMuse must have **Stream reply** enabled and be able to fetch HA's TTS URL.
 
 After updating the TTS server, reload **Local Russian Speech** under
 **Settings → Devices & services → Wyoming Protocol**. In
 **Settings → Voice assistants**, retain the local conversation agent, Russian
-language, local TTS entity and `piper-ru-irina` voice. Prefer handling commands
-locally remains enabled. Household data is not sent to an external model as a
-fallback.
+language and local TTS entity. With the current Silero service, select
+`silero-ru-default` to follow the shared [voice settings](https://github.com/ha-homelab/ha-echomuse/wiki/docs-speech-settings).
+Use `piper-ru-irina` only with the corresponding Piper backend when testing or
+rolling back. Prefer handling commands locally remains enabled. Household
+data is not sent to an external model as a fallback.
 
 Early speech begins after a complete sentence is available and synthesized.
 It cannot remove the model's delay before its first sentence. A short answer
