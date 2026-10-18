@@ -1,5 +1,9 @@
 # Russian voice rollout: 2026-10-14
 
+The subsequent Silero Baya service and five-voice controls are documented in
+[Local Russian voice settings](speech-settings.md). The Denis/Irina results below
+remain historical measurements.
+
 This dated record distinguishes service verification from physical listening tests.
 The later [Irina cutover](home-control.md#female-voice-cutover--october-14-2026)
 and [streaming rollout](voice-features.md#deployment-checks--october-14-2026)

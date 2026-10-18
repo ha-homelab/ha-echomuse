@@ -35,7 +35,7 @@ data connection are different checks.
    **Wyoming Protocol** in HA, then verify actual audio generation.
 4. Under **Settings → Voice assistants**, select **Local Russian Home**, Russian,
    the local conversation agent, the intended recognition provider and
-   `tts.local_russian_speech` with `piper-ru-irina`. Keep local intent handling
+   `tts.local_russian_speech` with `silero-ru-default`. Keep local intent handling
    enabled. Read back both Assistant selectors when a device exposes two.
 5. In Music Assistant, select each current native EchoMuse player in the
    **Home Assistant MediaPlayers** provider. Use its MA queue entity for the
@@ -58,7 +58,8 @@ assume a Supervisor add-on store.
   [«Привет, Мышка» model](russian-wake-word.md); Hey Jarvis is the earlier stock baseline.
 - **Voice language and voice persona:** HA's selected Assist pipeline and the
   speech server's installed model. Changing display language or a prompt does
-  not install a Russian voice. Irina replaces the earlier Denis baseline.
+  not install a Russian voice. The current Baya service exposes five Silero
+  speakers through [live settings](speech-settings.md).
 - **Device control and statistics:** the local conversation integration,
   reviewed control list, HA areas/aliases and Recorder data. Say a native
   command first to isolate configuration from model latency.
@@ -74,7 +75,7 @@ measurement and device evaluation. Read [compatibility](compatibility.md).
 
 ## Privacy boundary
 
-Local wake detection, the local household model, local tools and local Irina
+Local wake detection, the local household model, local tools and local Silero
 synthesis do not make the entire voice path offline. The recorded pipeline
 still uses **FCC cloud speech recognition**: spoken requests leave the home for
 transcription. The separate external Nemotron route is only for general

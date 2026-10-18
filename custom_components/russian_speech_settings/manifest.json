@@ -1,0 +1,12 @@
+{
+  "domain": "russian_speech_settings",
+  "name": "Russian Speech Settings",
+  "version": "0.1.0",
+  "config_flow": true,
+  "documentation": "https://github.com/ha-homelab/ha-echomuse/blob/main/docs/speech-settings.md",
+  "issue_tracker": "https://github.com/ha-homelab/ha-echomuse/issues",
+  "codeowners": ["@4alvit"],
+  "iot_class": "local_polling",
+  "integration_type": "service",
+  "requirements": []
+}

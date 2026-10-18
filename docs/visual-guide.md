@@ -44,7 +44,7 @@ Use the [operations handbook](operations.md) for the exact service startup order
 
 ## 2. Follow one spoken request
 
-![Local wake detection, recorded FCC cloud recognition, native or local-model HA routing, local Irina synthesis and playback on the originating Dot](assets/voice-request.svg)
+![Local wake detection, recorded FCC cloud recognition, native or local-model HA routing, local Silero synthesis and playback on the originating Dot](assets/voice-request.svg)
 
 The paths in this illustration are conceptual service stages. The controller
 carries the device connection; its transport is shown in the
@@ -60,7 +60,7 @@ carries the device connection; its transport is shown in the
    use the local Ollama agent and [bounded home tools](home-control.md).
    Entity exposure, user permissions, the control allowlist and ambiguity
    checks still apply. A broad question does not grant unrestricted control.
-4. **Synthesis:** local Irina speech through the Wyoming adapter turns complete
+4. **Synthesis:** local Silero speech through the Wyoming adapter turns complete
    sentences into audio. With compatible streaming at every stage, synthesis
    can begin before all answer text is available.
 5. **Playback:** the originating Dot fetches and plays the answer. Listen for

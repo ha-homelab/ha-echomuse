@@ -103,7 +103,7 @@ def request_flow():
                 "room-distance and music-interruption checks remain pending. "
                 "The recorded FCC service transcribes audio in the cloud. "
                 "Home Assistant routes the request to native intents or the local Ollama home tools. "
-                "Local Irina synthesis returns audio to the originating Dot. Streaming can overlap generation.",
+                "Local Silero synthesis returns audio to the originating Dot. Streaming can overlap generation.",
                 "02 / VOICE REQUEST", "Conceptual service flow · physical transport runs through the controller · not a timing diagram")
     d.edge("M420 257 H456")
     d.edge("M820 257 H856")
@@ -120,7 +120,7 @@ def request_flow():
     d.rect(60, 405, 360, 195, "#fff2d9")
     d.text(82, 443, "A CUE IS ONLY A CUE", 14, "#a85a06", bold=True)
     d.lines(82, 484, ["A light or wake sound confirms", "the trigger, not the transcript,", "a successful action or an", "answer heard in the room."], size=18)
-    d.card(460, 670, 760, 160, "teal", "4 / LOCAL SYNTHESIS", "Irina through the Wyoming adapter", ["A complete sentence can become audio while more text is generated.", "Streamed text, streamed TTS and device playback must all cooperate."])
+    d.card(460, 670, 760, 160, "teal", "4 / LOCAL SYNTHESIS", "Silero through the Wyoming adapter", ["A complete sentence can become audio while more text is generated.", "Streamed text, streamed TTS and device playback must all cooperate."])
     d.card(60, 670, 360, 160, "rose", "5 / ORIGINATING DOT", "Play the answer", ["Fetch and play the HA audio.", "Verify completeness by listening."])
     d.rect(60, 867, 1160, 53, "#f0ebff")
     d.text(82, 900, "During playback: say «Привет, Мышка», wait for the cue, then give the next request.", 20)

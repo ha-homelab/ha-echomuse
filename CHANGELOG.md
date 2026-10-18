@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add the Russian Speech Settings integration (0.1.0): five local Silero voices,
+  bounded prosody and pronunciation controls, persistent service settings, cache
+  invalidation and English/Russian/German/Spanish/French UI translations.
 - Add a local Russian openWakeWord training, validation, calibration and deployment workflow; record the two-Dot switch to «Привет, Мышка» and its measured limits.
 - Add attended button-controlled recording with serialized save/close handling, verified feature-cache provenance, and a pinned Controller overlay that treats incomplete wake-model inventories as unknown rather than missing.
 - Document the failed literary-name and quotation investigation, rejected prompt candidates, native-intent checks, and requirements for a grounded literary feature.
