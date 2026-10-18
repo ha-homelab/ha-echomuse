@@ -60,9 +60,10 @@ Zur Verwaltung dienen die authentifizierte Weboberfläche des Controllers und
 seine root Console: [Zugriff und Zugangsdaten](docs/device-access.md). Das Projekt
 richtet keinen universellen SSH-/Telnet-Zugang ein. Wiederherstellung ist ein eigener Ablauf.
 
-Die geprüfte Aktivierungsphrase ist **Hey Jarvis**. Die dokumentierte Firmware
-hat ein aktives Aktivierungsmodell; diese Übersetzung installiert kein deutsches
-Aktivierungswort. [Sprachfunktionen](docs/voice-features.md) erläutert Streaming
+Beide Pilot-Dots verwenden jetzt das lokal trainierte **«Привет, Мышка»** statt
+Hey Jarvis. Siehe [Training, Installation und Testgrenzen](docs/russian-wake-word.md).
+Die Firmware verwendet ein aktives Modell; persönliche Modellgewichte sind
+nicht im Repository enthalten. [Sprachfunktionen](docs/voice-features.md) erläutert Streaming
 und Unterbrechung. [Musik-Fehlersuche](docs/music-troubleshooting.md) behandelt
 fehlende Quelldateien, Pufferung sowie Stoppen und Pausieren am ursprünglichen
 Lautsprecher. **iBeacon Tracker** verarbeitet BLE-Signale und ist kein zusätzlicher Proxy.

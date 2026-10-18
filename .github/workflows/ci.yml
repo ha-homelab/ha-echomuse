@@ -56,7 +56,7 @@ jobs:
           python-version: '3.11'
       - name: Validate Python, upstream lock, and public files
         run: |
-          python -m compileall -q scripts tests custom_components
+          python -m compileall -q scripts tests custom_components training
           python -m json.tool upstream-lock.json > /dev/null
           python scripts/check_public.py
           python scripts/check_docs.py

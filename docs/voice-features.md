@@ -16,13 +16,16 @@ Save and read back each device's effective configuration. Per-device overrides
 are scoped by section: retain unrelated values when saving an override. An
 offline device can have saved settings without having received them yet.
 
-Barge-in listens for the configured wake phrase while speech is playing. With
-the current model, say **“Hey Jarvis”**, wait for the wake feedback, then give the
-next request. Arbitrary background speech is not a stop command. The deployed
-normal threshold is 0.5 and the playback threshold is 0.25; do not lower them
-merely to make interruption easier, especially after false activations. Keep
+Barge-in listens for the configured wake phrase while speech is playing. Both
+pilot Dots now use **«Привет, Мышка»**: say the phrase, wait for wake feedback,
+then give the next request. Arbitrary background speech is not a stop command.
+The current [Russian-model trial](russian-wake-word.md) uses **0.5** for both
+normal and playback thresholds; the earlier stock model used 0.25 for playback.
+Do not carry a previous model's threshold into a new model without validation,
+or lower it merely to make interruption easier after false activations. Keep
 acoustic echo cancellation enabled so the device does not wake on its own
-speech. Verify interruption by ear with a long answer before judging range.
+speech. The new model's room-distance and music tests are still pending. Verify
+interruption by ear with a long answer before judging range.
 
 The wake cue is a short two-tone confirmation of a detected wake word. It does
 not mean recognition, a home-control action, or a generated answer succeeded.
@@ -35,16 +38,19 @@ A device switch alone is insufficient. All three parts must support streaming:
    **Local Russian Home** Ollama agent supports it.
 2. The selected TTS integration must advertise streamed synthesis. The local
    Russian Wyoming adapter supports this starting with version **0.2.0**. It
-   renders complete sentences while more text arrives, keeping **Irina** as
-   the selected voice. See the [speech service runbook](https://github.com/4alvit/google-home-voice-stats/blob/feat/russian-tts2-pilot/docs/russian-speech.md).
+   renders complete sentences while more text arrives. That first streaming
+   rollout used **Irina**; the later settings-capable deployment uses **Silero
+   Baya** by default. See the [speech service runbook](https://github.com/4alvit/google-home-voice-stats/blob/feat/russian-tts2-pilot/docs/russian-speech.md).
 3. EchoMuse must have **Stream reply** enabled and be able to fetch HA's TTS URL.
 
 After updating the TTS server, reload **Local Russian Speech** under
 **Settings → Devices & services → Wyoming Protocol**. In
 **Settings → Voice assistants**, retain the local conversation agent, Russian
-language, local TTS entity and `piper-ru-irina` voice. Prefer handling commands
-locally remains enabled. Household data is not sent to an external model as a
-fallback.
+language and local TTS entity. With the current Silero service, select
+`silero-ru-default` to follow the shared [voice settings](https://github.com/ha-homelab/ha-echomuse/wiki/docs-speech-settings).
+Use `piper-ru-irina` only with the corresponding Piper backend when testing or
+rolling back. Prefer handling commands locally remains enabled. Household
+data is not sent to an external model as a fallback.
 
 Early speech begins after a complete sentence is available and synthesized.
 It cannot remove the model's delay before its first sentence. A short answer

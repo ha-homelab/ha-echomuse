@@ -67,9 +67,11 @@ carries the device connection; its transport is shown in the
    completeness; a generated audio URL or successful service call is not proof
    that the speaker was heard.
 
-During playback, say **“Hey Jarvis”**, wait for feedback, then speak the next
-request. A music stop command must reach that Dot's music queue; stopping TTS
-and stopping a Music Assistant queue are different operations. See
+During playback, use the configured wake phrase, now **«Привет, Мышка»** on both
+pilot Dots, wait for feedback, then speak the next request. The new
+[model trial](russian-wake-word.md) still needs independent room-distance and
+music-interruption checks. A music stop command must reach that Dot's music
+queue; stopping TTS and stopping a Music Assistant queue are different operations. See
 [voice features](voice-features.md) and [music troubleshooting](music-troubleshooting.md).
 
 ## 3. What the timing measurements actually show

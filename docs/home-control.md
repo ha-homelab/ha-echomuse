@@ -121,6 +121,85 @@ responses use their own templates and do not pass through the model prompt.
 These instructions describe the rollout; they are not proof that a live voice
 or pipeline has been changed.
 
+## General questions and names in speech
+
+The local model also answers general questions, but household tool performance
+is not evidence that it can reliably identify authors or quote literature.
+Separate three checks when a spoken request gets an incorrect answer:
+
+1. Inspect the satellite's `stt_text` and compare it with what was said. A voice
+   change affects TTS, not recognition or the model's knowledge.
+2. Use HA's Assist text interface with the **same conversation agent**, first
+   entering the actual transcript and then the correctly spelled name. Use fresh
+   conversations so previous incorrect replies do not contaminate the test.
+3. Compare the conversation trace with any tool output. A fluent answer is not
+   evidence of either literary accuracy or a successfully read sensor value.
+   A general-question prompt without home tools can help isolate prompt effects,
+   but it is not a substitute for testing the installed agent and native intents.
+
+### Investigation on October 16, 2026
+
+A request for a poem by the children's poet **Агния Барто** reached the agent as
+«Расскажи стих агни и борто». The original agent treated the corrupted name as
+a title. It also denied knowing the correctly spelled author under its household
+prompt, although the same model with a general-question prompt recognized her.
+The [Culture.ru author catalogue](https://www.culture.ru/literature/poems/author-agniya-barto)
+provides an independent author reference. This was both an STT error and
+prompt-dependent model behavior, not a TTS-voice problem.
+
+Two temporary prompt candidates were tested through HA's supported conversation
+subentry flow. A context-specific name hint recovered the intended author, but
+the first candidate invented verse when asked for a specific poem. A stricter
+candidate explained that it lacked verified text and labelled its generated
+verse as original. Neither reproduced the requested poem. Prompt instructions
+are not a verified poetry collection or an enforced output filter.
+
+The candidates also failed a direct-to-model household regression check: the
+model gave a numeric power value after metadata-only `FindEntities` without a
+corresponding sensor read. An explicit instruction requiring `GetEntityState`
+was insufficient in the repeated test. Do not present this as successful factual
+grounding. A `FindEntities` result identifies a sensor; it does not measure it.
+The current-state value must come from a successful read, never from a typical
+or rated appliance wattage.
+
+**Both candidate prompts were rejected and the original conversation options
+were restored.** No firmware, model, TTS voice, tool permissions or external
+provider routing was changed. The proposed name hint is not shipped as a
+validated fix in the example prompt. The incident remains an accuracy limitation
+of this local model/profile; the poetry capability was not completed.
+
+A final direct-model check after restoring the original options also did not
+return the requested current sensor reading. Native intent checks still did.
+This does not establish that the trial prompts introduced the underlying
+grounding limitation; neither candidate provided a validated solution.
+
+All four Assistant selectors across the two Dots retained the local pipeline.
+Separate text-only intent-stage checks for a current heater reading completed
+through native HA matching in under 0.2 seconds in both device contexts. These
+fast native tests must not be confused with the failed model-generated answers.
+They exclude recognition, synthesis and physical playback. No actuator was
+changed, microphone recording started or speaker playback sent during testing.
+
+The first uncached model request exceeded a 120-second diagnostic client deadline.
+A longer diagnostic deadline allowed subsequent checks to finish; the satellite's
+production timeout was not increased. Prompt prefill and inference remain latency
+limits. Neither name recovery nor a warmed request proves cold-start reliability.
+
+### Requirements for a future literary feature
+
+Use a verified, appropriately licensed text source and validate author/title
+identity before speaking a quotation. Keep original generated verse clearly
+separate from quotations. A model must not describe an unknown exact text as an
+unknown author. Reproduce the failing transcript, correctly spelled names and
+named-title requests in acceptance tests, then recheck home tool grounding and
+both satellites' native command paths. Keep copyrighted poem bodies, household
+recordings and private conversation logs out of the public repository.
+
+Household facts, history and control remain local. Failed local answers must not
+be automatically forwarded to the external general-question model: an apparently
+general request may still contain personal information. A future external route
+needs an explicit, tested data boundary rather than a prompt-only privacy promise.
+
 ## Tools and behavior
 
 - **FindEntities** searches current names, IDs, aliases and assigned rooms. It

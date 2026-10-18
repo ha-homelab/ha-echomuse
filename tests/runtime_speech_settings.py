@@ -1,5 +1,4 @@
 """Exercise settings config flow and entities in an isolated HA runtime."""
-import asyncio
 import copy
 from pathlib import Path
 import shutil

@@ -65,8 +65,10 @@ administration; see [access and credentials](docs/device-access.md). This projec
 does not provision a universal SSH/Telnet login. Recovery access is documented
 separately from normal operation.
 
-The tested wake phrase is **Hey Jarvis**. The documented firmware exposes one
-active wake model; a translated README does not install a translated wake word.
+Both pilot Dots now use the privately trained **«Привет, Мышка»** model, replacing
+Hey Jarvis. See [training, deployment and acceptance limits](docs/russian-wake-word.md).
+The firmware exposes one active wake model; personal weights are not included
+in this repository, and translating a README does not install a wake word.
 [Voice features](docs/voice-features.md) explains interruption and streaming.
 [Music troubleshooting](docs/music-troubleshooting.md) covers missing sources,
 buffering and the difference between stopping and pausing the originating player.

@@ -48,8 +48,10 @@ card can switch off the physical Dot's USB power.
 The deployed EchoMuse Controller 2.26.0 advertises `max_active_wake_words=1` and
 only its currently configured model through the ESPHome API. HA may still expose
 a second selector, but it does not enable a second simultaneous wake phrase.
-The live choices were `no_wake_word` and `hey jarvis`, with the second selector
-set to `no_wake_word`. The card therefore omits that unsupported control.
+The October 16 deployment offers `no_wake_word` and `Привет, Мышка`, with the
+Russian phrase selected in the first selector and the second set to
+`no_wake_word`. The card omits that unsupported second control. See the
+[Russian model's training and acceptance record](russian-wake-word.md).
 
 Change the actual model in the **EchoMuse Controller** dashboard. This version
 offers **Hey Jarvis**, **Alexa**, **Hey Mycroft** and **Hey Rhasspy**, or a compatible
@@ -58,6 +60,10 @@ The HA selector turns detection of that selected model on or off; it is not the
 full model catalog. A custom Russian phrase requires a compatible trained model
 and validation on the device. A model used by the previous EchoLocal deployment
 is not automatically installed or validated by the emOS/EchoMuse migration.
+
+After changing the Controller model, check the primary HA wake selector. During
+this rollout HA learned the new phrase but initially displayed `no_wake_word`;
+explicitly selecting the Russian phrase on both devices completed the HA setup.
 
 ## Distinguish stale cards from an offline device
 

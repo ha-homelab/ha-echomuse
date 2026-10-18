@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="980" viewBox="0 0 1280 980" role="img" aria-labelledby="title desc">
-<title id="title">What happens after “Hey Jarvis”</title><desc id="desc">Wake detection is local. The recorded FCC service transcribes audio in the cloud. Home Assistant routes the request to native intents or the local Ollama home tools. Local Silero synthesis returns audio to the originating Dot. Streaming can overlap generation.</desc>
+<title id="title">What happens after «Привет, Мышка»</title><desc id="desc">Wake detection is local. The Russian wake model is deployed as a trial on both Dots; room-distance and music-interruption checks remain pending. The recorded FCC service transcribes audio in the cloud. Home Assistant routes the request to native intents or the local Ollama home tools. Local Silero synthesis returns audio to the originating Dot. Streaming can overlap generation.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#758399"/></marker></defs>
 <style>text{font-family:Arial,Helvetica,sans-serif} .edge{fill:none;stroke:#758399;stroke-width:2.5;marker-end:url(#arrow)}</style>
 <rect x="0" y="0" width="1280" height="980" rx="24" fill="#f7f9fd"/>
 <rect x="0" y="0" width="1280" height="9" rx="0" fill="#6d4ad1"/>
 <text x="60" y="49" font-size="14" fill="#6d4ad1" font-weight="700">02 / VOICE REQUEST</text>
-<text x="60" y="96" font-size="35" fill="#172b4d" font-weight="700">What happens after “Hey Jarvis”</text>
+<text x="60" y="96" font-size="35" fill="#172b4d" font-weight="700">What happens after «Привет, Мышка»</text>
 <text x="60" y="132" font-size="18" fill="#4b6178">Conceptual service flow · physical transport runs through the controller · not a timing diagram</text>
 <path class="edge" d="M420 257 H456"/>
 <path class="edge" d="M820 257 H856"/>
@@ -65,6 +65,6 @@
 <text x="82" y="786" font-size="18" fill="#304a64">Fetch and play the HA audio.</text>
 <text x="82" y="812" font-size="18" fill="#304a64">Verify completeness by listening.</text>
 <rect x="60" y="867" width="1160" height="53" rx="18" fill="#f0ebff"/>
-<text x="82" y="900" font-size="20" fill="#172b4d">During playback: say “Hey Jarvis”, wait for the cue, then give the next request.</text>
+<text x="82" y="900" font-size="20" fill="#172b4d">During playback: say «Привет, Мышка», wait for the cue, then give the next request.</text>
 <text x="60" y="956" font-size="14" fill="#4b6178">EchoMuse project guide · recorded baseline, not live device status</text>
 </svg>
