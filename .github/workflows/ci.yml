@@ -68,9 +68,29 @@ jobs:
           ghcr.io/home-assistant/home-assistant:2026.10.0@sha256:1b64d38f38d922bf9d59336451fd6453e1d614f934456af4ee3d2a51061be3a4
           -m unittest discover -s tests -p 'runtime_*.py'
 
+  training:
+    name: Synthetic training and ONNX export
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Install the CPU training stack
+        run: |
+          torch_requirement=$(sed -n '/^torch==/p' training/requirements.txt)
+          test -n "$torch_requirement"
+          python -m pip install "$torch_requirement" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r training/requirements.txt
+      - name: Train and export synthetic features without recordings
+        run: python training/smoke_oww.py
+
   gate:
     name: CI gate
-    needs: [python, security, source]
+    needs: [python, security, source, training]
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -85,7 +105,7 @@ jobs:
         run: |
           import json, os
           results = json.loads(os.environ['RESULTS'])
-          expected = {'python', 'security', 'source'}
+          expected = {'python', 'security', 'source', 'training'}
           if set(results) != expected:
               raise SystemExit('Validation job inventory differs')
           failed = {name: value['result'] for name, value in results.items()

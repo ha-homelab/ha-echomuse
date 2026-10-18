@@ -21,7 +21,7 @@ class WorkflowGateTest(unittest.TestCase):
         )
 
     def test_all_checks_must_succeed(self):
-        results = {name: {"result": "success"} for name in ("python", "security", "source")}
+        results = {name: {"result": "success"} for name in ("python", "security", "source", "training")}
         self.assertEqual(self.run_gate(results).returncode, 0)
         for name in results:
             for state in ("failure", "cancelled", "skipped"):
@@ -30,7 +30,7 @@ class WorkflowGateTest(unittest.TestCase):
                     self.assertNotEqual(self.run_gate(changed).returncode, 0)
 
     def test_missing_or_unexpected_check_is_rejected(self):
-        complete = {name: {"result": "success"} for name in ("python", "security", "source")}
+        complete = {name: {"result": "success"} for name in ("python", "security", "source", "training")}
         self.assertNotEqual(self.run_gate({}).returncode, 0)
         self.assertNotEqual(self.run_gate({"python": complete["python"]}).returncode, 0)
         self.assertNotEqual(self.run_gate({**complete, "extra": {"result": "success"}}).returncode, 0)
