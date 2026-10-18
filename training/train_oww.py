@@ -28,6 +28,13 @@ class Classifier(nn.Module):
         return torch.sigmoid(self.layers(x))
 
 
+def export_classifier(model, example, target):
+    """Keep the deployed opset-17 graph contract across PyTorch upgrades."""
+    torch.onnx.export(model, example, str(target), input_names=["input"], output_names=["score"],
+                      dynamic_axes={"input": {0: "batch"}, "score": {0: "batch"}},
+                      opset_version=17, dynamo=False)
+
+
 def densify_negatives(x):
     """Recover skipped 80 ms windows only across exactly overlapping frames.
 
@@ -232,8 +239,7 @@ def main():
     report = json.loads((output/"selected.json").read_text())
     target = output/"privet_myshka_20261016.onnx"
     example = torch.zeros((1,16,96))
-    torch.onnx.export(model,example,str(target),input_names=["input"],output_names=["score"],
-                      dynamic_axes={"input":{0:"batch"},"score":{0:"batch"}},opset_version=17)
+    export_classifier(model, example, target)
     artifact = onnx.load(str(target))
     onnx.helper.set_model_props(artifact, {"wake_word":"Привет, Мышка","language":"ru",
         "recommended_threshold":str(report["threshold"]),"training":"personal-local-20261016",

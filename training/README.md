@@ -159,3 +159,12 @@ walking to the speaker does not change the recording distance. Keep training,
 validation and final-test sessions separate. For later runs, previously opened
 test data is regression coverage; reserve a fresh session for independent
 acceptance and open it only after freezing the new candidate.
+
+## Training dependency smoke check
+
+Run `python training/smoke_oww.py` after installing the training requirements.
+It uses generated features to verify optimization, safe checkpoint loading,
+ONNX opset-17 export, dynamic batch sizes, and numerical/decision parity. It
+does not access recordings or change deployed models. The exporter explicitly
+uses the legacy TorchScript path, preserving the deployed graph contract when
+PyTorch changes its default exporter.
