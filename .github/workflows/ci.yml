@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   python:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@3ee3558ff523dc31d89d8f5e3fd39b98efe36f0a
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@6b2d99519d513d2b871d2a845ddd6134dea4af2c
     with:
       python-version: '3.11'
       install-dependencies: true
@@ -29,7 +29,7 @@ jobs:
       coverage-artifact-name: echomuse-python-coverage
 
   security:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@3ee3558ff523dc31d89d8f5e3fd39b98efe36f0a
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@6b2d99519d513d2b871d2a845ddd6134dea4af2c
     permissions:
       contents: read
       actions: read

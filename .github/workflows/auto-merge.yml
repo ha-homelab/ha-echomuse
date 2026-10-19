@@ -27,7 +27,7 @@ jobs:
         (github.event.pull_request.head.repo.full_name != github.repository ||
          github.event.pull_request.user.login == 'dependabot[bot]'))) &&
       contains(fromJSON('["4alvit","californiantiramisu","dependabot[bot]","renovate[bot]"]'), github.event.pull_request.user.login)
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/auto-merge.yml@3ee3558ff523dc31d89d8f5e3fd39b98efe36f0a
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/auto-merge.yml@6b2d99519d513d2b871d2a845ddd6134dea4af2c
     with:
       native-auto-merge: true
       required-status-checks: CI gate
