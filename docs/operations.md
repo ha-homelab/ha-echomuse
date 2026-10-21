@@ -42,6 +42,8 @@ data connection are different checks.
    dashboard and origin-based music routing. Preserve other room selections.
 6. Add an optional, separate **ESPHome Bluetooth proxy** entry with the assigned
    BLE port and Noise encryption key. Voice enrollment does not enroll BLE.
+   Follow the [Bluetooth authentication guide](bluetooth-proxy.md#persistent-authentication-with-the-controller-fix)
+   when applying the pinned controller fix or recovering an existing entry.
 7. Update the existing Lovelace media view using [verified entity mappings](dashboard.md).
    A dashboard card cannot repair a disconnected controller or device.
 
@@ -121,6 +123,26 @@ Back up the controller's consistent database, its sidecars, CA and settings;
 HA integration configuration and dashboard mappings; per-device recovery images;
 and the original effective settings before changing them. Keep backups private
 and test readability. A fresh controller CA does not preserve existing trust.
+
+For a controller source overlay, snapshot the actual running files and existing
+mounts as well as the pinned image. An image digest alone does not identify
+files replaced by mounts. Apply a patch to a copy of those current files;
+preserve recorder, wake-word and other existing modifications. Use a new,
+versioned immutable ConfigMap for code-only Kubernetes overlays and retain the
+previous source and deployment template for rollback. Keep keys and the database
+on their existing private persistent volume, outside code ConfigMaps.
+Retain the overlay in the deployment source of truth: reapplying the stock
+manifest or upgrading the image can remove or invalidate it. Recheck the pinned
+source hashes and regression suite before carrying it to another release.
+
+Loading changed Python source requires a controller restart and temporarily
+interrupts its connected services. Do not combine that rollout with a Dot
+firmware update or database replacement. Afterward verify the actual mounted
+source hashes, unchanged BLE identity/port/key, HA subscription and fresh
+advertisement forwarding; verify voice and media connections independently.
+Rollback restores the previous source mounts and deployment template without
+replacing the database. A rollback of the BLE authentication fix also restores
+the older transport-mode behavior.
 
 After replacement entries work, obsolete EchoLocal integrations can be removed
 through HA's supported interface. Preserve private recovery information first

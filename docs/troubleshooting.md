@@ -88,6 +88,17 @@ unavailable source. They do not justify a blanket buffer increase. Short
 phrase and command are separate steps. Follow the full
 [music troubleshooting runbook](music-troubleshooting.md) and verify by ear.
 
+## Home Assistant reports expired Bluetooth proxy authentication
+
+The Noise key has no scheduled expiry. Check the exact BLE entry, controller
+endpoint and proxy identity, then confirm its saved key. The unpatched 2.26.0
+controller can change that endpoint to plaintext when active Connections is
+disabled or unavailable; HA may stop reconnecting and retain a repair even
+after encryption returns. Do not toggle Connections to refresh slots, rotate
+keys speculatively, or replace a current entry with a duplicate. Use the
+[same-entry authentication recovery procedure](bluetooth-proxy.md#authentication-expired-in-home-assistant)
+and verify subscription plus fresh forwarded advertisements afterward.
+
 ## Several Bluetooth entries look like the same speaker
 
 Inspect their integration, endpoint and active scanner identity. An old EchoLocal

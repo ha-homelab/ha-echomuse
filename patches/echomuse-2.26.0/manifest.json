@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "upstream": {
+    "repository": "https://github.com/wilbowes/EchoMuse",
+    "version": "2.26.0",
+    "commit": "e119433c0845dfe80f4b1ec44c9e8e8028adbb07",
+    "license": "MIT"
+  },
+  "patch": "ble-auth-lifecycle.patch",
+  "patch_sha256": "b2b4dca208cc5db88546890dd8e2909c6d4c1ad3b55cc81dc43a95b73c338668",
+  "files": {
+    "controller/em_ble_proxy.py": {
+      "before_sha256": "912508e75f3860898cda8d7c03572f747edc9e6907e660aacf4748ccefd59bb3",
+      "after_sha256": "d390ad703636d0dbaa7c078ed923911ca54e5e39c3306678facd7006f0efd1e5"
+    },
+    "controller/em_api.py": {
+      "before_sha256": "f643b330240f3a681e2b3a465092ee70b935f5e314b2da6cf234b7139ae4d323",
+      "after_sha256": "4e51dbca399fad58237657e5d4fb51ed4d73c0f38929bf2e5d527cf87e66d8a8"
+    },
+    "controller/static/dashboard.jsx": {
+      "before_sha256": "5b75b3eb40935e133dc9cf82752710b90acdbdcd2ca359f32c7917f09a2c78ab",
+      "after_sha256": "c3a2c321c1bccd0ddb5c6ab6a603092d1da0dc7b488d913ea1d374052b025c3d"
+    },
+    "controller/tests/test_ble_proxy_rules.py": {
+      "before_sha256": "ed1af96b28806901c0cb1630de87a7dec223c8bee94c2562adb1b59b962df9f9",
+      "after_sha256": "a6151a88c2643813ac13c79970b2cefd6e32bad97c44211b940cb72f549a0fcc"
+    }
+  },
+  "custom_api": {
+    "path": "controller/em_api.py",
+    "function": "_get_ble_proxy_key",
+    "before_function_sha256": "a8cef21789b2057386b238966f9f8a1d23ff268d700989f16cacd32d1b46e57d",
+    "after_function_sha256": "ce22766b0db0c73270348ce3d8de13140dd605891c4be3243a6627763edb59a9"
+  }
+}
