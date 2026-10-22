@@ -36,7 +36,8 @@ acceptance targets. Its color diagrams link back to the detailed runbooks below.
 - [Voice features](voice-features.md): streaming speech, interruption, cues,
   announcements and timers.
 - [Bluetooth proxy](bluetooth-proxy.md): separate enrollment, connection slots,
-  obsolete records and the role of iBeacon Tracker.
+  persistent authentication, HA reauth recovery, obsolete records and the role
+  of iBeacon Tracker.
 
 ## Diagnose and verify
 

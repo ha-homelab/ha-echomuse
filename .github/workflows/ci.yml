@@ -60,6 +60,24 @@ jobs:
           python -m json.tool upstream-lock.json > /dev/null
           python scripts/check_public.py
           python scripts/check_docs.py
+      - name: Check the pinned EchoMuse Bluetooth lifecycle patch
+        run: |
+          upstream="$RUNNER_TEMP/echomuse-source"
+          overlay="$RUNNER_TEMP/echomuse-ble-overlay"
+          commit="$(python -c 'import json; print(json.load(open("patches/echomuse-2.26.0/manifest.json"))["upstream"]["commit"])')"
+          git init --quiet "$upstream"
+          git -C "$upstream" remote add origin https://github.com/wilbowes/EchoMuse.git
+          git -C "$upstream" fetch --quiet --depth 1 origin "$commit"
+          git -C "$upstream" checkout --quiet --detach FETCH_HEAD
+          npm install --prefix "$RUNNER_TEMP/echomuse-build-tools" --no-audit --no-fund --package-lock=false esbuild@0.20.2
+          python scripts/apply_ble_auth_patch.py --source "$upstream" --output "$overlay" \
+            --esbuild "$RUNNER_TEMP/echomuse-build-tools/node_modules/.bin/esbuild"
+          docker run --rm --network none --read-only --tmpfs /tmp --user "$(id -u):$(id -g)" \
+            --cap-drop ALL --security-opt no-new-privileges \
+            -e PYTHONDONTWRITEBYTECODE=1 --entrypoint python \
+            -v "$PWD:/work:ro" -v "$upstream:/upstream:ro" -v "$overlay:/overlay:ro" -w /work \
+            ghcr.io/wilbowes/echomuse-controller:2.26.0@sha256:3e28ccba1102b0ef1c10d3821c937730afc1fb78e5f6f3811f3860079fc0008b \
+            scripts/check_ble_auth_runtime.py --source /upstream --overlay /overlay
       - name: Validate intents in an isolated Home Assistant runtime
         run: >-
           docker run --rm --network none

@@ -41,3 +41,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## EchoMuse Bluetooth authentication patch
+
+`patches/echomuse-2.26.0/ble-auth-lifecycle.patch` contains modifications to
+[EchoMuse 2.26.0](https://github.com/wilbowes/EchoMuse/tree/e119433c0845dfe80f4b1ec44c9e8e8028adbb07),
+copyright (c) 2026 Wil Bowes, distributed under the MIT license. The complete
+upstream notice is preserved in
+[LICENSE-EchoMuse-MIT.txt](patches/echomuse-2.26.0/LICENSE-EchoMuse-MIT.txt).
+The patch, its source/hash manifest, and tests do not include device data,
+controller databases, pairing keys, or firmware images.
