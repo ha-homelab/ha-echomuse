@@ -228,6 +228,26 @@ needs an explicit, tested data boundary rather than a prompt-only privacy promis
   accumulated-counter change. Missing values remain missing. Database gaps and
   the unfinished current interval mean a result may not cover the entire period.
 
+### Sensor discovery response
+
+When a returned `FindEntities` page contains sensors, its response includes one
+`sensor_read_with` object: `{"current": "GetEntityState", "history": "GetStatistics"}`.
+This replaces the identical `read_with` object previously repeated in each sensor
+row. It applies only to sensors on that page, including mixed sensor/device pages.
+Empty and non-sensor pages omit it. Sensor identities, names, units, measurement
+classes and availability remain in their rows; current sensor state values remain
+absent. Non-sensor states and ordinary `GetEntityState` responses are unchanged.
+The `total`, `offset` and `next_offset` fields are search metadata, not measurements.
+
+Validation passed all 22 home-tool runtime tests on Home Assistant 2026.10.0,
+including 12-sensor, mixed, empty, permission-filtered and paginated results.
+Fourteen differential cases also checked that the guidance move preserves other
+response fields, discovered-entity authorization and current-state reads. A
+synthetic 12-sensor response saved 730 serialized UTF-8 bytes; a single-sensor
+response adds seven bytes because `sensor_read_with` has a more explicit name.
+These are payload measurements, not a demonstrated latency improvement. Model
+comprehension and historical-answer correctness still require acceptance checks.
+
 Examples to say after the wake word:
 
 - «Включи кухонную лампу»

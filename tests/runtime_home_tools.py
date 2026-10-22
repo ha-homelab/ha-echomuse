@@ -258,9 +258,82 @@ class HomeToolsRuntimeTest(unittest.IsolatedAsyncioTestCase):
         row = result.data["entities"][0]
         self.assertNotIn("state", row)
         self.assertTrue(row["available"])
-        self.assertEqual(row["read_with"]["history"], "GetStatistics")
+        self.assertNotIn("read_with", row)
+        self.assertEqual(result.data["sensor_read_with"]["history"], "GetStatistics")
         current = await self.tool("GetEntityState", entity_id=row["entity_id"])
         self.assertEqual(current.data["state"], "12")
+
+    async def test_sensor_guidance_is_once_per_twelve_row_page(self):
+        measurements = [("energy", "kWh", "total_increasing"), ("power", "W", "measurement"),
+                        ("current", "A", "measurement"), ("voltage", "V", "measurement"),
+                        ("temperature", "°C", "measurement"), ("frequency", "Hz", "measurement")]
+        expected = {}
+        for device in ("one", "two"):
+            for measurement, unit, state_class in measurements:
+                entity_id = f"sensor.fixture_{device}_{measurement}"
+                name = f"Heater {device.title()} {measurement.title()}"
+                attrs = {"device_class": measurement, "unit_of_measurement": unit, "state_class": state_class}
+                state = "unavailable" if (device, measurement) == ("two", "frequency") else "12.5"
+                self.hass.states.async_set(entity_id, state, {**attrs, "friendly_name": name, "access_token": "dummy-secret"})
+                expected[entity_id] = {"entity_id": entity_id, "name": name, "available": state != "unavailable",
+                                       "controllable": False, "attributes": attrs}
+        result = await self.tool("FindEntities", query="fixture", domain="sensor")
+        self.assertFalse(result.error)
+        self.assertEqual(result.data["sensor_read_with"], {"current": "GetEntityState", "history": "GetStatistics"})
+        self.assertEqual({key: result.data[key] for key in ("total", "offset", "next_offset")},
+                         {"total": 12, "offset": 0, "next_offset": None})
+        self.assertEqual({row["entity_id"]: row for row in result.data["entities"]}, expected)
+        self.assertEqual(self.instance.tools[0].session.discovered, set(expected))
+        entity_id = "sensor.fixture_one_energy"
+        current = await self.tool("GetEntityState", entity_id=entity_id)
+        self.assertEqual(current.data, {**expected[entity_id], "state": "12.5"})
+        self.assertEqual(self.calls, [])
+
+    async def test_sensor_guidance_is_scoped_in_mixed_and_nonsensor_pages(self):
+        mixed = await self.tool("FindEntities", query="")
+        self.assertIn("sensor_read_with", mixed.data)
+        for row in mixed.data["entities"]:
+            self.assertNotIn("read_with", row)
+            self.assertEqual("state" in row, not row["entity_id"].startswith("sensor."))
+        lights = await self.tool("FindEntities", query="", domain="light")
+        self.assertNotIn("sensor_read_with", lights.data)
+        self.assertEqual(lights.data["entities"][0]["state"], "off")
+
+    async def test_sensor_guidance_omitted_on_empty_or_denied_page(self):
+        for args in ({"query": "no_such_fixture"}, {"query": "", "offset": 999}):
+            result = await self.tool("FindEntities", **args)
+            self.assertEqual(result.data["entities"], [])
+            self.assertNotIn("sensor_read_with", result.data)
+        self.assertEqual(self.instance.tools[0].session.discovered, set())
+        self.context.context = SimpleNamespace(user_id="denied-user")
+        user = SimpleNamespace(permissions=SimpleNamespace(check_entity=lambda *_: False))
+        with patch.object(self.hass, "auth", new=SimpleNamespace(async_get_user=AsyncMock(return_value=user)), create=True):
+            result = await self.tool("FindEntities", query="", domain="sensor")
+        self.assertEqual(result.data, {"total": 0, "offset": 0, "next_offset": None, "entities": []})
+        self.assertEqual(self.instance.tools[0].session.discovered, set())
+
+    async def test_sensor_guidance_keeps_pagination_and_discovery_authorization(self):
+        for i in range(13):
+            self.hass.states.async_set(f"sensor.page_fixture_{i:02}", str(i), {"friendly_name": f"Page Fixture {i}"})
+        first = await self.tool("FindEntities", query="page fixture", domain="sensor")
+        self.assertEqual(first.data["total"], 13)
+        self.assertEqual(first.data["next_offset"], 12)
+        self.assertEqual(len(first.data["entities"]), 12)
+        self.assertEqual(self.instance.tools[0].session.discovered,
+                         {row["entity_id"] for row in first.data["entities"]})
+        remaining = "sensor.page_fixture_12"
+        denied = await self.tool("GetEntityState", entity_id=remaining)
+        self.assertTrue(denied.error)
+        second = await self.tool("FindEntities", query="page fixture", domain="sensor", offset=12)
+        self.assertEqual(second.data["offset"], 12)
+        self.assertIsNone(second.data["next_offset"])
+        self.assertEqual([row["entity_id"] for row in second.data["entities"]], [remaining])
+        self.assertEqual(second.data["sensor_read_with"], first.data["sensor_read_with"])
+        self.assertEqual((await self.tool("GetEntityState", entity_id=remaining)).data["state"], "12")
+        empty = await self.tool("FindEntities", query="page fixture", domain="sensor", offset=24)
+        self.assertEqual(empty.data, {"total": 13, "offset": 24, "next_offset": None, "entities": []})
+        self.assertEqual(len(self.instance.tools[0].session.discovered), 13)
+        self.assertEqual(self.calls, [])
 
     async def test_named_control_resolves_authorizes_and_executes_once(self):
         result = await self.tool("ControlDevice", query="лампа на кухне", domain="light", operation="turn_on")
