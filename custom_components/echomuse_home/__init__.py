@@ -124,7 +124,6 @@ def public_state(row, *, discovery=False):
         # A counter snapshot is not consumption for a requested interval.
         # Keep discovery descriptive so period questions must fetch history.
         result.pop("state")
-        result["read_with"] = {"current": "GetEntityState", "history": "GetStatistics"}
     if row["area"]:
         result["area"] = row["area"]
     return result
@@ -176,7 +175,10 @@ class FindEntities(BaseTool):
         offset = args["offset"]
         rows = [row for _, row in matches[offset:offset + 12]]
         self.session.discovered.update(row["entity_id"] for row in rows)
-        return {"total": len(matches), "offset": offset, "next_offset": offset + 12 if offset + 12 < len(matches) else None, "entities": [public_state(row, discovery=True) for row in rows]}
+        result = {"total": len(matches), "offset": offset, "next_offset": offset + 12 if offset + 12 < len(matches) else None, "entities": [public_state(row, discovery=True) for row in rows]}
+        if any(row["entity_id"].startswith("sensor.") for row in rows):
+            result["sensor_read_with"] = {"current": "GetEntityState", "history": "GetStatistics"}
+        return result
 
 
 class GetEntityState(BaseTool):
