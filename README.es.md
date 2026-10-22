@@ -80,7 +80,7 @@ lejano y la fiabilidad prolongada tienen límites. Consulta el
 [registro](docs/deployment-record.md), la [validación de voz](docs/russian-voice-validation.md)
 y las [mediciones de latencia](docs/architecture.md).
 
-La voz rusa actual del registro es **Piper Irina**. Las herramientas del hogar
+La voz rusa actual del registro es **Silero Baya**. Las herramientas del hogar
 usan Ollama local, pero STT emplea FCC cloud speech: **la canalización completa no
 funciona sin servicios externos**. Cada idioma adicional necesita STT, modelo y
 TTS compatibles y su propia prueba auditiva. No envíes datos del hogar a la ruta
@@ -103,3 +103,5 @@ privados. Las instrucciones operativas detalladas se mantienen en inglés.
 
 Consulta [LICENSE](LICENSE). Los componentes externos conservan sus licencias;
 no se distribuyen firmware de Amazon, binarios de versiones ni modelos de voz personales.
+
+[Ajustes de voz rusa y catálogo de voces](docs/speech-settings.md): cinco voces Silero, velocidad, tono, pausas y pronunciación configurables en HA. La guía detallada está en inglés.

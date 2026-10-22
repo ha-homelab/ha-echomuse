@@ -1,0 +1,85 @@
+{
+  "title": "Russian Speech Settings",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Local Russian Speech",
+        "description": "Conecte el servicio local de voz rusa. Los ajustes se aplican a clientes con silero-ru-default.",
+        "data": {
+          "endpoint": "Dirección HTTPS del servicio",
+          "token": "Token del servicio",
+          "ca_file": "Ruta del certificado CA dentro de HA"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Token del servicio",
+        "data": {
+          "token": "Token del servicio"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "No se pudo conectar. Revise la dirección, el certificado CA y el servicio.",
+      "invalid_auth": "El servicio rechazó el token."
+    },
+    "abort": {
+      "already_configured": "El servicio ya está configurado.",
+      "reauth_successful": "Token actualizado."
+    }
+  },
+  "entity": {
+    "select": {
+      "voice": {
+        "name": "Voz",
+        "state": {
+          "silero-ru-baya": "Baya",
+          "silero-ru-kseniya": "Kseniya",
+          "silero-ru-xenia": "Xenia",
+          "silero-ru-aidar": "Aidar",
+          "silero-ru-eugene": "Eugene"
+        }
+      },
+      "intonation": {
+        "name": "Entonación",
+        "state": {
+          "auto": "Automática",
+          "statement": "Afirmación",
+          "question": "Pregunta",
+          "exclamation": "Exclamación"
+        }
+      }
+    },
+    "number": {
+      "rate": {
+        "name": "Velocidad del habla"
+      },
+      "pitch": {
+        "name": "Ajuste del tono"
+      },
+      "sentence_pause_ms": {
+        "name": "Pausa adicional entre frases"
+      },
+      "emphasis_intensity": {
+        "name": "Intensidad del énfasis"
+      }
+    },
+    "text": {
+      "emphasis_words": {
+        "name": "Palabras destacadas (separadas por comas)"
+      }
+    },
+    "switch": {
+      "auto_stress": {
+        "name": "Acentuación automática"
+      },
+      "auto_yo": {
+        "name": "Restauración automática de ё"
+      }
+    },
+    "button": {
+      "reset": {
+        "name": "Restablecer ajustes de voz"
+      }
+    }
+  }
+}

@@ -1,0 +1,432 @@
+--- a/controller/em_ble_proxy.py
++++ b/controller/em_ble_proxy.py
+@@ -42,8 +42,11 @@
+   - The feature flags Home Assistant reads once at connect gain
+     ACTIVE_CONNECTIONS, REMOTE_CACHING and CACHE_CLEARING.
+ 
+-A passive proxy is unchanged: plaintext, and nothing for Home Assistant to
+-re-enter.
++A passive proxy with no assigned key stays plaintext for compatibility.
++Once a key has been assigned, the transport stays encrypted across restarts,
++connection-setting changes, and firmware capability changes. Active GATT and
++transport authentication are separate: GATT always requires encryption, but
++encryption never requires GATT. Invalid persisted keys fail closed.
+ 
+ Entities: one diagnostic sensor (total adverts seen). HA's ESPHome
+ integration was observed to silently ignore zero-entity devices (see
+@@ -107,12 +110,12 @@
+         # only encodes/sends while HA is actually subscribed.
+         self.subscribed = False
+         self._states_subscribed = False
+-        # Connections: an encrypted listener and the Bluetooth handlers, or
+-        # neither. Decided by the server when this connection is accepted.
++        # Authentication is stable even while active GATT is unavailable.
+         self._gatt: Optional[em_ble_gatt.GattProxy] = None
+-        if owning_server.connections:
++        if owning_server.encrypted:
+             self.set_encryption(owning_server.key, self.server_name,
+                                 mac_address.replace(":", "").lower())
++        if owning_server.connections:
+             self._gatt = em_ble_gatt.GattProxy(
+                 owning_server.link, api_pb2, self._send_many, em_tasks.spawn,
+                 log_name=self._log_name)
+@@ -142,7 +145,7 @@
+                 project_version=_project_version(),
+                 bluetooth_proxy_feature_flags=(
+                     BT_PROXY_FLAGS_ACTIVE if self._gatt is not None else BT_PROXY_FLAGS),
+-                api_encryption_supported=self._gatt is not None,
++                api_encryption_supported=self._owning_server.encrypted,
+             )
+             return
+ 
+@@ -201,15 +204,19 @@
+     """TCP listener + mDNS identity for one device's BT proxy (single-claimant)."""
+ 
+     def __init__(self, device_id: str, label: str, mac_address: str, port: int,
+-                 key: Optional[bytes] = None) -> None:
++                 key: Optional[bytes] = None, *, connections: bool = False) -> None:
+         self.device_id   = device_id
+         self.label       = label
+         self.mac_address = mac_address
+         self.port        = port
+-        # Connections are on exactly when there is a key: the listener is
+-        # then encrypted and the Bluetooth handlers exist.
+-        self.key         = key
+-        self.connections = key is not None
++        # Never accept active GATT without a valid authenticated transport.
++        if key is not None and (not isinstance(key, bytes) or len(key) != 32):
++            raise ValueError("BT proxy encryption key must be 32 bytes")
++        if connections and key is None:
++            raise ValueError("BT proxy connections require encryption")
++        self.key = key
++        self.encrypted = key is not None
++        self.connections = connections
+         self.link        = em_ble_gatt.GattLink(self._send_gatt)
+         self._server: Optional[asyncio.AbstractServer] = None
+         self._active_satellite: Optional[BluetoothProxySatellite] = None
+@@ -287,6 +294,17 @@
+ _online: set[str] = set()   # device_ids with a live /control connection
+ _can_connect: set[str] = set()   # of those, the ones announcing `ble_connect`
+ _host: str = "0.0.0.0"
++# All lifecycle entry points share one lock per device. DB executor calls,
++# mDNS registration, and TCP bind yield, so an unlocked reconcile can create
++# two owners of the same identity/port or remove a newer owner's mapping.
++_lifecycle_locks: dict[str, asyncio.Lock] = {}
++_key_failures: set[str] = set()
++_stopping = False
++
++
++def _lifecycle_lock(device_id: str) -> asyncio.Lock:
++    return _lifecycle_locks.setdefault(device_id, asyncio.Lock())
++
+ # Writes one connection-bridge message to a device's data plane. Set by
+ # em_controller, which owns the sockets; this module must not import it.
+ _gatt_sender: Optional[Callable[[str, bytes], Awaitable[bool]]] = None
+@@ -362,6 +380,14 @@
+     (allocating a port on first enable), starts/stops the listener based on
+     device online state, and tears everything down when disabled. Idempotent.
+     """
++    async with _lifecycle_lock(device_id):
++        await _reconcile_locked(device_id)
++
++
++async def _reconcile_locked(device_id: str) -> None:
++    """Reconcile while holding the device lifecycle lock."""
++    if _stopping:
++        return
+     loop = asyncio.get_event_loop()
+     row = await loop.run_in_executor(None, db.get_device, device_id)
+     enabled = False
+@@ -380,19 +406,49 @@
+             await _teardown(device_id, proxy)
+         return
+ 
+-    # Connections need firmware that can make them. A device that is offline
+-    # keeps what it last had, so its proxy does not flip to plaintext and
+-    # back every time it reconnects: Home Assistant would be asked for the
+-    # key again each time.
++    # GATT eligibility may change on a firmware update or config toggle.
++    # Authentication must not follow it: HA persists the Noise key and treats
++    # a plaintext listener on this identity as a terminal authentication error.
+     if device_id in _online:
+         connections = wants_connections and device_id in _can_connect
+     else:
+         connections = wants_connections and (proxy is None or proxy.connections)
+-    if proxy is not None and proxy.connections != connections:
+-        # Encryption and the feature flags are fixed when a listener is
+-        # made, and Home Assistant reads the flags once per connection.
+-        log.info(f"[{device_id}] BT proxy connections "
+-                 f"{'on' if connections else 'off'} — rebuilding the proxy")
++
++    stored = row["ble_proxy_key"]
++    if stored is None and (device_id in _key_failures or
++                           (proxy is not None and proxy.encrypted)):
++        # A key disappearing from storage is not a request to rotate it or
++        # remove authentication from an already paired identity.
++        _key_failures.add(device_id)
++        if proxy is not None:
++            await _teardown(device_id, proxy)
++        log.error(f"[{device_id}] stored BT proxy key disappeared — listener disabled")
++        return
++    if stored is None and connections:
++        stored = await loop.run_in_executor(None, db.ensure_ble_proxy_key, device_id)
++    key = None
++    if stored is not None:
++        try:
++            key = base64.b64decode(stored, validate=True)
++            if len(key) != 32:
++                raise ValueError("invalid key length")
++        except (ValueError, TypeError):
++            _key_failures.add(device_id)
++            # Do not rotate or expose the invalid secret, and do not fall back
++            # to plaintext. The operator must restore the persisted key.
++            if proxy is not None:
++                await _teardown(device_id, proxy)
++            log.error(f"[{device_id}] invalid stored BT proxy key — listener disabled")
++            return
++        _key_failures.discard(device_id)
++    if connections and key is None:
++        if proxy is not None:
++            await _teardown(device_id, proxy)
++        log.error(f"[{device_id}] no usable BT proxy key — listener disabled")
++        return
++
++    if proxy is not None and (proxy.connections != connections or proxy.key != key):
++        log.info(f"[{device_id}] BT proxy capabilities changed — rebuilding the proxy")
+         await _teardown(device_id, proxy)
+         proxy = None
+ 
+@@ -403,18 +459,12 @@
+             log.warning(f"[{device_id}] BLE proxy enabled but device has no "
+                         f"ESPHome voice port yet — deferring until it does")
+             return
+-        key = None
+-        if connections:
+-            stored = await loop.run_in_executor(None, db.ensure_ble_proxy_key, device_id)
+-            key = base64.b64decode(stored) if stored else None
+-            if key is None or len(key) != 32:
+-                log.error(f"[{device_id}] no usable BT proxy key — connections stay off")
+-                key = None
+-        proxy = DeviceBleProxyServer(device_id, label, _proxy_mac(device_id), port, key)
++        proxy = DeviceBleProxyServer(device_id, label, _proxy_mac(device_id), port,
++                                     key, connections=connections)
+         _proxies[device_id] = proxy
+         azc = _azc()
+         if azc is not None:
+-            mdns_info = _make_mdns_info(device_id, label, port, encrypted=proxy.connections)
++            mdns_info = _make_mdns_info(device_id, label, port, encrypted=proxy.encrypted)
+             try:
+                 await azc.async_register_service(mdns_info, allow_name_change=True)
+                 proxy._mdns_info = mdns_info
+@@ -439,7 +489,8 @@
+ 
+ 
+ async def _teardown(device_id: str, proxy: DeviceBleProxyServer) -> None:
+-    _proxies.pop(device_id, None)
++    if _proxies.get(device_id) is proxy:
++        _proxies.pop(device_id, None)
+     azc = _azc()
+     if proxy._mdns_info is not None and azc is not None:
+         try:
+@@ -456,8 +507,9 @@
+ 
+     Call AFTER em_esphome.start_esphome_servers() — reuses its AsyncZeroconf.
+     """
+-    global _host
++    global _host, _stopping
+     _host = host
++    _stopping = False
+     loop = asyncio.get_event_loop()
+     all_devices = await loop.run_in_executor(None, db.get_all_devices)
+     for row in all_devices:
+@@ -467,33 +519,37 @@
+ 
+ 
+ async def stop_ble_proxy_servers() -> None:
+-    for device_id, proxy in list(_proxies.items()):
+-        await _teardown(device_id, proxy)
+-    _proxies.clear()
++    global _stopping
++    _stopping = True
++    # Include reconciles which hold a lock but have not published a proxy yet.
++    for device_id in list(_lifecycle_locks):
++        async with _lifecycle_lock(device_id):
++            proxy = _proxies.get(device_id)
++            if proxy is not None:
++                await _teardown(device_id, proxy)
+ 
+ 
+ async def device_connected(device_id: str, ble_connect: bool = False) -> None:
+-    """Called by em_controller when the physical device connects."""
+-    _online.add(device_id)
+-    if ble_connect:
+-        _can_connect.add(device_id)
+-    else:
++    """Reconcile new capability information before opening the listener."""
++    async with _lifecycle_lock(device_id):
++        _online.add(device_id)
++        if ble_connect:
++            _can_connect.add(device_id)
++        else:
++            _can_connect.discard(device_id)
++        await _reconcile_locked(device_id)
++
++
++async def device_disconnected(device_id: str) -> None:
++    """Stop the listener atomically with the presence/capability change."""
++    async with _lifecycle_lock(device_id):
++        _online.discard(device_id)
+         _can_connect.discard(device_id)
+-    proxy = _proxies.get(device_id)
+-    if proxy is not None:
+-        await proxy.start(_host)
+-
+-
+-async def device_disconnected(device_id: str) -> None:
+-    """Called by em_controller when the physical device disconnects."""
+-    _online.discard(device_id)
+-    _can_connect.discard(device_id)
+-    proxy = _proxies.get(device_id)
+-    if proxy is not None:
+-        # The device drops its links when the controller goes; say so to
+-        # Home Assistant before the listener closes under it.
+-        proxy.link.reset()
+-        await proxy.stop()
++        proxy = _proxies.get(device_id)
++        if proxy is not None:
++            # Inform HA that links dropped before closing its API transport.
++            proxy.link.reset()
++            await proxy.stop()
+ 
+ 
+ def gatt_from_device(device_id: str, payload: bytes) -> None:
+@@ -608,7 +664,7 @@
+         # Connections (#656). `encrypted` is what the port requires, which is
+         # what the dashboard has to tell the operator about.
+         "connections":      proxy.connections,
+-        "encrypted":        proxy.connections,
++        "encrypted":        proxy.encrypted,
+         "slotsFree":        proxy.link.free if proxy.connections else None,
+         "slotsLimit":       proxy.link.limit if proxy.connections else None,
+         "connected":        len(proxy.link.addrs) if proxy.connections else None,
+--- a/controller/em_api.py
++++ b/controller/em_api.py
+@@ -1158,18 +1158,26 @@
+     Handed to the one request and nothing else: never logged, never put in an
+     event (events reach every open tab and support bundles). It is all that
+     stands between the LAN and whatever the proxy can connect to. Admin only
+-    for the same reason. There is a key only while connections are on —
+-    a passive proxy is unencrypted and has nothing to show.
++    for the same reason. A previously paired proxy stays encrypted even
++    while active GATT is temporarily disabled; its key remains available.
+     """
+     device_id = request.match_info["id"]
+     status = em_ble_proxy.get_status(device_id)
+-    if status is None or not status.get("connections"):
+-        return _error("connections_off",
+-                      "Turn on Bluetooth connections for this Echo first", 409)
+-    key = await asyncio.get_event_loop().run_in_executor(
+-        None, db.ensure_ble_proxy_key, device_id)
+-    if not key:
++    if status is None or not status.get("encrypted"):
++        return _error("encryption_off", "This Bluetooth proxy has no encryption key", 409)
++    row = await asyncio.get_event_loop().run_in_executor(
++        None, db.get_device, device_id)
++    if row is None:
+         return _error("not_found", "Unknown device", 404)
++    # Reading a pairing key must never create or rotate one. Only a validated
++    # reconcile can provision the first key before opening its listener.
++    import base64
++    key = row["ble_proxy_key"]
++    try:
++        if len(base64.b64decode(key, validate=True)) != 32:
++            raise ValueError("invalid key length")
++    except (ValueError, TypeError):
++        return _error("key_unavailable", "Restore the stored Bluetooth proxy key", 409)
+     return _ok({"key": key})
+ 
+ 
+--- a/controller/static/dashboard.jsx
++++ b/controller/static/dashboard.jsx
+@@ -2464,7 +2464,7 @@
+                   ? <SendspinPairing deviceId={device.device_id} status={device.sendspin} isAdmin={isAdmin}/>
+                   : null}
+                 bleConnectCapable={!device.connected || !!device.bleConnectCapable}
+-                blePanel={device.connected && device.bleConnectCapable
++                blePanel={device.bleProxy
+                   ? <BleProxyKey deviceId={device.device_id} status={device.bleProxy} isAdmin={isAdmin}/>
+                   : null}
+                 mixCapable={!device.connected || !!device.audioMixCapable}
+@@ -10306,11 +10306,11 @@
+         chips={<><ScopeChip tone="device">Device</ScopeChip><ScopeChip tone="controller">Controller</ScopeChip></>}
+         desc="Turns the device into a Home Assistant Bluetooth proxy: it passively listens for BLE advertisements (presence beacons, temperature sensors) and forwards them to HA as a separate ESPHome device — independent of the voice assistant. Enabling permanently switches the Dot's Bluetooth chip away from Android's stack (Bluetooth speaker pairing, never used by EchoMuse, stops being possible)."
+         scope={scopeEl('bluetooth')} dim={secStyle('bluetooth')}
+-        after={(config.bleProxyConnections ?? false) ? blePanel : null}>
++        after={(config.bleProxyEnabled ?? false) ? blePanel : null}>
+         <div className="em-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px', ...inputStyle }}>
+           <Toggle label="Bluetooth proxy" sub="passive BLE scan → HA (Bermuda, BLE sensors)" value={config.bleProxyEnabled ?? false} onChange={v => set('bleProxyEnabled', v)}/>
+           <Toggle label="Allow connections"
+-            sub={bleConnectCapable ? 'proxy goes offline in HA until you enter its key' : 'needs newer firmware on this Echo'}
++            sub={bleConnectCapable ? 'first enable needs its key in HA; encryption stays on afterwards' : 'needs newer firmware on this Echo'}
+             disabled={!bleConnectCapable || !(config.bleProxyEnabled ?? false)}
+             value={config.bleProxyConnections ?? false}
+             onChange={v => set('bleProxyConnections', v)}/>
+@@ -10366,7 +10366,8 @@
+   };
+ 
+   const on = !!(status && status.connections);
+-  let line = 'Save to turn connections on';
++  const encrypted = !!(status && status.encrypted);
++  let line = encrypted ? 'Encrypted proxy; active connections off' : 'Passive scanning';
+   if (on) {
+     line = status.slotsLimit
+       ? `${status.slotsFree} of ${status.slotsLimit} connections free`
+@@ -10377,7 +10378,7 @@
+   return (
+     <div style={{ fontFamily: mono, fontSize: 11, color: 'var(--text2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+       <div>{line}</div>
+-      {on && isAdmin && !key && (
++      {encrypted && isAdmin && !key && (
+         <div><Pill small disabled={busy} onClick={show}>{busy ? 'Fetching…' : 'Show encryption key'}</Pill></div>
+       )}
+       {key && (
+--- a/controller/tests/test_ble_proxy_rules.py
++++ b/controller/tests/test_ble_proxy_rules.py
+@@ -71,36 +71,36 @@
+ 
+ # ── never offered in the clear ────────────────────────────────────────────────
+ 
+-def test_a_proxy_has_connections_exactly_when_it_has_a_key():
++def test_active_connections_require_key_but_key_does_not_require_connections():
+     init = _func("em_ble_proxy.py", "__init__", "DeviceBleProxyServer")
+-    assigned = {}
+-    for n in ast.walk(init):
+-        if isinstance(n, ast.Assign) and isinstance(n.targets[0], ast.Attribute):
+-            assigned[n.targets[0].attr] = ast.unparse(n.value)
+-    assert assigned["connections"] == "key is not None", assigned.get("connections")
++    src = ast.unparse(init)
++    assert "self.encrypted = key is not None" in src
++    assert "if connections and key is None:" in src
++    assert "raise ValueError('BT proxy connections require encryption')" in src
++
+ 
+ 
+ def test_the_handlers_exist_only_on_an_encrypted_connection():
+     init = _func("em_ble_proxy.py", "__init__", "BluetoothProxySatellite")
+-    guarded = [n for n in ast.walk(init) if isinstance(n, ast.If)
+-               and ast.unparse(n.test) == "owning_server.connections"]
+-    assert len(guarded) == 1, "one branch decides both encryption and the handlers"
+-    calls = _calls(guarded[0])
+-    assert "set_encryption" in calls and "GattProxy" in calls
++    branches = {ast.unparse(n.test): n for n in ast.walk(init) if isinstance(n, ast.If)}
++    assert "set_encryption" in _calls(branches["owning_server.encrypted"])
++    assert "GattProxy" in _calls(branches["owning_server.connections"])
++    calls = _calls(init)
+     assert calls.index("set_encryption") < calls.index("GattProxy")
+-    # And nowhere else in the module is a GattProxy made.
+     tree = ast.parse((CONTROLLER / "em_ble_proxy.py").read_text())
+     assert _calls(tree).count("GattProxy") == 1
+ 
+ 
+-def test_flags_and_encryption_follow_the_same_fact():
++
++def test_flags_follow_gatt_while_encryption_follows_transport():
+     handle = _func("em_ble_proxy.py", "handle_message", "BluetoothProxySatellite")
+     info = next(n for n in ast.walk(handle) if isinstance(n, ast.Call)
+                 and getattr(n.func, "attr", "") == "DeviceInfoResponse")
+     kw = {k.arg: ast.unparse(k.value) for k in info.keywords}
+-    assert kw["api_encryption_supported"] == "self._gatt is not None"
++    assert kw["api_encryption_supported"] == "self._owning_server.encrypted"
+     assert "BT_PROXY_FLAGS_ACTIVE if self._gatt is not None else BT_PROXY_FLAGS" in kw[
+         "bluetooth_proxy_feature_flags"]
++
+ 
+ 
+ def test_pairing_is_not_advertised():
+@@ -118,6 +118,8 @@
+     fn = _func("em_api.py", "_get_ble_proxy_key")
+     assert [ast.unparse(d) for d in fn.decorator_list] == ["auth.require_admin"]
+     calls = _calls(fn)
++    assert "ensure_ble_proxy_key" not in calls
++    assert "db.get_device" in ast.unparse(fn)
+     for forbidden in ("info", "warning", "debug", "error", "log_device", "broadcast", "_push_event"):
+         assert forbidden not in calls, f"the key handler calls {forbidden}"
+     src = (CONTROLLER / "em_api.py").read_text()
+@@ -129,7 +131,7 @@
+     api = ast.parse((CONTROLLER / "em_api.py").read_text())
+     users = [n.name for n in ast.walk(api)
+              if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+-             and "ensure_ble_proxy_key" in ast.unparse(n)]
++             and any(isinstance(v, ast.Constant) and v.value == "ble_proxy_key" for v in ast.walk(n))]
+     assert users == ["_get_ble_proxy_key"], users
+ 
+ 
+@@ -158,7 +160,7 @@
+ def test_a_rebuilt_proxy_asks_the_device_for_its_slots():
+     # The device reports its slots when the setting reaches it, which is
+     # before the controller has rebuilt the proxy that should hear it.
+-    fn = _func("em_ble_proxy.py", "reconcile")
++    fn = _func("em_ble_proxy.py", "_reconcile_locked")
+     src = ast.unparse(fn)
+     assert "sync_slots(device_id)" in src
+     assert src.index("await proxy.start(_host)") < src.index("sync_slots(device_id)")

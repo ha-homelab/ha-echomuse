@@ -90,3 +90,12 @@ was disconnected in both HA and the controller; the operator could not power
 it on for this check. Its new card is configured but physical reconnection
 remains unverified. The browser required a fresh HA login, so this update's
 verification was configuration/API based rather than a rendered UI check.
+
+## Shared Russian voice controls
+
+The **Local Russian Speech** card is separate from the per-Dot player cards.
+It configures the shared Silero service: changing its voice, speed, pitch or
+pronunciation affects every pipeline selecting `silero-ru-default`. See
+[settings and voice catalog](speech-settings.md) and the
+[card example](../examples/lovelace/russian-speech-settings.yaml). These are
+configuration entities, not player volume or wake-word controls.

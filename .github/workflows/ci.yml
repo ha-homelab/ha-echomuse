@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   python:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@3ee3558ff523dc31d89d8f5e3fd39b98efe36f0a
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@6b2d99519d513d2b871d2a845ddd6134dea4af2c
     with:
       python-version: '3.11'
       install-dependencies: true
@@ -29,7 +29,7 @@ jobs:
       coverage-artifact-name: echomuse-python-coverage
 
   security:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@3ee3558ff523dc31d89d8f5e3fd39b98efe36f0a
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@6b2d99519d513d2b871d2a845ddd6134dea4af2c
     permissions:
       contents: read
       actions: read
@@ -60,6 +60,24 @@ jobs:
           python -m json.tool upstream-lock.json > /dev/null
           python scripts/check_public.py
           python scripts/check_docs.py
+      - name: Check the pinned EchoMuse Bluetooth lifecycle patch
+        run: |
+          upstream="$RUNNER_TEMP/echomuse-source"
+          overlay="$RUNNER_TEMP/echomuse-ble-overlay"
+          commit="$(python -c 'import json; print(json.load(open("patches/echomuse-2.26.0/manifest.json"))["upstream"]["commit"])')"
+          git init --quiet "$upstream"
+          git -C "$upstream" remote add origin https://github.com/wilbowes/EchoMuse.git
+          git -C "$upstream" fetch --quiet --depth 1 origin "$commit"
+          git -C "$upstream" checkout --quiet --detach FETCH_HEAD
+          npm install --prefix "$RUNNER_TEMP/echomuse-build-tools" --no-audit --no-fund --package-lock=false esbuild@0.20.2
+          python scripts/apply_ble_auth_patch.py --source "$upstream" --output "$overlay" \
+            --esbuild "$RUNNER_TEMP/echomuse-build-tools/node_modules/.bin/esbuild"
+          docker run --rm --network none --read-only --tmpfs /tmp --user "$(id -u):$(id -g)" \
+            --cap-drop ALL --security-opt no-new-privileges \
+            -e PYTHONDONTWRITEBYTECODE=1 --entrypoint python \
+            -v "$PWD:/work:ro" -v "$upstream:/upstream:ro" -v "$overlay:/overlay:ro" -w /work \
+            ghcr.io/wilbowes/echomuse-controller:2.26.0@sha256:3e28ccba1102b0ef1c10d3821c937730afc1fb78e5f6f3811f3860079fc0008b \
+            scripts/check_ble_auth_runtime.py --source /upstream --overlay /overlay
       - name: Validate intents in an isolated Home Assistant runtime
         run: >-
           docker run --rm --network none
@@ -68,9 +86,29 @@ jobs:
           ghcr.io/home-assistant/home-assistant:2026.10.0@sha256:1b64d38f38d922bf9d59336451fd6453e1d614f934456af4ee3d2a51061be3a4
           -m unittest discover -s tests -p 'runtime_*.py'
 
+  training:
+    name: Synthetic training and ONNX export
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Install the CPU training stack
+        run: |
+          torch_requirement=$(sed -n '/^torch==/p' training/requirements.txt)
+          test -n "$torch_requirement"
+          python -m pip install "$torch_requirement" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r training/requirements.txt
+      - name: Train and export synthetic features without recordings
+        run: python training/smoke_oww.py
+
   gate:
     name: CI gate
-    needs: [python, security, source]
+    needs: [python, security, source, training]
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -85,7 +123,7 @@ jobs:
         run: |
           import json, os
           results = json.loads(os.environ['RESULTS'])
-          expected = {'python', 'security', 'source'}
+          expected = {'python', 'security', 'source', 'training'}
           if set(results) != expected:
               raise SystemExit('Validation job inventory differs')
           failed = {name: value['result'] for name, value in results.items()

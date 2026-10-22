@@ -1,0 +1,85 @@
+{
+  "title": "Russian Speech Settings",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Local Russian Speech",
+        "description": "Lokalen russischen Sprachdienst verbinden. Einstellungen gelten für Clients mit silero-ru-default.",
+        "data": {
+          "endpoint": "HTTPS-Dienstadresse",
+          "token": "Dienst-Token",
+          "ca_file": "Pfad zum CA-Zertifikat in HA"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Dienst-Token",
+        "data": {
+          "token": "Dienst-Token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen. Adresse, CA-Zertifikat und Dienst prüfen.",
+      "invalid_auth": "Der Dienst hat das Token abgelehnt."
+    },
+    "abort": {
+      "already_configured": "Dienst bereits eingerichtet.",
+      "reauth_successful": "Token aktualisiert."
+    }
+  },
+  "entity": {
+    "select": {
+      "voice": {
+        "name": "Stimme",
+        "state": {
+          "silero-ru-baya": "Baya",
+          "silero-ru-kseniya": "Kseniya",
+          "silero-ru-xenia": "Xenia",
+          "silero-ru-aidar": "Aidar",
+          "silero-ru-eugene": "Eugene"
+        }
+      },
+      "intonation": {
+        "name": "Intonation",
+        "state": {
+          "auto": "Automatisch",
+          "statement": "Aussage",
+          "question": "Frage",
+          "exclamation": "Ausruf"
+        }
+      }
+    },
+    "number": {
+      "rate": {
+        "name": "Sprechtempo"
+      },
+      "pitch": {
+        "name": "Tonhöhenänderung"
+      },
+      "sentence_pause_ms": {
+        "name": "Zusätzliche Satzpause"
+      },
+      "emphasis_intensity": {
+        "name": "Betonungsstärke"
+      }
+    },
+    "text": {
+      "emphasis_words": {
+        "name": "Betonte Wörter (kommagetrennt)"
+      }
+    },
+    "switch": {
+      "auto_stress": {
+        "name": "Automatische Wortbetonung"
+      },
+      "auto_yo": {
+        "name": "Automatisches ё"
+      }
+    },
+    "button": {
+      "reset": {
+        "name": "Stimmeinstellungen zurücksetzen"
+      }
+    }
+  }
+}

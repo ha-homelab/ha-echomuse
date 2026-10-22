@@ -428,6 +428,11 @@ free slots with no active GATT clients. The first Dot's key and settings were
 prepared, but its offline state prevented enrollment. No arbitrary nearby
 device was connected as a test.
 
+That historical slot-refresh workaround is superseded: changing Connections
+on the unpatched controller can change its authentication mode. Follow the
+[current Bluetooth diagnostics](bluetooth-proxy.md#operational-limits-and-diagnostics)
+instead of repeating the old toggle sequence.
+
 Two obsolete EchoLocal ESPHome entries and their two Bluetooth entries were
 removed through HA's supported API after private backup and reference checks.
 Their 14 device records and 212 entity records were removed; unrelated entries

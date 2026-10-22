@@ -23,7 +23,8 @@ No HACS EchoLocal management component is needed for this connection.
 intents handle supported commands quickly. The local Ollama conversation agent
 uses bounded home tools for discovery, state, reviewed controls and Recorder
 statistics. The IGW energy adapter supplies deterministic snapshot reports.
-Local Russian TTS uses **Piper Irina** through the Wyoming adapter. In the
+Local Russian TTS uses **Silero Baya** by default through the Wyoming adapter. The
+[settings integration](speech-settings.md) controls its five voices and prosody. In the
 recorded configuration, speech recognition still uses FCC's cloud service;
 the voice path is therefore not fully offline.
 
