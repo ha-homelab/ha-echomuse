@@ -315,9 +315,9 @@ prepared, but a cold load stalled on NAS reads after a network handover. The
 model did not reach generation, so no 14B speed or Russian-quality result is
 claimed and it is not enabled for family conversation. A separate SSH transfer
 probe excluded connection setup and measured approximately 1.97 MB/s of payload
-throughput. An 8B model on local disk was also considered, but its preflight
-would leave only 6.72 GiB free, below the chosen 8 GiB reserve, so it was not
-downloaded. The private runtime and verified NAS weights are retained; all test
+throughput. An 8B model on local disk was also considered. Its guarded preparation
+stopped when projected free space fell below the chosen 8 GiB reserve, before
+any weight file was downloaded. No 8B inference ran. The private runtime and verified NAS weights are retained; all test
 processes exited and temporary package caches were removed. Homeway was not enabled: its monthly free allowance
 was exhausted, and the household retained the local-data preference.
 
