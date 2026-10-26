@@ -1,0 +1,58 @@
+{
+  "repository": "mlx-community/Qwen3-14B-4bit",
+  "revision": "a4d9b2df59d2c150bef02fcbe0d91046b7ca33a4",
+  "expected_bytes": 8323868085,
+  "files": [
+    {
+      "filename": "added_tokens.json",
+      "size": 707,
+      "sha256": null
+    },
+    {
+      "filename": "config.json",
+      "size": 939,
+      "sha256": null
+    },
+    {
+      "filename": "merges.txt",
+      "size": 1671853,
+      "sha256": null
+    },
+    {
+      "filename": "model-00001-of-00002.safetensors",
+      "size": 5354381380,
+      "sha256": "5795efcfc7c96fd273e600562e8b111bfcc427415de9001d0a07e70cd99cff19"
+    },
+    {
+      "filename": "model-00002-of-00002.safetensors",
+      "size": 2953517134,
+      "sha256": "2814562d654fe2d541fd4682804a0ccaa400e79701872c8e9f5998cf9481fdf8"
+    },
+    {
+      "filename": "model.safetensors.index.json",
+      "size": 86266,
+      "sha256": null
+    },
+    {
+      "filename": "special_tokens_map.json",
+      "size": 613,
+      "sha256": null
+    },
+    {
+      "filename": "tokenizer.json",
+      "size": 11422654,
+      "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+    },
+    {
+      "filename": "tokenizer_config.json",
+      "size": 9706,
+      "sha256": null
+    },
+    {
+      "filename": "vocab.json",
+      "size": 2776833,
+      "sha256": null
+    }
+  ],
+  "checksum_notes": "SHA-256 values are the upstream LFS checksums where supplied. Small Git files are pinned by the repository revision; null does not mean an empty-file hash."
+}

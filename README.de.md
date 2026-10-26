@@ -13,6 +13,8 @@ Es ist keine offizielle EchoMuse-Distribution und keine Universalfirmware für a
 
 **[Visueller Leitfaden: Ablauf und Ergebnis](docs/visual-guide.md)** — Konvertierung, Sprachverarbeitung, gemessene Zeiten, Bluetooth-Rollen und Abnahmeprüfungen. Leitfaden und Grafiken sind auf Englisch; die Verbindungen erklärt die [Architektur](docs/architecture.md).
 
+[Gedichte, Rätsel und Familienfunktionen](docs/family-interaction.md): geprüfte Texte, eigene Geschichten und Musik; Anleitung auf Englisch.
+
 ## Funktionen
 
 - Reproduzierbare Vorbereitung mit festgelegten Versionen; **das Build-Skript flasht kein Gerät**.

@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-10-26",
+  "description": "Small, verified mirror of complete historical public-domain poems. This is not live web search.",
+  "entries": [
+    {
+      "id": "blok_zaychik",
+      "title": "Зайчик",
+      "author": "Александр Блок",
+      "author_aliases": [
+        "блок",
+        "блока",
+        "александр блок",
+        "александра блока"
+      ],
+      "title_aliases": [
+        "зайчик",
+        "зайчика",
+        "маленькому зайчику"
+      ],
+      "topics": [
+        "зайка",
+        "зайку",
+        "зайке",
+        "зайчик",
+        "зайчика",
+        "зайчике",
+        "заяц",
+        "зайца",
+        "зайце",
+        "осень",
+        "осени"
+      ],
+      "text": "Маленькому зайчику\nНа сырой ложбинке\nПрежде глазки тешили\nБелые цветочки...\nОсенью расплакались\nТонкие былинки,\nЛапки наступают\nНа желтые листочки.\nХмурая, дождливая\nНаступила осень,\nВсю капусту сняли,\nНечего украсть.\nБедный зайчик прыгает\nВозле мокрых сосен,\nСтрашно в лапы волку\nСерому попасть...\nДумает о лете,\nПрижимает уши,\nНа небо косится —\nНеба не видать...\nТолько б потеплее,\nТолько бы посуше...\nОчень неприятно\nПо воде ступать!",
+      "source": {
+        "url": "https://ilibrary.ru/text/5114/p.1/index.html",
+        "edition": "А. А. Блок. Полное собрание сочинений и писем в 20-ти томах. Том IV. М.: Наука, 1999.",
+        "accessed": "2026-10-26",
+        "normalization": "Poem body only; HTML spacing converted to line breaks; nonbreaking spaces normalized. Wording and punctuation retained."
+      },
+      "rights": {
+        "status": "public-domain",
+        "author_death_year": 1921,
+        "written_year": 1906,
+        "first_publication_year": null,
+        "evidence_url": "https://ilibrary.ru/text/5114/index.html",
+        "note": "The source explicitly identifies this poem as public domain. It gives the composition year, not a verified first-publication year. This catalogue does not treat the 1999 source edition as first publication; no edition commentary or illustrations are copied."
+      },
+      "kind": "poem",
+      "language": "ru",
+      "sha256": "3b9214af15802e8ee4bcdef0215a8b8da902be2dbcb0dad0c3c398d560af43e1"
+    },
+    {
+      "id": "maykov_lullaby",
+      "title": "Колыбельная песня",
+      "author": "Аполлон Майков",
+      "author_aliases": [
+        "майков",
+        "майкова",
+        "аполлон майков",
+        "аполлона майкова"
+      ],
+      "title_aliases": [
+        "колыбельная песня",
+        "колыбельную песню",
+        "спи дитя мое усни"
+      ],
+      "topics": [
+        "колыбельная",
+        "колыбельную",
+        "сон",
+        "сне",
+        "малыш",
+        "малыша",
+        "усни"
+      ],
+      "text": "Спи, дитя мое, усни!\nСладкий сон к себе мани:\nВ няньки я тебе взяла\nВетер, солнце и орла.\n\nУлетел орел домой;\nСолнце скрылось под водой;\nВетер, после трех ночей,\nМчится к матери своей.\n\nВетра спрашивает мать:\n«Где изволил пропадать?\nАли звезды воевал?\nАли волны всё гонял?»\n\n«Не гонял я волн морских,\nЗвезд не трогал золотых;\nЯ дитя оберегал,\nКолыбелочку качал!»",
+      "source": {
+        "url": "https://ilibrary.ru/text/4378/p.1/index.html",
+        "edition": "А. Н. Майков. Сочинения в 2-х томах. Том 1. М.: Правда, 1984.",
+        "accessed": "2026-10-26",
+        "normalization": "Poem body only; HTML spacing converted to verse lines and stanzas; composition date excluded from speech."
+      },
+      "rights": {
+        "status": "public-domain",
+        "author_death_year": 1897,
+        "written_year": 1860,
+        "first_publication_year": 1861,
+        "evidence_url": "https://ilibrary.ru/text/4378/index.html",
+        "publication_evidence_url": "https://ru.wikisource.org/wiki/Автор:Аполлон_Николаевич_Майков",
+        "note": "The text source explicitly identifies the work as public domain. Publication year follows the author catalogue; the text source dates its composition to 1860. Only the historical poem is copied."
+      },
+      "kind": "poem",
+      "language": "ru",
+      "sha256": "340c57e361efd52a719cfb20eb823daf0b3d8faae6a661471d71ee8aeff588da"
+    },
+    {
+      "id": "maykov_swallow",
+      "title": "Ласточка примчалась",
+      "author": "Аполлон Майков",
+      "author_aliases": [
+        "майков",
+        "майкова",
+        "аполлон майков",
+        "аполлона майкова"
+      ],
+      "title_aliases": [
+        "ласточка примчалась",
+        "ласточка",
+        "ласточку"
+      ],
+      "topics": [
+        "ласточка",
+        "ласточку",
+        "ласточке",
+        "весна",
+        "весну",
+        "весне",
+        "птичка",
+        "птичку",
+        "птичке"
+      ],
+      "text": "Ласточка примчалась\nИз-за бела моря,\nСела и запела:\nКак февраль ни злися,\nКак ты, март, ни хмурься,\nБудь хоть снег, хоть дождик —\nВсё весною пахнет!",
+      "source": {
+        "url": "https://ru.wikisource.org/wiki/Ласточка_примчалась_(Майков)",
+        "revision_url": "https://ru.wikisource.org/w/index.php?title=Ласточка_примчалась_(Майков)&oldid=5708895",
+        "revision_id": 5708895,
+        "edition": "А. Н. Майков. Сочинения в двух томах. М.: Правда, 1984. Том 1, с. 373.",
+        "accessed": "2026-10-26",
+        "normalization": "Extracted the complete poem block; removed editorial line number 5 and date; normalized nonbreaking space before dash. No editorial commentary copied."
+      },
+      "rights": {
+        "status": "public-domain",
+        "author_death_year": 1897,
+        "written_year": 1858,
+        "first_publication_year": 1858,
+        "evidence_url": "https://ru.wikisource.org/w/index.php?title=Ласточка_примчалась_(Майков)&oldid=5708895",
+        "note": "The source marks the historical work PD-old-70 and cites first publication in Подснежник, 1858, no. 2, p. 6. This is the historical verse only, not the separately licensed wiki presentation or commentary."
+      },
+      "kind": "poem",
+      "language": "ru",
+      "sha256": "932ccbf4aef5c5b2fb271560d0c89ce085eb9c7e964746a78876a8a86d87685b"
+    },
+    {
+      "id": "esenin_birch",
+      "title": "Берёза",
+      "author": "Сергей Есенин",
+      "author_aliases": [
+        "есенин",
+        "есенина",
+        "сергей есенин",
+        "сергея есенина"
+      ],
+      "title_aliases": [
+        "береза",
+        "березу",
+        "белая береза"
+      ],
+      "topics": [
+        "береза",
+        "березу",
+        "березе",
+        "зима",
+        "зиму",
+        "зиме",
+        "снег",
+        "снеге"
+      ],
+      "text": "Белая берёза\nПод моим окном\nПринакрылась снегом,\nТочно серебром.\n\nНа пушистых ветках\nСнежною каймой\nРаспустились кисти\nБелой бахромой.\n\nИ стоит берёза\nВ сонной тишине,\nИ горят снежинки\nВ золотом огне.\n\nА заря, лениво\nОбходя кругом,\nОбсыпает ветки\nНовым серебром.",
+      "source": {
+        "url": "https://ru.wikisource.org/wiki/Берёза_(Есенин)",
+        "revision_url": "https://ru.wikisource.org/w/index.php?title=Берёза_(Есенин)&oldid=5746567",
+        "revision_id": 5746567,
+        "edition": "С. А. Есенин. Полное собрание сочинений в 7 томах. М.: Наука; Голос, 1996. Том 4, с. 45.",
+        "accessed": "2026-10-26",
+        "normalization": "Complete poem block copied without change; editorial heading, composition date and commentary omitted."
+      },
+      "rights": {
+        "status": "public-domain",
+        "author_death_year": 1925,
+        "written_year": 1913,
+        "first_publication_year": 1914,
+        "evidence_url": "https://ru.wikisource.org/w/index.php?title=Берёза_(Есенин)&oldid=5746567",
+        "note": "The historical poem was first published in Мирок, January 1914, p. 10, under Аристон; the source records author lifespan 1895–1925. The historical verse predates 1931 and the author died over 100 years before this catalogue review. Modern editorial commentary and wiki presentation are not copied."
+      },
+      "kind": "poem",
+      "language": "ru",
+      "sha256": "439f7ef8374f0cdc0f7ae97266b939cd3622dd0517a25277f4bf3ad5bea486b0"
+    }
+  ]
+}

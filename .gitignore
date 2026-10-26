@@ -43,6 +43,9 @@ credentials.tfrc.json
 *.keras
 *.pt
 *.pth
+*.safetensors
+*.gguf
+*.ggml
 *.tar.gz
 *.tar
 *.tgz

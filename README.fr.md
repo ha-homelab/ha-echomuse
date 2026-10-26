@@ -13,6 +13,8 @@ d’exploitation. Ce n’est ni une distribution officielle d’EchoMuse ni un m
 
 **[Guide visuel : processus et résultat](docs/visual-guide.md)** — conversion, parcours vocal, durées mesurées, rôles Bluetooth et vérifications. Le guide et les graphiques sont en anglais ; les connexions sont détaillées dans l’[architecture](docs/architecture.md).
 
+[Poèmes, devinettes et activités en famille](docs/family-interaction.md) : textes vérifiés, histoires originales et musique ; guide en anglais.
+
 ## Fonctionnalités
 
 - Préparation reproductible avec versions figées ; **le constructeur d’image ne flashe aucun appareil**.
