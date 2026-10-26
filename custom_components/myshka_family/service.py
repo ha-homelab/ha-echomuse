@@ -11,7 +11,7 @@ from wyoming.asr import Transcript
 from wyoming.client import AsyncClient
 from wyoming.handle import Handled
 from .public_topics import public_prompt
-from .creative_contract import CREATIVE_OPTIONS, CREATIVE_PROMPT, creative_messages
+from .creative_contract import CREATIVE_OPTIONS, creative_messages
 from homeassistant.auth.permissions.const import POLICY_CONTROL
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession

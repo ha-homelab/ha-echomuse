@@ -310,16 +310,18 @@ def main(argv=None):
         bearer = load_bearer(args.bearer_file)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
+        return 2
     generator = MLXGenerator(model_path)
     server = BoundedHTTPServer((bind, args.port), InferenceEngine(bearer, generator))
     print("Family creative server ready: fixed model, offline weights.", flush=True)
     try:
         server.serve_forever(poll_interval=0.5)
     except KeyboardInterrupt:
+        # Ctrl-C requests a clean shutdown; server_close runs below.
         pass
     finally:
         server.server_close()
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
