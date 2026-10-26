@@ -1,7 +1,9 @@
 # Fixed-model local creative server
 
 `scripts/local_family_server.py` provides a small authenticated endpoint for
-the optional local family-generation route. It does not expose MLX-LM's model
+the optional local family-generation route. It is experimental: protocol tests
+passed, but the reference 14B run stalled on storage reads before inference, so
+this server is not enabled in the reference deployment. It does not expose MLX-LM's model
 management server. Reading the bundled poems and using the riddles do not need
 this service.
 

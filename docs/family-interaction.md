@@ -313,7 +313,12 @@ HA configuration, then HA was restarted. Both creative endpoints are absent
 from the deployed settings. A private MLX runtime and the pinned 14B model were
 prepared, but a cold load stalled on NAS reads after a network handover. The
 model did not reach generation, so no 14B speed or Russian-quality result is
-claimed and it is not enabled for family conversation. Homeway was not enabled: its monthly free allowance
+claimed and it is not enabled for family conversation. A separate SSH transfer
+probe excluded connection setup and measured approximately 1.97 MB/s of payload
+throughput. An 8B model on local disk was also considered, but its preflight
+would leave only 6.72 GiB free, below the chosen 8 GiB reserve, so it was not
+downloaded. The private runtime and verified NAS weights are retained; all test
+processes exited and temporary package caches were removed. Homeway was not enabled: its monthly free allowance
 was exhausted, and the household retained the local-data preference.
 
 The reported bunny request returned the complete attributed Blok text through
@@ -322,6 +327,12 @@ warm intent-only requests took approximately **0.058 and 0.077 seconds**. A ridd
 hint, wrong answer and answer reveal also completed locally. These checks used
 text inputs and did not activate a microphone or play sound. They do not measure
 end-to-end speech delay or prove acoustic quality on the offline first Dot.
+
+A service-connectivity check also found a missing host-network source in the
+Ollama ingress policy and a temporary NUC heartbeat outage. A single observed
+source was added to the private policy; its egress denial was preserved. The
+NUC recovered without a restart, both Ollama entries returned to loaded, and the
+original heater sensor phrase again completed through native intents.
 
 The original household tool source, household voice package and pipeline storage
 were byte-identical before and after installation. The optional creative-model
