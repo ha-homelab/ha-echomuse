@@ -1,0 +1,71 @@
+# Install only with custom_components/myshka_family and prefer-local enabled.
+language: ru
+lists:
+  myshka_subject:
+    wildcard: true
+  myshka_kind:
+    values:
+      - in: "(стих|стишок|стихотворение)"
+        out: "стих"
+      - in: "(сказку|историю)"
+        out: "сказка"
+      - in: "потешку"
+        out: "потешка"
+
+intents:
+  MyshkaRead:
+    data:
+      - sentences:
+          - "(расскажи|прочитай|почитай|найди) [мне|нам] [с выражением] [короткий|детский] (стих|стишок|стихотворение) (о|об|про) {myshka_subject:subject}"
+        slots:
+          thematic: true
+      - sentences:
+          - "(расскажи|прочитай|почитай|найди) [мне|нам] [с выражением] (стих|стишок|стихотворение) {myshka_subject:subject}"
+      - sentences:
+          - "(расскажи|прочитай|почитай) [мне|нам] [с выражением] [короткий|детский] (стих|стишок|стихотворение)"
+          - "[расскажи] [мне|нам] ещё [один] (стих|стишок|стихотворение)"
+        slots:
+          thematic: true
+          subject: "зайке"
+  MyshkaCreate:
+    data:
+      - sentences:
+          - "(сочини|придумай) [мне|нам] [короткий|короткую|добрую|весёлый|веселый] {myshka_kind:kind} (о|об|про) {myshka_subject:subject}"
+          - "(сочини|придумай) [мне|нам] [короткий|короткую|добрую] {myshka_kind:kind}"
+      - sentences:
+          - "(расскажи|придумай) [мне|нам] [короткую|добрую] (сказку|историю) (о|об|про) {myshka_subject:subject}"
+          - "расскажи [мне|нам] [короткую|добрую] (сказку|историю)"
+        slots:
+          kind: "сказка"
+  MyshkaActivity:
+    data:
+      - sentences:
+          - "расскажи [мне|нам] (свой|собственный|весёлый|веселый) стишок [(про|о) {myshka_subject:subject}]"
+        slots:
+          prepared: true
+      - sentences:
+          - "[загадай|расскажи|придумай] [мне|нам] [новую|детскую|интересную|сложную] загадку [для детей|для ребёнка|для малышей|для взрослых|посложнее]"
+          - "[расскажи|прочитай] [мне|нам] потешку [(про|о) {myshka_subject:subject}]"
+      - sentences:
+          - "[загадай] [мне|нам] ещё [одну] загадку"
+        slots:
+          continue_kind: "riddle"
+      - sentences:
+          - "[расскажи] [мне|нам] ещё [одну] потешку"
+        slots:
+          continue_kind: "nursery"
+  MyshkaRiddleReply:
+    data:
+      - sentences:
+          - "мой ответ {myshka_subject:subject}"
+          - "ответ на загадку"
+      - sentences:
+          - "[дай] подсказку к загадке"
+          - "подсказка к загадке"
+        slots:
+          request: "дай подсказку"
+  MyshkaSong:
+    data:
+      - sentences:
+          - "(спой|включи|поставь|сыграй) [мне|нам] (песню|песенку) [{myshka_subject:subject}]"
+          - "спой [мне|нам] что-нибудь"

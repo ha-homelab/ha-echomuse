@@ -30,6 +30,10 @@ acceptance targets. Its color diagrams link back to the detailed runbooks below.
   aliases, Ollama and Recorder.
 - [Languages and i18n](i18n.md): what is localized, language selection, fallback
   and the limits of speech support.
+- [Family conversation](family-interaction.md): sourced poems, local riddles,
+  optional original stories, music-library playback and privacy boundaries.
+- [Local creative server](local-family-server.md): fixed-model Apple Silicon
+  inference, loopback transport, authentication and resource limits.
 - [Energy reports](energy-assist.md): bounded read-only reports.
 - [Dashboard](dashboard.md): current voice and music entities in Lovelace.
 - [Voice settings and catalog](speech-settings.md): live Silero controls and all installed speakers.

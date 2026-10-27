@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add native Russian family activities with four sourced public-domain poems,
+  nine original short pieces and six riddles with isolated sessions. Document optional
+  creative generation through a finite public-topic gate, measured local-model
+  limits, exact-title music-library playback and the existing speech controls.
+
 - Add a pinned Controller 2.26.0 fix that retains BLE Noise authentication when
   active GATT is disabled or unavailable, serializes proxy lifecycle changes,
   and makes administrator key retrieval read-only. Document same-entry HA

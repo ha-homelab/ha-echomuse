@@ -88,7 +88,13 @@ Do not judge steady-state latency from the first request, which also loads weigh
 For Kubernetes, `examples/home-voice-ollama.yaml` provides storage, a private
 service and ingress policy. If HA uses `hostNetwork`, its traffic may originate
 from the HA node or its overlay interface instead of a namespaced pod. Add only
-that observed source address as an ingress `ipBlock` (`/32` for IPv4), and verify connectivity. After
+the observed source address or addresses as ingress `ipBlock` entries (`/32`
+for IPv4), and verify the configured service DNS/ClusterIP path. A direct Pod IP
+probe can use a different source and succeed while the service path times out.
+First confirm that the Ollama pod, its node and the service endpoint are Ready;
+a node heartbeat outage can remove a healthy process from service routing.
+Do not replace the service URL with an ephemeral Pod IP or widen a policy to
+work around a missing endpoint. Preserve these narrowly scoped rules in private deployment configuration and recheck after a HA restart. After
 provisioning, apply `examples/home-voice-offline.yaml` and verify both blocked
 outbound connections and working HA inference. Namespace labels alone do not
 establish isolation unless the cluster's network plugin enforces the policies.

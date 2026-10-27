@@ -1,0 +1,10 @@
+{
+  "domain": "myshka_family",
+  "name": "Myshka Family Activities",
+  "version": "0.1.0",
+  "documentation": "https://github.com/ha-homelab/ha-echomuse/blob/main/docs/family-interaction.md",
+  "dependencies": ["conversation", "intent"],
+  "codeowners": [],
+  "iot_class": "local_push",
+  "requirements": []
+}

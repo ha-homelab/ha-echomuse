@@ -22,6 +22,9 @@ an official EchoMuse distribution or a replacement firmware for every Echo.
   timers, early speech and wake-word interruption where supported.
 - A local Ollama tool API for current states, explicitly allowed device controls,
   and Recorder statistics; bounded, read-only energy reports.
+- [Family activities](docs/family-interaction.md): reviewed Russian poems, local
+  riddles, song-title playback and optional original stories through an isolated
+  creative backend.
 - A separate encrypted Bluetooth proxy endpoint for BLE devices.
 - English, Russian, German, Spanish and French README guides and bounded
   assistant-language selection. English and Russian native state-query examples
