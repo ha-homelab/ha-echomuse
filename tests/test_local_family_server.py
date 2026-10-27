@@ -8,6 +8,7 @@ import tempfile
 import threading
 from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 
 
 PATH = Path(__file__).resolve().parents[1] / "scripts/local_family_server.py"
@@ -32,6 +33,23 @@ class FakeSocket:
 
     def settimeout(self, value):
         self.timeout = value
+
+
+class MainLifecycleTest(unittest.TestCase):
+    def test_normal_and_interrupted_shutdown_close_server_and_exit_successfully(self):
+        for interruption in (None, KeyboardInterrupt):
+            with self.subTest(interruption=interruption), \
+                    patch.object(server, "validate_bind", return_value="127.0.0.1"), \
+                    patch.object(server, "validate_model_path", return_value=Path("/model")), \
+                    patch.object(server, "load_bearer", return_value=DUMMY_BEARER), \
+                    patch.object(server, "MLXGenerator"), \
+                    patch.object(server, "BoundedHTTPServer") as constructor, \
+                    redirect_stdout(io.StringIO()):
+                instance = constructor.return_value
+                instance.serve_forever.side_effect = interruption
+                result = server.main(["--model-path", "/model", "--bearer-file", "/bearer"])
+                instance.server_close.assert_called_once_with()
+                self.assertEqual(result, 0)
 
 
 def payload():
