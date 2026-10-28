@@ -1,5 +1,7 @@
 # EchoMuse Bluetooth proxy
 
+**Deployment note, October 28, 2026:** both physical Dots now use TECHO5 native proxies. Their former EchoMuse controller and HA proxy identities were retired; do not recreate them for those migrated units. The instructions below remain applicable to devices actually running EchoMuse. See the [current deployment record](https://github.com/ha-homelab/ha-techo5-dot/blob/main/docs/status.md).
+
 Controller 2.26.0 and device firmware 2.18.0 support BLE advertisement forwarding
 and optional active GATT connections. This is a Bluetooth Low Energy proxy for
 Home Assistant sensors/integrations, not Bluetooth speaker pairing or A2DP music.
