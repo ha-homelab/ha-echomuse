@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   python:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@8008fd1db4c410640e7abddfc8bc75833cdcd970
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@e71559f44e41f39ad0037bf13c7f43bbbb2ec9af
     with:
       python-version: '3.11'
       install-dependencies: true
@@ -29,7 +29,7 @@ jobs:
       coverage-artifact-name: echomuse-python-coverage
 
   security:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@6b2d99519d513d2b871d2a845ddd6134dea4af2c
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@e71559f44e41f39ad0037bf13c7f43bbbb2ec9af
     permissions:
       contents: read
       actions: read
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.11'
       - name: Validate Python, upstream lock, and public files
@@ -94,7 +94,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.11'
       - name: Install the CPU training stack
