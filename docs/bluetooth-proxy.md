@@ -127,7 +127,10 @@ HA's supported reconfiguration flow before retrying credentials. If the key
 really changed, first establish whether the database or device record was
 replaced; restore the original key from backup, or reauthenticate the verified
 existing entry with the intended current key. Remove an entry only after
-confirming it is an [obsolete EchoLocal record](#remove-obsolete-echolocal-entries).
+confirming that it is obsolete: follow the
+[EchoLocal cleanup procedure](#remove-obsolete-echolocal-entries) or, for a Dot
+that has moved away from EchoMuse, the
+[controller identity retirement procedure](#retire-an-echomuse-identity-after-migrating-a-dot).
 
 The controller's status fields describe different stages: `listening` means
 the endpoint exists; `encrypted` describes its transport; `haConnected` alone
@@ -170,6 +173,12 @@ a single nonzero total may be old. Correlate the source with the current
 EchoMuse proxy. Multiple copies of a display name are not proof of multiple
 physical radios. Nearby addresses and payloads can identify household or
 neighbouring devices, so keep captures private.
+
+Check sensor units when comparing different satellite systems. The EchoMuse
+advertisement sensor is a cumulative `total_increasing` value; the TECHO5
+sensor observed in this deployment reports an advertisement rate in `/s`.
+A falling TECHO5 rate is not a counter reset. Use fresh source-attributed HA
+advertisement events to establish reception from either implementation.
 
 ## iBeacon Tracker is a consumer, not another proxy
 
@@ -219,3 +228,56 @@ HA subscribed, advertisements were forwarded, three slots were free, and HCI
 errors/restarts were zero. No unidentified nearby GATT device was connected as a
 test. Dot 1 was offline: its configuration, port and private key were prepared;
 HA enrollment and runtime validation still require the device to reconnect.
+
+## Retire an EchoMuse identity after migrating a Dot
+
+When a physical Dot moves to another satellite system such as TECHO5, HA can
+retain its disabled EchoMuse voice, BLE and scanner entries. A disabled entry
+does not represent an active second radio. A proxy belonging to another
+physical Dot remains a separate valid device.
+
+The controller registers mDNS advertisements for approved offline devices even
+though their TCP listeners are stopped. Deleting only the old HA entries can
+therefore cause rediscovery. First identify the migrated record and check its
+entity references, including the local assistant's media-player allowlist.
+Preserve other physical Dots and their controller configuration.
+
+Use a bounded private SQLite online backup before retirement; a raw copy of a
+live database can omit WAL data. Preserve required training and utterance
+recordings separately and verify their hashes. The controller administrator's
+`DELETE /api/devices/{device_id}` operation, verified on the deployed controller,
+removes that device's voice and BLE listeners and mDNS registrations. It is a
+hard delete: configuration, keys, device logs, boot/wear records, wake samples
+and ordinary utterance recordings are removed. The separate training-recorder
+directory is outside that deletion path. Check the actual storage layout before
+relying on this distinction. Retained historical metrics cannot recreate a
+device advertisement without its approved registry record.
+
+Then remove only the corresponding obsolete ESPHome and Bluetooth entries
+through HA's integration controls. Its supported administrator API is
+`DELETE /api/config/config_entries/entry/{entry_id}`; do not edit live `.storage`
+files. Disabling `bleProxyEnabled` tears down BLE alone and preserves the old
+voice advertisement, so it is not complete retirement.
+
+On October 27, the migrated Dot's old record and three HA entries were removed
+after an integrity-checked online database backup and preservation of 56
+training files. The archive was approximately 2.65 MB compressed. HA removed
+three old device records and ten entity records; the other physical Dot's
+controller configuration remained unchanged. These are observed cleanup counts,
+not a general deletion target. The current TECHO5 migration and final acceptance
+record are maintained in
+[ha-techo5-dot](https://github.com/ha-homelab/ha-techo5-dot/blob/main/docs/home-assistant.md#retire-the-former-controller-identity).
+
+The other physical Dot's encrypted EchoMuse BLE endpoint was then enrolled in
+HA and successfully subscribed. After a separate TECHO5 radio outage was
+recovered with a normal device reboot, a 45-second HA observation received
+12 fresh TECHO5 reports and 4 fresh EchoMuse reports, excluding 42 cached reports.
+Both satellites remained idle and their saved wake/assistant settings were
+preserved. This verifies observed recovery, not long-term absence of radio
+failures. Final HA verification showed exactly two loaded Bluetooth entries,
+one per physical Dot, with the obsolete entries absent and no pending ESPHome
+setup flows or related repairs.
+
+Verify absence of the retired identity, fresh advertisements from each intended
+scanner, and current voice/player availability independently. No full Alexa
+filesystem backup or device reflash is required for registry cleanup.

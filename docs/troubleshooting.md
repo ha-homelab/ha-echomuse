@@ -107,6 +107,13 @@ are different objects. A repeated display name inside one card is not an extra
 radio. After private backup and reference checks, remove truly obsolete
 EchoLocal entries through HA; keep the current voice and BLE entries.
 
+After migrating a Dot away from EchoMuse, its disabled controller proxy can
+also remain visible. Retire that Dot's old controller identity before removing
+its HA records, because approved offline devices still advertise discovery.
+Follow the [migration cleanup procedure](bluetooth-proxy.md#retire-an-echomuse-identity-after-migrating-a-dot),
+including its backup and hard-delete side effects. Keep proxies belonging to
+other physical Dots.
+
 No new iBeacon entities does not by itself indicate proxy failure. Verify fresh
 advertisements first, then the consumer's supported beacon format and discovery
 rules. Read [Bluetooth and iBeacon diagnostics](bluetooth-proxy.md).
