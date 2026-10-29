@@ -1,5 +1,7 @@
 # ha-echomuse
 
+**Mise à jour du 28 octobre 2026 :** les deux Echo Dot 2 du laboratoire domestique utilisent désormais [TECHO5](https://github.com/ha-homelab/ha-techo5-dot/blob/main/docs/status.md). Les services Home Assistant de gestion du domicile et d’activités familiales de ce dépôt restent actifs. Les instructions relatives aux appareils et au contrôleur EchoMuse décrivent l’ancienne installation.
+
 [English](README.md) · [Русский](README.ru.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md)
 
 Transformez un **Echo Dot 2** existant en satellite vocal Home Assistant avec

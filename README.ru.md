@@ -1,5 +1,7 @@
 # ha-echomuse
 
+**Обновление от 28 октября 2026:** обе домашние Echo Dot 2 переведены на [TECHO5](https://github.com/ha-homelab/ha-techo5-dot/blob/main/docs/status.md). Сервисы управления домом и семейного общения для Home Assistant из этого репозитория продолжают работать. Инструкции для устройств и контроллера EchoMuse описывают прежнюю установку.
+
 [English](README.md) · [Русский](README.ru.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md)
 
 Превратите имеющуюся **Echo Dot 2** в голосовой терминал Home Assistant с

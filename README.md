@@ -1,5 +1,7 @@
 # ha-echomuse
 
+**Deployment update, October 28, 2026:** both homelab Echo Dot 2 units now run [TECHO5](https://github.com/ha-homelab/ha-techo5-dot/blob/main/docs/status.md). The Home Assistant household and family services in this repository remain in use. EchoMuse device/controller instructions describe the former deployment.
+
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15578/badge)](https://www.bestpractices.dev/projects/15578)
 
 [English](README.md) · [Русский](README.ru.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md)

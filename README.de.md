@@ -1,5 +1,7 @@
 # ha-echomuse
 
+**Stand vom 28. Oktober 2026:** beide Echo Dot 2 im Homelab verwenden jetzt [TECHO5](https://github.com/ha-homelab/ha-techo5-dot/blob/main/docs/status.md). Die Home-Assistant-Dienste für Haussteuerung und Familienfunktionen aus diesem Repository bleiben im Einsatz. Die EchoMuse-Geräte- und Controller-Anleitungen beschreiben den früheren Betrieb.
+
 [English](README.md) · [Русский](README.ru.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Français](README.fr.md)
 
 Einen vorhandenen **Echo Dot 2** mit EchoMuse und emOS als Sprachsatelliten für

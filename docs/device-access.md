@@ -1,8 +1,8 @@
 # Device access and administrator credentials
 
-This guide describes the installed emOS **0.10**, EchoMuse device firmware
-**2.18.0**, and controller **2.26.0**. Both converted Echo Dot 2 units use this
-stack. UI labels and access behavior were checked against pinned upstream
+This guide describes the former deployment of emOS **0.10**, EchoMuse device firmware
+**2.18.0**, and controller **2.26.0**. Both converted Echo Dot 2 units used this
+stack. They now run TECHO5; see the [current deployment and access settings](https://github.com/ha-homelab/ha-techo5-dot/blob/main/docs/home-assistant.md). UI labels and access behavior were checked against pinned upstream
 commit `e119433c0845dfe80f4b1ec44c9e8e8028adbb07`.
 
 ## What runs where
