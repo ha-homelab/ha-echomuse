@@ -12,6 +12,36 @@ stock firmware. No fallback to an unguarded announcement is enabled.
 Version b2 adds explicit, capability-gated music ducking; the default remains
 the original idle-only `skip` policy.
 
+## B2 adapter activation — October 29, 2026
+
+At **21:49:52 UTC**, the read-only post-restart check confirmed Home Assistant
+**2026.10.4** was `RUNNING`, `echomuse_home` was loaded as **0.4.0b2**, and all
+four announcement services were registered. The live submit service schema
+exposed both `skip` and `duck_music`.
+
+The four installed files — `announcement_protocol.py`, `announcements.py`,
+`services.yaml` and `manifest.json` — matched the exact SHA-256 hashes from
+[source commit `13f5de5`](https://github.com/ha-homelab/ha-echomuse/commit/13f5de59414e118e1e1b25e2fed64c07aeb12d2a).
+The protected `__init__.py`, `intent.py` and `policy.py` remained byte-for-byte
+identical to the reviewed b1 baseline. The complete seven-file live inventory
+was checked, and the prior files were retained in a private verified backup.
+Activation used one coordinated HA restart.
+
+This was a **targeted overlay**, not installation of the complete public source
+package. The public b2 archive contains all 14 repository component files;
+installing that archive also brings the repository's other integration code.
+The running household installation preserves its existing intent and language
+behavior. Its version identifies the updated announcement adapter and does not
+claim that every file from the full archive was deployed.
+
+The source passed **190 repository tests** and **23 adapter runtime tests**
+against installed HA libraries with fake transports, plus documentation and
+public-content checks. This activation check did not query reconnecting Dot
+daemons or start audio, calls or recordings. Native duck support must still be
+verified through `announcement_capabilities`; adapter registration alone does
+not establish that either device supports ducking. Acoustic acceptance is
+separate from these software checks.
+
 ## Previous b1 deployment check — October 29, 2026
 
 The four services are active after one coordinated Home Assistant restart.
