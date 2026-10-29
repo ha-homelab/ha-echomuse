@@ -1,0 +1,81 @@
+announcement_capabilities:
+  name: Guarded announcement capabilities
+  description: Read the device's guarded announcement contract without playing audio.
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          domain: assist_satellite
+          integration: esphome
+
+announcement_submit:
+  name: Submit guarded announcement
+  description: Submit an already rendered audio file only through a verified native idle guard. Does not start a conversation.
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          domain: assist_satellite
+          integration: esphome
+    request_id:
+      required: true
+      description: Unique announce-<32 lowercase hexadecimal characters>-<3 digit endpoint> identifier. Retries query the same request.
+      selector:
+        text:
+    media_id:
+      required: true
+      description: An already rendered HTTP audio URL, Home Assistant path, or local media-source ID. TTS synthesis IDs are rejected.
+      selector:
+        text:
+    expires_at:
+      required: true
+      description: Integer Unix UTC deadline, at most 180 seconds in the future.
+      selector:
+        number:
+          min: 1
+          max: 9999999999
+          mode: box
+    preannounce:
+      default: false
+      description: Must be false. No preliminary chime is played.
+      selector:
+        boolean:
+    busy_policy:
+      default: skip
+      description: Only skip is supported. A busy device is never forcibly interrupted.
+      selector:
+        select:
+          options:
+            - skip
+
+announcement_status:
+  name: Guarded announcement status
+  description: Query the exact native request without playing, retrying, or restarting it.
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          domain: assist_satellite
+          integration: esphome
+    request_id:
+      required: true
+      selector:
+        text:
+
+announcement_stop:
+  name: Stop owned announcement
+  description: Ask the device to stop only the matching guarded announcement, never a call or another player.
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          domain: assist_satellite
+          integration: esphome
+    request_id:
+      required: true
+      selector:
+        text:

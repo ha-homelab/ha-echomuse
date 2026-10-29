@@ -45,6 +45,8 @@ async def async_setup(hass, config):
     settings = config[DOMAIN]
     api = HomeAPI(hass, settings)
     hass.data[DOMAIN] = {"api": api, "unregister": llm.async_register_api(hass, api)}
+    from .announcements import async_setup_announcements
+    hass.data[DOMAIN]["announcements"] = await async_setup_announcements(hass)
     return True
 
 
