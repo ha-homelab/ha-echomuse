@@ -26,7 +26,7 @@ announcement_submit:
         text:
     media_id:
       required: true
-      description: An already rendered HTTP audio URL, Home Assistant path, or local media-source ID. TTS synthesis IDs are rejected.
+      description: An already rendered Home Assistant HTTP audio URL, HA path, or local media-source ID. Foreign origins and TTS synthesis IDs are rejected.
       selector:
         text:
     expires_at:

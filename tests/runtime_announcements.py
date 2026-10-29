@@ -4,6 +4,7 @@ Run with a compatible Home Assistant Python environment. All transports,
 registries and storage are fakes. Importing this file does not run tests.
 """
 import asyncio
+from ipaddress import IPv4Address
 import json
 from types import SimpleNamespace
 import unittest
@@ -17,6 +18,8 @@ from custom_components.echomuse_home import announcements as a
 
 RID = "announce-" + "b" * 32 + "-223"
 ENTITY = "assist_satellite.test"
+# Synthetic RFC1918 address, not a discovered endpoint or an actual connection.
+FOREIGN_PRIVATE_ORIGIN = f"http://{IPv4Address(0x0A000007)}"
 
 
 class RuntimeAnnouncementsTest(unittest.IsolatedAsyncioTestCase):
@@ -28,7 +31,8 @@ class RuntimeAnnouncementsTest(unittest.IsolatedAsyncioTestCase):
         self.config = SimpleNamespace(domain="esphome", data={"noise_psk": "test"}, runtime_data=self.runtime)
         self.auth = SimpleNamespace(async_get_user=AsyncMock(return_value=SimpleNamespace(
             permissions=SimpleNamespace(check_entity=lambda *_: True))))
-        self.hass = SimpleNamespace(auth=self.auth, config_entries=SimpleNamespace(async_get_entry=lambda _: self.config))
+        self.hass = SimpleNamespace(auth=self.auth, config_entries=SimpleNamespace(async_get_entry=lambda _: self.config),
+                                    config=SimpleNamespace(internal_url="http://ha.internal:8123", external_url="https://ha.example"))
         self.transport = a.NativeTransport(self.hass)
         self.call = SimpleNamespace(data={"entity_id": ENTITY}, context=Context(user_id="user-1"))
         self.registry = SimpleNamespace(async_get=lambda _: self.entry)
@@ -59,6 +63,51 @@ class RuntimeAnnouncementsTest(unittest.IsolatedAsyncioTestCase):
     async def test_disconnected_endpoint_is_explicit(self):
         self.runtime.available = False
         with self.assertRaises(a.EndpointUnavailable): await self.bind()
+
+    async def test_relative_tts_proxy_uses_standard_ha_resolution(self):
+        path = "/api/tts_proxy/example.wav"
+        final = "http://ha.internal:8123" + path + "?authSig=example"
+        with patch.object(a, "get_url", return_value="http://ha.internal:8123"), \
+             patch.object(a, "async_process_play_media_url", return_value=final) as resolve:
+            self.assertEqual(await self.transport.resolve(path), final)
+            resolve.assert_called_once_with(self.hass, path)
+        self.runtime.client.execute_service.assert_not_called()
+
+    async def test_configured_and_current_ha_origins_are_allowed(self):
+        with patch.object(a, "get_url", return_value="http://selected-ha.example:8123"), \
+             patch.object(a, "async_process_play_media_url", side_effect=lambda _, url: url):
+            for url in ("https://ha.example:443/api/tts_proxy/a.wav", "http://ha.internal:8123/api/tts_proxy/a.wav",
+                        "http://selected-ha.example:8123/api/tts_proxy/a.wav"):
+                self.assertEqual(await self.transport.resolve(url), url)
+
+    async def test_foreign_private_or_lookalike_origin_is_rejected_before_resolution(self):
+        with patch.object(a, "get_url", return_value="http://ha.internal:8123"), \
+             patch.object(a, "async_process_play_media_url") as resolve:
+            for url in ("http://192.0.2.20:8181/audio.wav", FOREIGN_PRIVATE_ORIGIN + "/audio.wav", "https://ha.example.evil.test/a.wav",
+                        "http://ha.example/a.wav", "https://ha.example:8443/a.wav"):
+                with self.subTest(url=url), self.assertRaises(ValueError):
+                    await self.transport.resolve(url)
+            resolve.assert_not_called()
+
+    async def test_foreign_origin_after_media_source_resolution_is_rejected(self):
+        with patch.object(a, "get_url", return_value="http://ha.internal:8123"), \
+             patch.object(a.media_source, "async_resolve_media", new=AsyncMock(return_value=SimpleNamespace(url=FOREIGN_PRIVATE_ORIGIN + "/audio.wav"))), \
+             patch.object(a, "async_process_play_media_url") as resolve:
+            with self.assertRaises(ValueError):
+                await self.transport.resolve("media-source://media_source/local/example.wav")
+            resolve.assert_not_called()
+
+    async def test_final_origin_is_checked_again(self):
+        with patch.object(a, "get_url", return_value="http://ha.internal:8123"), \
+             patch.object(a, "async_process_play_media_url", return_value=FOREIGN_PRIVATE_ORIGIN + "/audio.wav"):
+            with self.assertRaises(ValueError):
+                await self.transport.resolve("/api/tts_proxy/example.wav")
+
+    async def test_tts_source_never_reaches_resolver(self):
+        with patch.object(a.media_source, "async_resolve_media", new=AsyncMock()) as resolve:
+            with self.assertRaises(ValueError):
+                await self.transport.resolve("media-source://tts/provider?message=example")
+            resolve.assert_not_called()
 
     async def test_native_response_is_correlated(self):
         endpoint = await self.bind()

@@ -26,7 +26,20 @@ The caller should generate Baya audio once through its configured
 for the request lifetime, and submit that file. The conversation pipeline does
 not select or change this announcement's voice. A `media-source://tts/...` URI
 would request new synthesis and is rejected; local pre-rendered media sources,
-Home Assistant paths, and HTTP(S) audio URLs are accepted.
+Home Assistant paths, and HTTP(S) audio URLs on trusted Home Assistant origins
+are accepted.
+
+Prefer a relative path such as `/api/tts_proxy/<asset>` when the caller's HA API
+address differs from HA's configured internal address. The standard HA
+`async_process_play_media_url` helper makes it absolute and adds authentication
+when needed. The allowed origins are HA's configured `internal_url`,
+`external_url`, and the current result of HA's standard `get_url` selection.
+An origin is the exact scheme, hostname and effective port (default 80/443).
+The adapter checks absolute URLs before resolution, media-source results before
+signing, and the final URL afterward. Other origins, including other private
+LAN servers, are rejected. It never infers trust from an IP address being private,
+the caller's API base URL, or a hostname suffix. Resolution does not synthesize
+speech and does not fetch or play the file.
 
 Install the updated integration files during a coordinated maintenance window.
 An already running HA process does not load changed Python files merely because

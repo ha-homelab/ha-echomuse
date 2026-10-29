@@ -5,6 +5,7 @@ import asyncio
 from dataclasses import dataclass
 import json
 from typing import Any
+from urllib.parse import urlsplit
 from uuid import uuid4
 
 import probatio as vol
@@ -15,13 +16,22 @@ from homeassistant.components.media_player import async_process_play_media_url
 from homeassistant.core import SupportsResponse
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv, entity_registry as er
+from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.storage import Store
 
-from .announcement_protocol import AnnouncementBroker, PROTOCOL, capabilities, failed, request_id
+from .announcement_protocol import AnnouncementBroker, PROTOCOL, capabilities, failed, request_id, media_id as validate_media_id
 from .policy import DOMAIN
 
 NATIVE_PREFIX = "guarded_announcement_"
 TIMEOUT = 2
+
+
+def _origin(value: str) -> tuple[str, str, int]:
+    parsed = urlsplit(value)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password:
+        raise ValueError("A trusted Home Assistant HTTP origin is required")
+    port = parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80)
+    return parsed.scheme, parsed.hostname.lower(), port
 
 
 def _false(value):
@@ -91,10 +101,33 @@ class NativeTransport:
 
     async def resolve(self, source: str) -> str:
         async with asyncio.timeout(TIMEOUT):
+            validate_media_id(source)
+            configured = [self.hass.config.internal_url, self.hass.config.external_url]
+            try:
+                # Match the same selection used by async_process_play_media_url.
+                configured.append(get_url(self.hass))
+            except NoURLAvailableError:
+                pass
+            origins = set()
+            for url in configured:
+                if url:
+                    origins.add(_origin(url))
+
+            def check_absolute(url):
+                if urlsplit(url).scheme in {"http", "https"} and _origin(url) not in origins:
+                    raise ValueError("Audio URL must use a configured Home Assistant origin")
+
+            check_absolute(source)
             if media_source.is_media_source_id(source):
                 resolved = await media_source.async_resolve_media(self.hass, source, None)
                 source = resolved.url
-            return async_process_play_media_url(self.hass, source)
+                validate_media_id(source)
+                check_absolute(source)
+            resolved = async_process_play_media_url(self.hass, source)
+            validate_media_id(resolved)
+            if _origin(resolved) not in origins:
+                raise ValueError("Resolved audio URL must use a configured Home Assistant origin")
+            return resolved
 
     async def send(self, endpoint: Endpoint, operation: str, values: dict) -> dict:
         if not endpoint.runtime.available:
