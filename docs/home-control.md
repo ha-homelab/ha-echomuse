@@ -6,6 +6,10 @@ use the optional `custom_components/echomuse_home` integration to find devices,
 read current values, request historical statistics and perform device actions.
 No firmware change or USB connection is needed for this feature.
 
+The same integration also exposes optional [guarded one-way announcements](guarded-announcements.md)
+for devices that implement the native announcement contract. These services
+accept rendered audio and remain separate from the conversation tools.
+
 ## Install
 
 For English sentence examples, translated native responses and the distinction
