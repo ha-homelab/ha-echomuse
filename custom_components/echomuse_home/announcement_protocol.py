@@ -61,6 +61,7 @@ def capabilities(payload: Any) -> dict[str, Any]:
     data = payload if isinstance(payload, dict) else {}
     valid = data.get("protocol") == PROTOCOL and isinstance(data.get("boot_id"), str) and bool(data["boot_id"])
     result = {"protocol": PROTOCOL, **{key: valid and (data.get(key) is True or data.get(key) == "true") for key in CAPABILITIES}}
+    result["duck_music"] = all(result[key] for key in CAPABILITIES) and (data.get("duck_music") is True or data.get("duck_music") == "true")
     if valid:
         result["boot_id"] = data["boot_id"][:128]
     if not all(result[key] for key in CAPABILITIES):
@@ -127,21 +128,26 @@ class AnnouncementBroker:
 
     async def stop(self, target: Any, rid: str) -> dict:
         request_id(rid)
-        caps = await self.get_capabilities(target)
-        if not all(caps[key] for key in CAPABILITIES):
-            return failed(rid, "guarded_endpoint_unavailable")
         try:
-            return receipt(await self.send(target, "stop", {"request_id": rid}), rid, boot_id=caps["boot_id"])
+            # Cancellation is not new admission. A damaged local ledger or a
+            # failed capabilities probe must not prevent stopping an owned ID.
+            # The bound native action still validates exact request ownership.
+            return receipt(await self.send(target, "stop", {"request_id": rid}), rid)
         except Exception:
             return failed(rid, "native_stop_unconfirmed")
 
-    async def submit(self, target: Any, *, identity: str, rid: str, source: str, expires_at: int) -> dict:
+    async def submit(self, target: Any, *, identity: str, rid: str, source: str, expires_at: int, policy: str = "skip") -> dict:
         request_id(rid)
         media_id(source)
         if type(expires_at) is not int:
             raise ValueError("expires_at must be integer Unix UTC seconds")
+        if policy not in ("skip", "duck_music"):
+            raise ValueError("Unsupported announcement busy_policy")
         key = identity + ":" + rid
-        digest = hashlib.sha256(json.dumps([source, expires_at], separators=(",", ":")).encode()).hexdigest()
+        # Retain the exact b1 skip fingerprint across upgrades. Only the new
+        # policy adds a discriminator, so old retries remain status-only.
+        fingerprint = [source, expires_at] if policy == "skip" else [source, expires_at, policy]
+        digest = hashlib.sha256(json.dumps(fingerprint, separators=(",", ":")).encode()).hexdigest()
         async with self.lock:
             old = self.records.get(key)
             if old and old["fingerprint"] != digest:
@@ -154,6 +160,8 @@ class AnnouncementBroker:
         caps = await self.get_capabilities(target)
         if not all(caps[key] for key in CAPABILITIES):
             return failed(rid, "guarded_endpoint_unavailable", status="skipped")
+        if policy == "duck_music" and not caps["duck_music"]:
+            return failed(rid, "duck_music_unavailable", status="skipped")
         try:
             url = media_id(await self.resolve(source))
         except Exception:
@@ -181,7 +189,7 @@ class AnnouncementBroker:
         if old:
             return await self.get_status(target, rid)
         try:
-            result = await self.send(target, "submit", {
+            result = await self.send(target, "submit_duck" if policy == "duck_music" else "submit", {
                 "request_id": rid, "media_id": url, "expires_at": str(expires_at),
             })
             return receipt(result, rid, boot_id=caps["boot_id"])

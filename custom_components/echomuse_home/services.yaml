@@ -11,7 +11,7 @@ announcement_capabilities:
 
 announcement_submit:
   name: Submit guarded announcement
-  description: Submit an already rendered audio file only through a verified native idle guard. Does not start a conversation.
+  description: Submit rendered audio through a verified native guard. Optionally duck music when the device explicitly supports it. Does not start a conversation.
   fields:
     entity_id:
       required: true
@@ -44,11 +44,12 @@ announcement_submit:
         boolean:
     busy_policy:
       default: skip
-      description: Only skip is supported. A busy device is never forcibly interrupted.
+      description: Skip requires an idle device. Duck music requires explicit native support and uses the device's configured attenuation; calls and Assist are not interrupted.
       selector:
         select:
           options:
             - skip
+            - duck_music
 
 announcement_status:
   name: Guarded announcement status

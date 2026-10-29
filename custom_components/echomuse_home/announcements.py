@@ -60,7 +60,7 @@ SUBMIT = vol.Schema({
     vol.Required("media_id"): cv.string,
     vol.Required("expires_at"): _integer,
     vol.Optional("preannounce", default=False): _false,
-    vol.Optional("busy_policy", default="skip"): vol.In(["skip"]),
+    vol.Optional("busy_policy", default="skip"): vol.In(["skip", "duck_music"]),
 })
 
 
@@ -151,6 +151,11 @@ class NativeTransport:
         data = json.loads(response.response_data)
         if not isinstance(data, dict) or data.get("request_id") != rid:
             raise HomeAssistantError("The native receipt is not correlated")
+        if operation == "capabilities":
+            duck = [item for item in endpoint.runtime.services.values() if item.name == NATIVE_PREFIX + "submit_duck"]
+            if len(duck) != 1 or getattr(duck[0], "supports_response", 0) not in (1, 2):
+                # A flag alone cannot make an absent/nonresponsive action usable.
+                data["duck_music"] = False
         return data
 
 
@@ -197,7 +202,7 @@ async def async_setup_announcements(hass):
                 if operation == "stop":
                     return await broker.stop(target, data["request_id"])
                 return await broker.submit(target, identity=target.device_id, rid=data["request_id"],
-                                           source=data["media_id"], expires_at=data["expires_at"])
+                                           source=data["media_id"], expires_at=data["expires_at"], policy=data["busy_policy"])
         except TimeoutError:
             return capabilities(None) if operation == "capabilities" else failed(data["request_id"], "service_deadline")
         except EndpointUnavailable:

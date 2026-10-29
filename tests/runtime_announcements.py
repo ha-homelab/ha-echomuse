@@ -133,6 +133,28 @@ class RuntimeAnnouncementsTest(unittest.IsolatedAsyncioTestCase):
             await self.transport.send(endpoint, "submit", {"request_id": RID})
         self.runtime.client.execute_service.assert_not_called()
 
+    async def test_duck_capability_requires_responding_dedicated_action(self):
+        endpoint = await self.bind()
+        self.runtime.services[1] = SimpleNamespace(name="guarded_announcement_capabilities", supports_response=2)
+        async def reply(service, values, **kwargs):
+            return SimpleNamespace(success=True, response_data=json.dumps({"request_id": values["request_id"],
+                "protocol": a.PROTOCOL, "boot_id": "boot-1", "duck_music": True}))
+        self.runtime.client.execute_service.side_effect = reply
+        self.assertFalse((await self.transport.send(endpoint, "capabilities", {}))["duck_music"])
+        self.runtime.services[2] = SimpleNamespace(name="guarded_announcement_submit_duck", supports_response=0)
+        self.assertFalse((await self.transport.send(endpoint, "capabilities", {}))["duck_music"])
+        self.runtime.services[2].supports_response = 1
+        self.assertTrue((await self.transport.send(endpoint, "capabilities", {}))["duck_music"])
+        self.runtime.services[3] = SimpleNamespace(name="guarded_announcement_submit_duck", supports_response=1)
+        self.assertFalse((await self.transport.send(endpoint, "capabilities", {}))["duck_music"])
+
+    async def test_missing_duck_action_does_not_use_legacy_submit(self):
+        endpoint = await self.bind()
+        self.runtime.services[1] = SimpleNamespace(name="guarded_announcement_submit", supports_response=2)
+        with self.assertRaises(HomeAssistantError):
+            await self.transport.send(endpoint, "submit_duck", {"request_id": RID, "media_id": "http://ha.example/a.wav", "expires_at": "1000"})
+        self.runtime.client.execute_service.assert_not_called()
+
     async def test_event_only_service_is_not_playback_evidence(self):
         endpoint = await self.bind()
         self.runtime.services[1] = SimpleNamespace(name="guarded_announcement_status", supports_response=0)
@@ -153,8 +175,10 @@ class RuntimeAnnouncementsTest(unittest.IsolatedAsyncioTestCase):
     def test_schema_requires_one_target_and_no_audio_overrides(self):
         good = {"entity_id": ENTITY, "request_id": RID, "media_id": "/local/rendered.wav", "expires_at": 1234}
         self.assertIs(a.SUBMIT(good)["preannounce"], False)
+        self.assertEqual(a.SUBMIT(good)["busy_policy"], "skip")
+        self.assertEqual(a.SUBMIT({**good, "busy_policy": "duck_music"})["busy_policy"], "duck_music")
         for override in ({"preannounce": True}, {"preannounce": 0}, {"busy_policy": "interrupt"},
-                         {"expires_at": True}, {"entity_id": [ENTITY]}, {"start_conversation": True}):
+                         {"expires_at": True}, {"entity_id": [ENTITY]}, {"start_conversation": True}, {"duck_db": -18}):
             with self.subTest(override=override), self.assertRaises(vol.Invalid): a.SUBMIT({**good, **override})
 
     async def setup_services(self, saved=None):
@@ -171,6 +195,15 @@ class RuntimeAnnouncementsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(set(self.registered), {"announcement_" + name for name in ("submit", "status", "stop", "capabilities")})
         for _, options in self.registered.values():
             self.assertIs(options["supports_response"], SupportsResponse.ONLY)
+
+    async def test_submit_service_forwards_explicit_duck_policy(self):
+        broker, _ = await self.setup_services()
+        broker.submit = AsyncMock(return_value={"request_id": RID, "status": "accepted"})
+        data = a.SUBMIT({"entity_id": ENTITY, "request_id": RID, "media_id": "/api/tts_proxy/a.wav", "expires_at": 1000, "busy_policy": "duck_music"})
+        call = SimpleNamespace(service="announcement_submit", data=data, context=self.call.context)
+        with patch.object(a.er, "async_get", return_value=self.registry):
+            self.assertEqual((await self.registered[call.service][0](call))["status"], "accepted")
+        self.assertEqual(broker.submit.call_args.kwargs["policy"], "duck_music")
 
     async def test_unavailable_device_returns_truthful_receipt(self):
         await self.setup_services()

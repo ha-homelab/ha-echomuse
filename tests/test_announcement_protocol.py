@@ -1,6 +1,8 @@
 """Offline protocol tests: no network, HA instance, microphone or playback."""
 import asyncio
+import hashlib
 import importlib.util
+import json
 from pathlib import Path
 import unittest
 
@@ -26,6 +28,12 @@ class ProtocolTest(unittest.TestCase):
                 self.assertFalse(all(p.capabilities(invalid)[k] for k in p.CAPABILITIES))
         self.assertTrue(all(p.capabilities(caps())[k] for k in p.CAPABILITIES))
         self.assertTrue(all(p.capabilities(caps(**dict.fromkeys(p.CAPABILITIES, "true")))[k] for k in p.CAPABILITIES))
+
+    def test_duck_capability_is_explicit_and_requires_base_contract(self):
+        for data in (caps(), caps(duck_music=False), caps(duck_music=1), caps(duck_music="yes"), caps(duck_music=True, owned_cancel=False)):
+            self.assertIs(p.capabilities(data)["duck_music"], False)
+        for value in (True, "true"):
+            self.assertIs(p.capabilities(caps(duck_music=value))["duck_music"], True)
 
     def test_receipts_require_protocol_request_and_boot(self):
         for changes in ({"request_id": "other"}, {"protocol": "other"}, {"boot_id": ""}, {"boot_id": "boot-2"}, {"status": "ok"}):
@@ -59,7 +67,7 @@ class BrokerTest(unittest.IsolatedAsyncioTestCase):
         async def send(target, operation, args):
             self.calls.append((target, operation, args))
             if operation == "capabilities": return self.capabilities
-            if operation == "submit" and self.raise_submit: raise TimeoutError()
+            if operation in {"submit", "submit_duck"} and self.raise_submit: raise TimeoutError()
             if operation == "status": return result("playing")
             if operation == "stop": return result("stopped")
             return self.reply
@@ -78,7 +86,7 @@ class BrokerTest(unittest.IsolatedAsyncioTestCase):
                                         **{"source": "/local/rendered.wav", "expires_at": 1100, **changes})
 
     def submitted(self):
-        return [row for row in self.calls if row[1] == "submit"]
+        return [row for row in self.calls if row[1] in {"submit", "submit_duck"}]
 
     async def test_only_native_receipt_can_complete(self):
         response = await self.submit()
@@ -116,6 +124,48 @@ class BrokerTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.submitted(), [])
         self.assertEqual(self.saved, [])
 
+    async def test_unsupported_duck_never_falls_back_to_skip(self):
+        self.assertEqual((await self.submit(policy="duck_music"))["reason"], "duck_music_unavailable")
+        self.assertEqual(self.submitted(), [])
+        self.assertEqual(self.saved, [])
+
+    async def test_duck_dispatches_only_dedicated_action(self):
+        self.capabilities = caps(duck_music=True)
+        self.assertEqual((await self.submit(policy="duck_music"))["status"], "accepted")
+        self.assertEqual([row[1] for row in self.submitted()], ["submit_duck"])
+        self.assertEqual(set(self.submitted()[0][2]), {"request_id", "media_id", "expires_at"})
+
+    async def test_skip_to_duck_same_id_is_conflict(self):
+        await self.submit()
+        self.capabilities = caps(duck_music=True)
+        self.assertEqual((await self.submit(policy="duck_music"))["reason"], "request_id_conflict")
+        self.assertEqual([row[1] for row in self.submitted()], ["submit"])
+
+    async def test_duck_to_skip_same_id_is_conflict(self):
+        self.capabilities = caps(duck_music=True)
+        await self.submit(policy="duck_music")
+        self.assertEqual((await self.submit())["reason"], "request_id_conflict")
+        self.assertEqual([row[1] for row in self.submitted()], ["submit_duck"])
+
+    async def test_legacy_skip_fingerprint_is_preserved(self):
+        old = hashlib.sha256(json.dumps(["/local/rendered.wav", 1100], separators=(",", ":")).encode()).hexdigest()
+        self.broker = p.AnnouncementBroker(self.send, self.resolve, self.save, now=lambda: self.clock,
+            records={"device-1:" + RID: {"fingerprint": old, "expires_at": 1100}})
+        self.assertEqual((await self.submit())["status"], "playing")
+        self.assertEqual(self.submitted(), [])
+
+    async def test_uncertain_duck_retry_only_queries_status(self):
+        self.capabilities = caps(duck_music=True)
+        self.raise_submit = True
+        self.assertEqual((await self.submit(policy="duck_music"))["status"], "unknown")
+        self.assertEqual((await self.submit(policy="duck_music"))["status"], "playing")
+        self.assertEqual(len(self.submitted()), 1)
+
+    async def test_invalid_policy_is_rejected_before_native_io(self):
+        for policy in ("interrupt", "duck", None, True):
+            with self.assertRaises(ValueError): await self.submit(policy=policy)
+        self.assertEqual(self.calls, [])
+
     async def test_deadline_and_boolean_validation(self):
         for expiration in (999, 1000, 1181):
             self.assertEqual((await self.submit(expires_at=expiration))["status"], "skipped")
@@ -146,6 +196,26 @@ class BrokerTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await self.broker.stop("target", RID))["status"], "stopped")
         self.assertEqual(self.submitted(), [])
         self.assertEqual(self.calls[-1][2], {"request_id": RID})
+
+    async def test_status_and_stop_survive_unavailable_admission_ledger(self):
+        self.broker.ready = lambda: False
+        self.assertFalse((await self.broker.get_capabilities("target"))["dedup"])
+        self.assertEqual((await self.broker.get_status("target", RID))["status"], "playing")
+        self.assertEqual((await self.broker.stop("target", RID))["status"], "stopped")
+        self.assertEqual([row[1] for row in self.calls], ["status", "stop"])
+
+    async def test_owned_stop_does_not_depend_on_capability_probe(self):
+        async def send(target, operation, data):
+            if operation == "capabilities": raise TimeoutError()
+            self.assertEqual(operation, "stop")
+            return result("stopped")
+        self.broker.send = send
+        self.assertEqual((await self.broker.stop("target", RID))["status"], "stopped")
+
+    async def test_owned_stop_rejects_another_request_receipt(self):
+        async def send(target, operation, data): return result("stopped", request_id="other")
+        self.broker.send = send
+        self.assertEqual((await self.broker.stop("target", RID))["status"], "unknown")
 
     async def test_malformed_ledger_is_not_silently_discarded(self):
         with self.assertRaises(ValueError):

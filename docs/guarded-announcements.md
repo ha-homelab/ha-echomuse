@@ -5,12 +5,14 @@ accept **already rendered audio**. They do not synthesize speech, open a SIP
 call, start Assist, or request microphone audio. Ordinary calls continue to use
 the one SIP extension assigned to each physical device.
 
-This is the `0.4.0b1` integration-source beta. Offline protocol and HA
+This is the `0.4.0b2` integration-source beta. Offline protocol and HA
 adapter checks do not establish acoustic quality or installation on a device.
 Use the capability query to distinguish an installed guarded endpoint from
 stock firmware. No fallback to an unguarded announcement is enabled.
+Version b2 adds explicit, capability-gated music ducking; the default remains
+the original idle-only `skip` policy.
 
-## Deployment check — October 29, 2026
+## Previous b1 deployment check — October 29, 2026
 
 The four services are active after one coordinated Home Assistant restart.
 Both TECHO5 Dots, running the experimental `v1.0.40-myshka.1.alpha.1` daemon,
@@ -81,6 +83,7 @@ that audio finished.
   "owned_cancel": true,
   "honest_completion": true,
   "deadline_enforced": true,
+  "duck_music": true,
   "boot_id": "device-boot-identifier"
 }
 ```
@@ -89,6 +92,12 @@ The five booleans are forwarded only from a matching native protocol response
 with a nonempty boot identifier. Missing support, malformed replies and
 unavailable transport result in false capabilities. A caller must require all
 five to be true before submission.
+
+`duck_music` is an optional extension to the same protocol. It is false unless
+the device explicitly advertises support, the base five guarantees are true,
+and its dedicated `guarded_announcement_submit_duck` action supports JSON
+responses. Missing, duplicate or nonresponsive native action definitions do
+not qualify. Old b1 endpoints can continue to serve the default `skip` policy.
 
 `announcement_submit` accepts:
 
@@ -107,11 +116,38 @@ The example deadline must be replaced with a fresh integer Unix timestamp in
 UTC. It must be in the future and at most 180 seconds away. Request IDs contain
 32 lowercase hexadecimal characters and a three-digit endpoint suffix. Generate
 a new random ID for each new message; preserve the same ID for retries.
-`preannounce` can only be false and `busy_policy` can only be `skip`.
+`preannounce` can only be false. `busy_policy` is either `skip` (the default)
+or `duck_music`. The latter requires `duck_music: true`; unsupported requests
+return `skipped` with `reason: duck_music_unavailable` without falling back to
+another action or interrupting an existing activity.
+
+### Music ducking
+
+Use `"busy_policy": "duck_music"` with the same submit fields to ask the device
+to continue eligible music at a reduced level while speaking. The dedicated
+native action uses its owned music-duck lease; completion or cancellation
+releases only that lease. Music is not replaced with the announcement file.
+This policy does not grant permission to interrupt SIP calls, Assist, alarms
+or other incompatible foreground activity, and does not bypass Do Not Disturb.
+
+The attenuation comes from the device's existing **Music ducking** setting
+(`media_duck_level` in its native HA entities; configuration `media.duck_db`).
+The exposed range is **−40 to −3 dB**, in 1 dB steps, with default **−15 dB**.
+More negative values make the music quieter. There is no per-request gain or
+volume override in this service. The dedicated duck action keeps the stream
+running even when the ordinary conversation setting is configured to pause
+music; ordinary conversation behavior is unchanged.
+
+Software tests cover protocol gating and ownership, not perceived loudness or
+every music source. Acoustic quality, audible restoration and coexistence with
+real music require a separately authorized listening check.
 
 `announcement_status` and `announcement_stop` accept exactly `entity_id` and
 `request_id`. They never synthesize or submit audio. Stop addresses the matching
 native announcement only; it does not call a generic media stop or hang up SIP.
+Status and owned cancellation remain available when a capabilities probe or
+the local dispatch ledger is unavailable. They do not authorize new playback;
+the native stop action must still match the exact request ID.
 
 Responses contain the same `request_id`, `status`, and an optional machine-readable
 `reason`. A validated device receipt also includes `boot_id`. Status is one of:
@@ -127,8 +163,9 @@ Responses contain the same `request_id`, `status`, and an optional machine-reada
 
 ## Ownership and completion
 
-The device performs the atomic idle check against calls, Assist, media and
-Do Not Disturb. HA state snapshots alone cannot provide that guarantee. A
+The device performs the atomic activity check against calls, Assist, media and
+Do Not Disturb. `skip` requires idle media; `duck_music` permits eligible music
+only through the dedicated native path. HA state snapshots alone cannot provide that guarantee. A
 new legitimate interaction can preempt the owned announcement according to the
 native contract. The HA adapter does not cancel an existing Assist pipeline.
 
@@ -142,8 +179,12 @@ resolution operations have two-second bounds. Device playback continues
 asynchronously. If a response is lost, query status using the same request ID.
 The device's expiry remains authoritative even if the caller disconnects.
 
-Before dispatch, HA durably stores a fingerprint of the original `media_id` and
-deadline, keyed by device and request ID. It stores no message text, audio URL,
+Before dispatch, HA durably stores a fingerprint of the original `media_id`,
+deadline and policy, keyed by device and request ID. The original b1 fingerprint
+format is retained exactly for `skip`; `duck_music` adds its own policy
+discriminator. Retrying an old skip request after upgrading remains a status
+query. Reusing an ID with a different policy is a conflict in either direction.
+The ledger stores no message text, audio URL,
 authentication signature or recording. Repeated submissions query native status
 instead of resending, including after an HA restart. A changed payload under the
 same ID is rejected. This also avoids replay when resolving a media source
@@ -162,6 +203,7 @@ The native actions are:
 
 - `guarded_announcement_capabilities(request_id: string)`
 - `guarded_announcement_submit(request_id: string, media_id: string, expires_at: string)`
+- `guarded_announcement_submit_duck(request_id: string, media_id: string, expires_at: string)` — optional b2 duck path
 - `guarded_announcement_status(request_id: string)`
 - `guarded_announcement_stop(request_id: string)`
 
