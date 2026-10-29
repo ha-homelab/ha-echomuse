@@ -10,6 +10,24 @@ adapter checks do not establish acoustic quality or installation on a device.
 Use the capability query to distinguish an installed guarded endpoint from
 stock firmware. No fallback to an unguarded announcement is enabled.
 
+## Deployment check — October 29, 2026
+
+The four services are active after one coordinated Home Assistant restart.
+Both TECHO5 Dots, running the experimental `v1.0.40-myshka.1.alpha.1` daemon,
+returned the expected protocol, a boot identifier and all five capabilities
+through this adapter. Three additional capability probes per Dot succeeded.
+Their voice/media entities were idle and their existing SIP accounts ready.
+No announcement, call, recording or test playback was started by these checks.
+Acoustic acceptance remains pending.
+
+The live installation used a hash-checked, targeted overlay on the existing
+`0.2.0` component: service registration, announcement modules, service metadata
+and version were updated while existing household intent/policy behavior was
+preserved. The published `0.4.0b1` source package also contains the repository's
+other changes; this deployment does not claim to have activated those changes.
+The [Dot validation record](https://github.com/ha-homelab/ha-techo5-dot/blob/codex/guarded-announcements-20261029/docs/guarded-announcement-validation.md)
+records the binary, source pins and maintenance boundaries.
+
 ## Requirements
 
 - Home Assistant 2026.10 with `echomuse_home` configured as described in
