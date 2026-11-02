@@ -19,7 +19,7 @@ from homeassistant.helpers import config_validation as cv, entity_registry as er
 from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.storage import Store
 
-from .announcement_protocol import AnnouncementBroker, PROTOCOL, capabilities, failed, request_id, media_id as validate_media_id
+from .announcement_protocol import AnnouncementBroker, capabilities, failed, request_id, media_id as validate_media_id
 from .policy import DOMAIN
 
 NATIVE_PREFIX = "guarded_announcement_"
@@ -107,6 +107,8 @@ class NativeTransport:
                 # Match the same selection used by async_process_play_media_url.
                 configured.append(get_url(self.hass))
             except NoURLAvailableError:
+                # A selected URL is optional: only explicitly configured origins
+                # remain trusted, and an empty set rejects the resolved URL.
                 pass
             origins = set()
             for url in configured:
