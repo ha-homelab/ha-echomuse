@@ -15,6 +15,7 @@ from homeassistant.exceptions import HomeAssistantError
 import probatio as vol
 
 from custom_components.echomuse_home import announcements as a
+from custom_components.echomuse_home.announcement_protocol import PROTOCOL
 
 RID = "announce-" + "b" * 32 + "-223"
 ENTITY = "assist_satellite.test"
@@ -114,7 +115,7 @@ class RuntimeAnnouncementsTest(unittest.IsolatedAsyncioTestCase):
         service = SimpleNamespace(name="guarded_announcement_status", supports_response=2)
         self.runtime.services[1] = service
         self.runtime.client.execute_service.return_value = SimpleNamespace(success=True, response_data=json.dumps(
-            {"request_id": RID, "status": "completed", "protocol": a.PROTOCOL, "boot_id": "boot-1"}))
+            {"request_id": RID, "status": "completed", "protocol": PROTOCOL, "boot_id": "boot-1"}))
         result = await self.transport.send(endpoint, "status", {"request_id": RID})
         self.assertEqual(result["status"], "completed")
         self.runtime.client.execute_service.assert_awaited_once_with(service, {"request_id": RID}, return_response=True)
@@ -138,7 +139,7 @@ class RuntimeAnnouncementsTest(unittest.IsolatedAsyncioTestCase):
         self.runtime.services[1] = SimpleNamespace(name="guarded_announcement_capabilities", supports_response=2)
         async def reply(service, values, **kwargs):
             return SimpleNamespace(success=True, response_data=json.dumps({"request_id": values["request_id"],
-                "protocol": a.PROTOCOL, "boot_id": "boot-1", "duck_music": True}))
+                "protocol": PROTOCOL, "boot_id": "boot-1", "duck_music": True}))
         self.runtime.client.execute_service.side_effect = reply
         self.assertFalse((await self.transport.send(endpoint, "capabilities", {}))["duck_music"])
         self.runtime.services[2] = SimpleNamespace(name="guarded_announcement_submit_duck", supports_response=0)
