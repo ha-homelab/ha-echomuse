@@ -52,7 +52,7 @@ spec:
             - {name: HOME, value: /tmp}
             - {name: LLAMA_ARG_CACHE_RAM, value: "256"}
           resources:
-            requests: {cpu: "2", memory: 4Gi}
+            requests: {cpu: "500m", memory: 4Gi}
             limits: {cpu: "8", memory: 12Gi}
           securityContext:
             runAsUser: 1000
