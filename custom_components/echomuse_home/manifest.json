@@ -1,7 +1,7 @@
 {
   "domain": "echomuse_home",
   "name": "EchoMuse Home Tools",
-  "version": "0.3.0",
+  "version": "0.4.0b2",
   "documentation": "https://github.com/ha-homelab/ha-echomuse/blob/main/docs/home-control.md",
   "dependencies": ["conversation", "intent", "recorder"],
   "codeowners": [],
