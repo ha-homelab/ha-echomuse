@@ -131,6 +131,28 @@ responses use their own templates and do not pass through the model prompt.
 These instructions describe the rollout; they are not proof that a live voice
 or pipeline has been changed.
 
+## Speech is recognized but the assistant never answers
+
+If an Assist trace reaches `stt-end` and then reports `intent-failed`, inspect
+the conversation error before changing microphone, wake-word, or TTS settings.
+On Home Assistant 2026.11, an error saying `HomeAPI` has no `requires_admin`
+attribute means the installed EchoMuse Home Tools skipped initialization of its
+base LLM API. Update the component and restart Home Assistant. The corrected
+constructor initializes HA's defaults; it retains the local Ollama restriction,
+per-user entity permissions, and configured control allowlist.
+
+For a customized installation, preserve its private configuration and prompt.
+The required code change is to call `super().__init__(hass=hass, id=DOMAIN,
+name="EchoMuse local home control and statistics")` instead of manually assigning
+those three fields in `HomeAPI.__init__`. Keep `controls` and `aliases`
+initialization afterward. Merely setting an attribute on a running instance
+will not survive a restart.
+
+Verify through HA's registered API acquisition, not only a direct call to
+`HomeAPI.async_get_api_instance`: the latter bypasses the authorization step
+that exposed this defect. Then test a read-only spoken question and verify the
+trace reaches intent completion, TTS, playback completion, and cleanup.
+
 ## General questions and names in speech
 
 The local model also answers general questions, but household tool performance

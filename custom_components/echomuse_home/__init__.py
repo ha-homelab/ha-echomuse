@@ -52,9 +52,8 @@ async def async_setup(hass, config):
 
 class HomeAPI(llm.API):
     def __init__(self, hass, settings):
-        self.hass = hass
-        self.id = DOMAIN
-        self.name = "EchoMuse local home control and statistics"
+        super().__init__(hass=hass, id=DOMAIN,
+                         name="EchoMuse local home control and statistics")
         self.controls = set(settings["control_entities"])
         self.aliases = settings["aliases"]
 
