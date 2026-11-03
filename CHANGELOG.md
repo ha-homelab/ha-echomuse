@@ -24,9 +24,18 @@
 - Use module-qualified unittest mocking imports to resolve quality diagnostics.
 - Provide a concrete private vulnerability-reporting fallback and response policy.
 
-## Current integration source: 0.3.0
+## EchoMuse Home Tools 0.4.0b3
 
-The integration manifest identifies the EchoMuse Home Tools source as 0.3.0.
+- Initialize Home Assistant's base LLM API defaults so recognized speech can
+  reach the conversation handler on Home Assistant 2026.11. Preserve older
+  supported HA versions, local-provider restrictions and per-user entity permissions.
+- Exercise the registered API acquisition path in runtime tests, including a
+  removed user's denied access. This beta is the full integration source, not
+  an export of a customized installation or a device-firmware release.
+
+## Historical integration source: 0.3.0
+
+The earlier integration manifest identified EchoMuse Home Tools source as 0.3.0.
 This repository also contains version-pinned upstream download and offline emOS
 build helpers, deployment examples and operational documentation. A complete Git
 commit identifies each source snapshot across these files. These notes do not

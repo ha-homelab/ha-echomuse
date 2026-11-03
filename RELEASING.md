@@ -27,3 +27,27 @@ source revision compatible with the current configuration. Repository tests and
 compiler results do not replace target hardware/OS acceptance. A stable binary
 release requires recorded tests of the exact candidate on its intended targets;
 no physical deployment or flashing occurs in CI.
+
+## EchoMuse Home Tools beta package
+
+The component version in `custom_components/echomuse_home/manifest.json` is
+separate from repository source snapshots and upstream device firmware. Use a
+reviewed version PR and completed required CI before tagging
+`echomuse-home-v<version>` as a prerelease on its full source commit.
+
+Retain the established package contract: `echomuse_home-<version>.zip`,
+`release-manifest.json` and `SHA256SUMS.txt`. The ZIP contains only the committed
+`custom_components/echomuse_home/` files, the repository license, an `INSTALL.md`
+with version-specific installation and rollback instructions, and `SOURCE.json`
+with the exact repository, commit and version. The release manifest records each
+payload file's size/hash, the ZIP size/hash and the actual qualification scope.
+Generate these files from committed Git objects, never a running installation
+or an untracked working directory. Download the published assets and compare
+all bytes and source references before announcing completion.
+
+The package is the full public integration. A successful targeted patch of an
+older customized installation does not qualify that installation as the full
+package. Describe that difference, the tested HA versions and any remaining
+physical acceptance limits in the notes. Publication does not restart or update
+Home Assistant. Retain the previous package and configuration for operator-led
+rollback; never rewrite an existing release tag or asset.
