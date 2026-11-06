@@ -57,3 +57,30 @@ live household devices.
 ## Project participation
 
 Use public GitHub issues and pull requests for questions, proposals and reproducible non-sensitive bugs. English is the shared discussion language. Read [governance](GOVERNANCE.md), [Code of Conduct](CODE_OF_CONDUCT.md) and the [roadmap](ROADMAP.md). All major functionality changes require automated regression coverage, including relevant negative cases, and updated interface documentation. Resolve review findings and required CI failures before normal merge. Original contributions are accepted under the repository MIT license; preserve third-party licensing and attribution.
+
+## Security fixes for manually maintained locks
+
+For a direct or transitive advisory in the manually maintained environment,
+identify the affected package and the advisory's fixed version range. A plain
+lock regeneration may retain the existing transitive pin. Replace
+`AFFECTED_PACKAGE` below with the advisory's package name and request its update
+explicitly in the existing reviewed build environment:
+
+```sh
+uv pip compile --python .venv/bin/python --generate-hashes requirements-dev.in -o requirements-dev.txt --upgrade-package AFFECTED_PACKAGE
+```
+
+Review any direct or parent constraint that prevents selection of a fixed
+release; qualify that constraint change together with the lock. Preserve the
+documented interpreter, platform, hash and build-isolation requirements.
+Check the resulting affected-package versions against the advisory's affected
+and fixed ranges in every applicable Python/platform marker branch and every
+coupled lock or export. A successful resolver exit alone is not proof of a fix.
+If no compatible fixed resolution exists, keep the advisory open and document
+the blocker instead of marking it remediated.
+
+Use the documented isolated `.venv` interpreter. Keep `requirements-dev.in` and `requirements-dev.txt` together; the separately qualified local-family benchmark environment still requires its own review.
+
+Run the repository's complete existing dependency, runtime and CI qualification
+before merging the source constraints and generated files together. GitHub
+vulnerability alerts remain enabled for these manually maintained units.
