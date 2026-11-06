@@ -15,7 +15,14 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  scope:
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/change-scope.yml@04d1a895fac608e5c972e49b127a1a792d7ad725 # main
+    with:
+      force-full: false
+      documentation-paths: "[\"GOVERNANCE.md\", \"README.de.md\", \"README.es.md\", \"README.fr.md\", \"README.ru.md\", \"ROADMAP.md\"]"
   python:
+    if: ${{ needs.scope.outputs.run == 'true' }}
+    needs: ["scope"]
     uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@e71559f44e41f39ad0037bf13c7f43bbbb2ec9af # main
     with:
       python-version: '3.11'
@@ -41,6 +48,7 @@ jobs:
       run-dependency-review: true
 
   source:
+    needs: ["scope"]
     name: Public source validation
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -61,6 +69,7 @@ jobs:
           python scripts/check_public.py
           python scripts/check_docs.py
       - name: Check the pinned EchoMuse Bluetooth lifecycle patch
+        if: ${{ needs.scope.outputs.run == 'true' }}
         run: |
           upstream="$RUNNER_TEMP/echomuse-source"
           overlay="$RUNNER_TEMP/echomuse-ble-overlay"
@@ -79,6 +88,7 @@ jobs:
             ghcr.io/wilbowes/echomuse-controller:2.26.0@sha256:3e28ccba1102b0ef1c10d3821c937730afc1fb78e5f6f3811f3860079fc0008b \
             scripts/check_ble_auth_runtime.py --source /upstream --overlay /overlay
       - name: Validate intents in an isolated Home Assistant runtime
+        if: ${{ needs.scope.outputs.run == 'true' }}
         run: >-
           docker run --rm --network none
           --entrypoint python3
@@ -87,6 +97,8 @@ jobs:
           -m unittest discover -s tests -p 'runtime_*.py'
 
   training:
+    if: ${{ needs.scope.outputs.run == 'true' }}
+    needs: ["scope"]
     name: Synthetic training and ONNX export
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -108,7 +120,7 @@ jobs:
 
   gate:
     name: CI gate
-    needs: [python, security, source, training]
+    needs: ["python", "scope", "security", "source", "training"]
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -116,18 +128,28 @@ jobs:
       - uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
-      - name: Require all validation jobs
+      - name: Require the exact selected validation path
         env:
           RESULTS: ${{ toJSON(needs) }}
         shell: python3 {0}
         run: |
           import json, os
           results = json.loads(os.environ['RESULTS'])
-          expected = {'python', 'security', 'source', 'training'}
-          if set(results) != expected:
+          expected = ['python', 'scope', 'security', 'source', 'training']
+          always = ['scope', 'security', 'source']
+          if set(results) != set(expected):
               raise SystemExit('Validation job inventory differs')
-          failed = {name: value['result'] for name, value in results.items()
-                    if value['result'] != 'success'}
+          scope = results['scope']
+          outputs = scope.get('outputs', {})
+          run = outputs.get('run')
+          if scope['result'] != 'success' or run not in {'true', 'false'}:
+              raise SystemExit('Change scope did not succeed')
+          if run == 'false' and outputs.get('reason') != 'documentation-only':
+              raise SystemExit('Unproven documentation-only scope')
+          failed = {}
+          for name, value in results.items():
+              wanted = 'success' if run == 'true' or name in always else 'skipped'
+              if value['result'] != wanted:
+                  failed[name] = {'actual': value['result'], 'expected': wanted}
           if failed:
               raise SystemExit(f'Validation did not pass: {failed}')
-          print('All validation jobs passed.')
