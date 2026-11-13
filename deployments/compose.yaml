@@ -3,7 +3,7 @@ name: ha-echomuse
 services:
   controller:
     # Upstream GA controller 2.26.0. Firmware uses a separate version track.
-    image: ghcr.io/wilbowes/echomuse-controller:2.26.0@sha256:3e28ccba1102b0ef1c10d3821c937730afc1fb78e5f6f3811f3860079fc0008b
+    image: ghcr.io/wilbowes/echomuse-controller:2.27.0@sha256:f0cab64d198bfb9b2fae07b5686f30cb78bc6f5ff525d0d747c2ed21ae6227ac
     restart: unless-stopped
     network_mode: host
     env_file: .env
