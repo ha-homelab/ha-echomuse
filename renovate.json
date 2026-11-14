@@ -39,6 +39,32 @@
         "requirements-local-family.txt"
       ],
       "enabled": false
+    },
+    {
+      "description": "The synthetic training CI and supported host use Python 3.11; NumPy 2.5 requires Python 3.12. Migrate the host explicitly before crossing this boundary.",
+      "matchManagers": [
+        "pip_requirements"
+      ],
+      "matchFileNames": [
+        "training/requirements.txt"
+      ],
+      "matchPackageNames": [
+        "numpy"
+      ],
+      "allowedVersions": "<2.5"
+    },
+    {
+      "description": "Preserve Python 3.11 synthetic-training compatibility; SciPy 1.18 requires Python 3.12.",
+      "matchManagers": [
+        "pip_requirements"
+      ],
+      "matchFileNames": [
+        "training/requirements.txt"
+      ],
+      "matchPackageNames": [
+        "scipy"
+      ],
+      "allowedVersions": "<1.18"
     }
   ],
   "pip_requirements": {
