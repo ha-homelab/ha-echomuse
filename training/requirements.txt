@@ -1,5 +1,5 @@
-numpy==1.26.4
-scipy==1.18.1
+numpy==2.4.6
+scipy==1.17.1
 onnxruntime==1.32.0
 onnx==1.23.2
 torch==2.15.0
