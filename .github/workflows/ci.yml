@@ -16,14 +16,14 @@ concurrency:
 
 jobs:
   scope:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/change-scope.yml@4774181674f4a1a18488bfc918b4c5ed1df39163 # main
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/change-scope.yml@f6ef8c9c4e949a242a7999e3b3b1bc50e5ff3077 # main
     with:
       force-full: false
       documentation-paths: "[\"GOVERNANCE.md\", \"README.de.md\", \"README.es.md\", \"README.fr.md\", \"README.ru.md\", \"ROADMAP.md\"]"
   python:
     if: ${{ needs.scope.outputs.run == 'true' }}
     needs: ["scope"]
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@4774181674f4a1a18488bfc918b4c5ed1df39163 # main
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@f6ef8c9c4e949a242a7999e3b3b1bc50e5ff3077 # main
     with:
       python-version: '3.11'
       install-dependencies: true
@@ -36,7 +36,7 @@ jobs:
       coverage-artifact-name: echomuse-python-coverage
 
   security:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@4774181674f4a1a18488bfc918b4c5ed1df39163 # main
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@f6ef8c9c4e949a242a7999e3b3b1bc50e5ff3077 # main
     permissions:
       contents: read
       actions: read
