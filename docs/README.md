@@ -52,6 +52,10 @@ acceptance targets. Its color diagrams link back to the detailed runbooks below.
 - [Russian voice validation](russian-voice-validation.md): what was tested and what was not.
 - [Deployment record](deployment-record.md): dated migration evidence.
 - [Russian voice roadmap](russian-voice-roadmap.md): historical experiments and decisions.
+- [Security analysis records](security-analysis.md): how the CodeQL clear-text
+  logging alert was traced and resolved.
+- [Guarded, one-way announcements](guarded-announcements.md): request identity,
+  expiry and owned cancellation for the optional announcement services.
 
 ## Maintain this project
 
@@ -60,6 +64,12 @@ acceptance targets. Its color diagrams link back to the detailed runbooks below.
 - [Wiki publishing](wiki.md): render a reproducible snapshot from these sources.
 - [Diagram sources and measurements](assets/README.md).
 - [Language inventory](languages.json): machine-readable README coverage.
+- [Russian wake phrase «Привет, Мышка»](russian-wake-word.md): training,
+  deployment and acceptance limits for the wake model.
+- [Strict artifact-download transport](strict-tls.md): the optional `--strict-tls`
+  profile for upstream fetches.
+- [Quality and security evidence](quality.md): unit, isolated-runtime and
+  public-source checks.
 
 A recorded test result is evidence for that version and scenario. It is not a
 live status report or a guarantee for a different device, language or provider.

@@ -97,6 +97,8 @@ optional general-question cloud route; see [privacy boundaries](docs/home-contro
 
 ## Contributing and documentation
 
+Docs index: [docs/README.md](docs/README.md).
+
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for checks and translations,
 [SECURITY.md](SECURITY.md) for private reporting, and [shared CI](docs/ci.md) for
 review requirements. The [wiki source and publishing guide](docs/wiki.md)
